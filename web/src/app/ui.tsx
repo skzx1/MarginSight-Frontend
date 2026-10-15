@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-export type IconName = 'overview' | 'upload' | 'products' | 'orders' | 'simulation' | 'assistant' | 'receipt' | 'rules' | 'reconcile' | 'line' | 'arrow' | 'check' | 'shield' | 'refresh' | 'logout' | 'menu' | 'close';
+export type IconName = 'overview' | 'upload' | 'products' | 'orders' | 'simulation' | 'assistant' | 'receipt' | 'rules' | 'reconcile' | 'line' | 'arrow' | 'check' | 'shield' | 'refresh' | 'logout' | 'menu' | 'close' | 'settings' | 'search' | 'calculator' | 'plus' | 'sparkles' | 'chevronRight';
 const paths: Record<IconName, ReactNode> = {
   overview: <><rect x="3" y="3" width="7" height="7" rx="2" /><rect x="14" y="3" width="7" height="7" rx="2" /><rect x="3" y="14" width="7" height="7" rx="2" /><rect x="14" y="14" width="7" height="7" rx="2" /></>,
   upload: <path d="M12 16V3m-5 5 5-5 5 5M4 16v4a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-4" />,
@@ -17,7 +17,13 @@ const paths: Record<IconName, ReactNode> = {
   refresh: <path d="M20 8a8 8 0 1 0 0 8M20 3v5h-5" />,
   logout: <path d="M9 4H4v16h5m0-8h12m-4-4 4 4-4 4" />,
   menu: <path d="M4 6h16M4 12h16M4 18h16" />,
-  close: <path d="m6 6 12 12M6 18 18 6" />
+  close: <path d="m6 6 12 12M6 18 18 6" />,
+  settings: <><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" /><circle cx="12" cy="12" r="3" /></>,
+  search: <><circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" /></>,
+  calculator: <><rect x="4" y="2" width="16" height="20" rx="2" /><line x1="8" y1="6" x2="16" y2="6" /><line x1="16" y1="14" x2="16" y2="18" /><path d="M8 10h.01M12 10h.01M16 10h.01M8 14h.01M12 14h.01M8 18h.01M12 18h.01" /></>,
+  plus: <path d="M12 5v14m-7-7h14" />,
+  sparkles: <path d="m12 3 1.9 4.8a2 2 0 0 0 1.3 1.3L20 11l-4.8 1.9a2 2 0 0 0-1.3 1.3L12 19l-1.9-4.8a2 2 0 0 0-1.3-1.3L4 11l4.8-1.9a2 2 0 0 0 1.3-1.3L12 3Z" />,
+  chevronRight: <path d="m9 18 6-6-6-6" />
 };
 export function Icon({
   name

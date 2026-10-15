@@ -1,0 +1,11 @@
+import {spawnSync} from 'node:child_process';
+import {readdirSync} from 'node:fs';
+import {resolve} from 'node:path';
+const run=(args,cwd=process.cwd())=>{const r=spawnSync(process.execPath,args,{cwd,stdio:'inherit'});if(r.status!==0)process.exit(r.status??1)};
+run(['scripts/verify-preview.mjs']);
+run(['node_modules/typescript/bin/tsc','--noEmit','-p','web']);
+run(['scripts/check-policy.mjs']);
+run(['--test',...readdirSync('tests').filter(n=>n.endsWith('.test.mjs')).map(n=>'tests/'+n)]);
+run([resolve('node_modules/next/dist/bin/next'),'build'],resolve('web'));
+run(['scripts/package-deploy.mjs']);
+console.log('PASS standalone frontend verification; no backend source required');

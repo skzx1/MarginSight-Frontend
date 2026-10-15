@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "formulaVersion": "margin-v1.1.0",
+  "sourceRepository": "https://github.com/skzx1/MarginSight-Backend",
+  "sourceHashes": {
+    "backend/src/browser-preview.ts": "ac5d3a84d1d0ff927b084d2bed3ef1502190a305a471e6962cbf2c42e5998f27",
+    "backend/src/domain/calculate.ts": "84548b29df431b7042a9e923fb0251539d41d16a83032bc9660cec00f1ab19e5",
+    "backend/src/domain/date.ts": "682092300624f89fd27918b883f6ff0788a3f1ae6ae5190b845aee73eeea96dd",
+    "backend/src/domain/demo-fixture.ts": "6dd4ea6795624a7f839372be762bf94f4c6a0a108689ce8637e6d2151cbc54f7",
+    "backend/src/domain/model.ts": "b134bcf58003a5ac3221b433ba4064325f270b0eac3c37f269806ada1bbb3ec3",
+    "backend/src/domain/money.ts": "4c545c5966c5e96c7bc0c91f88d19bc678dfef1abbcce8b5fe75279bcbaf119a",
+    "backend/src/domain/program.ts": "9c230461e0917122d29d77e743a5b9ede789acf837be5725550896b94b75bd07"
+  },
+  "files": {
+    "domain-types/calculate.d.ts": "b371105c91cdcb9c3efcec1c7af884c4045df5e96df6f437f771041dcb07ebba",
+    "domain-types/demo-fixture.d.ts": "8f1808ebc1cb4ef71b2b003dce3f2e4c81ffda030593d2b50f916868037b51ea",
+    "domain-types/model.d.ts": "c119fbdd6f5ec476b6485c91fa5edc194b52ce8b6a69d3b44517cf262b112f9c",
+    "domain.generated.d.ts": "8d92c959c67cc741d33bb74bce707191cd5a60be013b6df355592587d0f50837",
+    "domain.generated.js": "ad7c826de654443a44a418e7b8bb7555a1075054a49a3b42311ef6b09804a38c"
+  }
+}

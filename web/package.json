@@ -1,0 +1,24 @@
+{
+  "name": "@marginsight/web",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev -p 4050",
+    "build": "next build",
+    "typecheck": "tsc --noEmit",
+    "prebuild": "node ../scripts/verify-preview.mjs",
+    "predev": "node ../scripts/verify-preview.mjs"
+  },
+  "dependencies": {
+    "next": "16.4.0",
+    "react": "19.3.0",
+    "react-dom": "19.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.19.2",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "typescript": "7.0.2"
+  },
+  "type": "module"
+}

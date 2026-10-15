@@ -1,0 +1,2 @@
+﻿platform,order_id,transaction_id,revenue_delta_thb,cogs_delta_thb,reason,effective_at
+mock-market,O-IMPORT-001,REFUND-001,-50.00,-25.00,MOCK partial refund,2026-10-15

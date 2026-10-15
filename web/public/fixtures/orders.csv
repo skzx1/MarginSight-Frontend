@@ -1,0 +1,2 @@
+﻿platform,order_id,line_id,sku,quantity,order_at,revenue_thb,buyer_payment_thb,packaging_thb,ads_thb
+mock-market,O-IMPORT-001,1,SKU-DEMO-02,1,2026-10-14,100.00,100.00,5.00,0.00

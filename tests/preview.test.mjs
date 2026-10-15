@@ -1,0 +1,10 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {calculate,simulate,breakEven,demoFixture} from '../web/src/lib/domain.generated.js';
+import {verifyContract} from '../scripts/preview-contract.mjs';
+import {fileURLToPath} from 'node:url';
+test('checked-in contract is complete, pinned and independent',async()=>{assert.equal((await verifyContract(fileURLToPath(new URL('../web/src/lib',import.meta.url)))).formulaVersion,'margin-v1.1.0')});
+test('independently checked MOCK baseline: profit 9 THB, margin 4.5%, TTR 28%',()=>{const r=calculate(demoFixture());assert.equal(r.profitSatang,900);assert.equal(r.marginPct,4.5);assert.equal(r.ttr.percent,28);assert.equal(r.dataOrigin,'MOCK')});
+test('15% discount loses 14.10 THB and no-program baseline earns 15 THB',()=>{assert.equal(simulate(demoFixture(),17000).profitSatang,-1410);const f=demoFixture();f.enrollments=[];assert.equal(calculate(f).profitSatang,1500)});
+test('missing cost remains unknown',()=>{const f=demoFixture();f.costs=[];const r=calculate(f);assert.equal(r.profitSatang,null);assert.equal(r.marginPct,null);assert.equal(r.status,'INCOMPLETE')});
+test('break-even price is checked through the engine',()=>{const r=breakEven(demoFixture());assert.equal(r.priceSatang,18831);assert.equal(r.calculation.profitSatang,0);assert.equal(simulate(demoFixture(),18830).profitSatang,-1)});

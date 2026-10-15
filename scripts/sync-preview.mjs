@@ -1,0 +1,10 @@
+import {cp,mkdir,readFile,writeFile,readdir,unlink} from 'node:fs/promises';
+import {resolve} from 'node:path';
+import {verifyContract} from './preview-contract.mjs';
+const index=process.argv.indexOf('--from');if(index<0||!process.argv[index+1])throw new Error('Usage: npm run sync:preview -- --from <backend>/contracts/browser-preview');
+const source=resolve(process.argv[index+1]);const manifest=await verifyContract(source);
+const destination=resolve(import.meta.dirname,'../web/src/lib');await mkdir(destination+'/domain-types',{recursive:true});
+for(const name of await readdir(destination+'/domain-types'))if(!manifest.files['domain-types/'+name])await unlink(destination+'/domain-types/'+name);
+for(const name of Object.keys(manifest.files))await cp(source+'/'+name,destination+'/'+name);
+await writeFile(destination+'/manifest.json',await readFile(source+'/manifest.json'));
+await verifyContract(destination);console.log('Synced canonical preview; review/commit generated files and run npm run verify');

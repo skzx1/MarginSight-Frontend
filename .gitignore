@@ -1,0 +1,50 @@
+node_modules/
+.next/
+web/out/
+backend/dist/
+.aws-sam/
+.local/
+.env
+.env.local
+**/.env.local
+samconfig.toml
+docs/deployment-outputs.json
+tmp/
+*.log
+
+# Secrets and local credentials (only the empty example belongs in Git)
+.env.*
+!.env.example
+.aws/
+.ssh/
+.npmrc
+.netrc
+.pypirc
+*.pem
+*.key
+*.p12
+*.pfx
+id_rsa*
+id_ed25519*
+
+# Local releases, merchant data, screenshots and original attachments
+/artifacts/
+/output/
+/reference/
+/docs/evidence/
+
+# Generated caches and editor/OS state
+*.tsbuildinfo
+__pycache__/
+*.pyc
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Independent repositories created during the frontend/backend split
+/repositories/
+
+/deploy-outputs.json
+/scripts/operator-runtime.mjs
+/contracts/.staging/

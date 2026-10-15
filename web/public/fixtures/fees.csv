@@ -1,0 +1,3 @@
+﻿platform,order_id,fee_id,fee_type,scope,amount_thb,effective_at
+mock-market,O-IMPORT-001,F-001,COMMISSION,PER_ORDER,12.00,2026-10-14
+mock-market,O-IMPORT-001,F-002,TRANSACTION,PER_ORDER,8.00,2026-10-14

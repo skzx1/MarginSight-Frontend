@@ -1727,6 +1727,7 @@ footer,.auth-bottom {
 }
 
 /* Store Navigation Groups */
+/* Store Navigation Groups */
 .nav-group-title {
   display: flex;
   align-items: center;
@@ -1744,6 +1745,154 @@ footer,.auth-bottom {
   background: var(--border);
   margin: 16px 10px;
 }
+
+/* Secondary Navigation (Two-Level Hierarchy Sub-tabs) */
+.subnav-container {
+  display: flex;
+  align-items: center;
+  margin: 0 0 22px 0;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 14px;
+}
+
+.subnav-pills {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 4px 2px;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  width: 100%;
+}
+
+.subnav-pills::-webkit-scrollbar {
+  display: none;
+}
+
+.subnav-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 18px;
+  border-radius: 24px;
+  border: 1px solid var(--border);
+  background: white;
+  color: var(--muted);
+  font-weight: 500;
+  font-size: 13px;
+  cursor: pointer;
+  white-space: nowrap;
+  min-height: 42px;
+  transition: all 0.15s ease;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+}
+
+.subnav-pill:hover {
+  background: var(--green-soft);
+  color: var(--green-dark);
+  border-color: var(--green);
+}
+
+.subnav-pill.active {
+  background: var(--green);
+  color: white;
+  border-color: var(--green);
+  font-weight: 600;
+  box-shadow: 0 3px 8px rgba(8, 123, 104, 0.25);
+}
+
+.subnav-pill.active .icon {
+  stroke: white;
+}
+
+.subnav-pill .icon {
+  width: 17px;
+  height: 17px;
+}
+
+/* Friendly Guide Card */
+.guide-card {
+  background: #f4faf7;
+  border: 1px solid #d0e7dc;
+  border-radius: 14px;
+  padding: 16px 20px;
+  margin-bottom: 22px;
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.guide-card-icon {
+  color: var(--green);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.guide-card-content h3 {
+  margin: 0 0 4px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--green-dark);
+}
+
+.guide-card-content p {
+  margin: 0;
+  font-size: 13px;
+  color: #435c50;
+  line-height: 1.55;
+}
+
+/* LINE Connect Card */
+.line-connect-box {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 26px;
+  margin: 20px 0;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+}
+
+.line-steps-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  margin: 20px 0;
+}
+
+.line-step-item {
+  background: #fbfdfc;
+  border: 1px solid #eef5f1;
+  border-radius: 14px;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.line-step-badge {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--green-soft);
+  color: var(--green-dark);
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.line-step-item strong {
+  font-size: 14px;
+  color: var(--ink);
+}
+
+.line-step-item p {
+  margin: 0;
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
 
 /* Product Toolbar & Search */
 .product-toolbar {

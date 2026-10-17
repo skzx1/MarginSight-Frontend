@@ -59,3 +59,10 @@ Self-service15ตุลาคม: deployโค้ดLambda/เว็บบนบ
 ## Frontend feature merge / release — 17 October 2026
 
 17 October 2026 before static publish: verified account109991964227 / ap-southeast-1 / stackmarginsight UPDATE_COMPLETE. BudgetHackathon-Team10 limit350USD; ActualSpend0.02USD, LastUpdatedTime2026-10-17T02:23:35.531000+00:00 (billing delayed). Trial target25USD unchanged. Plan is only static files on the existing private web bucket and a scoped CloudFront invalidation; no new stack/role/service, model call or training.
+
+
+## AWS frontend release verified — 17 October 2026
+
+17 October 2026 actual release: one static publish and7-path CloudFront invalidation on existing resources; existing Cognito client appearance applied/read back. No new stack, IAM role, database, reserved capacity or training; Backend not redeployed. CloudShell build/downloads and S3/CloudFront operations may incur standard usage; no dollar spend estimate presented as actual. Billing before release still ActualSpend0.02USD at02:23:35.531Z (lagged), limit350USD total/trialtarget25USD.
+
+Browser used one fresh MOCK demo session, one simulation, two catalog writes (product/cost), data reads/reload/menu checks. No assistant/OCR inference or LINE messages in this slice. Demo records retain normal expiry policies. Existing retained resources still count toward the team budget. Rollback HTML/config was backed up under /tmp/marginsight-fe-20261017-x4guow2_/.local/pre-release in that CloudShell session (ephemeral); durable source rollback is prior main532bceb plus its verified build/publish and Cognito CSS. Do not delete store data to roll back UI.

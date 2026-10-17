@@ -127,7 +127,7 @@ Publish ใช้ private bucket เดิม; ไม่เปิด S3 public, 
 distribution=$(aws cloudformation describe-stacks --stack-name marginsight \
   --region ap-southeast-1 --query "Stacks[0].Outputs[?OutputKey=='DistributionId'].OutputValue | [0]" --output text)
 aws cloudfront create-invalidation --distribution-id "$distribution" \
-  --paths '/' '/index.html' '/config.json' '/404.html'
+  --paths '/' '/index.html' '/login/' '/login/index.html' '/config.json' '/404.html' '/release.json'
 ```
 
 ไฟล์ assets มี cache 300 วินาที; HTML/config ใช้ no-store อย่า invalidate ทั้งเว็บซ้ำโดยไม่มีเหตุผล การปรับธีม Cognito เป็นงานแยก: `python3 scripts/cloud-brand-auth.py` ใช้เฉพาะเมื่อแก้ branding และมีสิทธิ์ที่ตรง.
@@ -188,3 +188,10 @@ Frontend publish ไป bucket จาก outputs ของ stack เดิม �
 ```
 
 กรณีจะใช้บัญชีใหม่ ให้เปลี่ยนย่อหน้าเป้าหมายเป็นข้อมูลที่เจ้าของบัญชีแจ้ง และให้ AI ทำข้อ 6 ก่อน ห้ามส่งต่อ session authorization ของบัญชีเดิมเป็นสิทธิ์บัญชีใหม่.
+
+
+## Frontend routing / release marker — 17 October 2026
+
+หน้าแรกเป็น landing; workspace อยู่ /login/. Cognito callback ยังเป็น origin root ตาม config เดิม AuthCallback ส่ง code/error ไป /login/ แล้วแลก code ด้วย redirect_uri เดิม ห้ามเปลี่ยน callback ทั้งสองฝั่งอย่างไม่สอดคล้อง. Invalidation ต้องรวม /login/ และ /login/index.html ตามข้อ5.
+
+cloud-publish.sh เขียน public release.json จาก verified source commit และ formula version ไม่ใส่ credentials. Clone/build จาก commit ที่ต้องการก่อน publish; ถ้าใช้ artifact ที่ไม่มี Git ให้กำหนด MARGINSIGHT_SOURCE_COMMIT เป็น commit40ตัวที่ตรงกับ artifact และต้องมี manifest ของ preview. การมี release.json ไม่แทนหลักฐาน browser/tenant tests. ราคาขาย/จำนวนในหน้าเพิ่มสินค้าเป็น draft ไม่เก็บใน catalog; การแก้ profile/notifications ยังไม่มี save API จึงแสดง disabled ไม่อ้างว่าบันทึก/ส่งข้อความได้.

@@ -93,3 +93,8 @@ Frontend source redesign เสร็จ:4เมนูหลัก mobile-first,
 ## Frontend feature merge / release — 17 October 2026
 
 VERIFIED_LOCAL: merged yoshi/new-ui-design and prepared production static build. Seventeen tests pass. New landing and /login/ preserve the existing origin-root Cognito callback via a client redirect. API/catalog/assistant writes use confirmed responses; unsupported settings are visibly disabled. AWS release remains pending until publish/read-back/browser verification is recorded.
+
+
+## AWS frontend release verified — 17 October 2026
+
+VERIFIED_AWS (17 October 2026): yoshi/new-ui-design merged through d11f935; releasecb11f7f is live at https://d2y04qc334m0rd.cloudfront.net/ (workspace /login/). Seventeen tests passed locally/CloudShell/GitHub Actions. Static asset read-back/invalidation/Cognito appearance/HTTP denials passed. AWS browser confirmed MOCK9THB baseline,15%=-14.10THB, confirmed product+154.50cost after reload and all12screens opening. Screens use API-confirmed data; offline save/assistant fabrication and dummy catalog enrichment removed. Price/quantity form inputs are unsaved pre-expense drafts only; settings profile/notifications are visibly disabled until a real save API exists. Backend/resources/auth policies unchanged. FULL_SCOPE is not claimed; LINE/native platform/real OCR/two-user workflow blockers remain. See verification for exact evidence and scope.

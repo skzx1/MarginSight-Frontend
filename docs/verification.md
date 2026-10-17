@@ -179,3 +179,16 @@ ControlledAPIresponsevariantsเฉพาะbrowser: missingcost3ได้7/10, 
 ## Frontend feature merge / release — 17 October 2026
 
 VERIFIED_LOCAL 17 October 2026: merged origin/yoshi/new-ui-design (dbb39ac) into main. npm run verify passes17tests/TypeScript/pinned preview integrity/browser policy/static export/package. Added four regression cases for no fabricated catalog metadata, exact pre-expense draft, failed product creation and partial cost-save retry. Removed browser-made assistant responses, dummy catalog enrichment and API-to-fixture overview replacement. Product cost is confirmed by API; unsaved price/quantity are labelled and excluded from stored product. Unsupported settings controls are disabled and visibly unconnected. API errors remain errors. AWS publish/browser verification is pending below; earlier feature-branch browser evidence is historical.
+
+
+## AWS frontend release verified — 17 October 2026
+
+VERIFIED_AWS release cb11f7f480a08615d7ca0d2b731a3146b975f4ad (17 October 2026): clone the exact public source in Singapore CloudShell, run Node24/npm ci/npm run verify:17tests/typecheck/hash/policy/static export/package passed. GitHub Actions also passed for this same commit: https://github.com/skzx1/MarginSight-Frontend/actions/runs/39027823137 .
+
+Published web/out to the existing private web bucket; SHA-256 read-back matched index.html, login/index.html, config.json and release.json. Public /release.json identifies cb11f7f, publishedAt2026-10-17T11:15:03.509813+00:00. CloudFront invalidation IAP12V4X2C0OYATK4JJLBSM5P8 Completed (7paths). Cognito appearance CSS applied/read back (CSSVersion20261017111745), logo present, authPoliciesChanged=false.
+
+AWS read-back11:20:14Z: health200/protectedNoToken401/privateWebBucket403/web200/login200. Cognito root callback, authorization-code flow and marginsight/api scope preserved; stackUPDATE_COMPLETE. No Backend/IaC update or new resources.
+
+AGENT-OBSERVED AWS_BROWSER: new bilingual landing -> /login/ -> create one isolated MOCK demo session. Overview uses the actual API fixture (profit9THB/margin4.5/revenue200), does not substitute display-only marketplace orders. Simulation15% returns-14.10THB and break-even188.31. Added RELEASE-CHECK-20261017 product plus154.50THB confirmed cost; after reload product and cost remain, unsaved price/quantity/profit stay unknown. Opened all12screens, including assistant/OCR/rules/LINE, without claiming every mutation was tested. Overview390px/1440px and simulation390px have no horizontal overflow. Settings draft fields are explicitly disabled/unconnected. Screenshot: [AWS MOCK UI](design/frontend-aws-2026-10-17.jpg). Local evidence .local/aws-ui-release-20261017/ is excluded from Git.
+
+No AI/model/OCR call, live LINE, real merchant data, fresh Cognito login/signup roundtrip or native marketplace integration test in this release. Opening a screen is not proof of its external integration. Local browser attempt could not reach localhost, so no new local-browser pass is claimed; browser evidence above is the actual AWS site. Overall PARTIAL_WITH_EXTERNAL_BLOCKERS remains. Source/docs/publish-marker maintenance after cb11f7f does not change the recorded deployed UI commit.

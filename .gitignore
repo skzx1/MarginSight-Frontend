@@ -48,3 +48,4 @@ Thumbs.db
 /deploy-outputs.json
 /scripts/operator-runtime.mjs
 /contracts/.staging/
+.impeccable

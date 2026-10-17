@@ -3,8 +3,11 @@ import { useEffect, useRef, useState } from 'react';
 import { request } from '../../lib/auth';
 import type { AssistantAnswer, CatalogProduct, ChatMessage, FeatureProps } from '../../lib/types';
 import { useLanguage } from '../language';
-import { ProductSelect } from '../components/forms';
-import { EvidencePanel } from '../components/ledger';
+import { ProductSelect, ErrorNotice } from '../components/forms';
+import { EvidencePanel, Money } from '../components/ledger';
+import { useResource } from '../../lib/use-resource';
+import { MarketplaceControls } from '../components/marketplace-controls';
+import {initialMarketplaceDraft,marketplaceRequest,type MarketplaceOptions} from '../../lib/marketplace-context';
 import { Icon } from '../ui';
 
 export default function Assistant({
@@ -25,13 +28,18 @@ export default function Assistant({
   const [text, setText] = useState('');
   const [history, setHistory] = useState<Record<string, ChatMessage[]>>({});
   const [pending, setPending] = useState<Record<string, boolean>>({});
+  const [marketplace, setMarketplace] = useState({...initialMarketplaceDraft});
+  const [contextError, setContextError] = useState<unknown>();
+  const options=useResource<MarketplaceOptions>(base+'/assistant-options');
+  const contextKey=JSON.stringify([month,sku,marketplace]);
+  const usingPlatform=marketplace.platform!=='recorded';
 
   const locks = useRef(new Set<string>());
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const messages = history[month] ?? [];
-  const isPending = !!pending[month];
+  const messages = history[contextKey] ?? [];
+  const isPending = !!pending[contextKey];
 
   // Auto-scroll on new message or when pending status changes
   useEffect(() => {
@@ -49,10 +57,12 @@ export default function Assistant({
 
   const send = async (explicitText?: string) => {
     const questionText = (explicitText !== undefined ? explicitText : text).trim();
-    if (!questionText || locks.current.has(month)) return;
-
-    const activeSku = sku || products[0]?.sku || 'GENERAL';
-    const context = month;
+    if (!questionText || !sku || locks.current.has(contextKey)) return;
+    let scenario:ReturnType<typeof marketplaceRequest>;
+    try { scenario=marketplaceRequest(marketplace,options.data); setContextError(undefined); }
+    catch(error){setContextError(error);return;}
+    const activeSku = sku;
+    const context = contextKey;
     const id = crypto.randomUUID();
 
     locks.current.add(context);
@@ -67,10 +77,11 @@ export default function Assistant({
     }
 
     try {
-      const answer = await request<AssistantAnswer>(base + '/assistant', {
+      const answer = await request<AssistantAnswer>(base + (scenario?'/assistant-scenarios':'/assistant'), {
           message: questionText,
           sku: activeSku,
-          month: context
+          month,
+          ...(scenario?{scenario}:{})
         });
 
       setHistory(old => ({
@@ -96,7 +107,7 @@ export default function Assistant({
     }
   };
 
-  const promptChips = [
+  const promptChips = usingPlatform ? [t('askProfit'),t('askDiscount'),locale==='th'?'ราคาคุ้มทุนของสินค้านี้เท่าไร?':'What is the break-even price?',locale==='th'?'เทียบไม่เข้าแคมเปญกับเข้าแคมเปญ':'Compare without and with the selected campaigns'] : [
     t('promptProfitWeek'),
     t('promptTopProduct'),
     t('promptDiscountCheck'),
@@ -119,6 +130,10 @@ export default function Assistant({
             </span>
           </div>
           <p className="caption chat-context-caption">{t('chatNote')}</p>
+          <MarketplaceControls draft={marketplace} change={value=>{setMarketplace(value);setContextError(undefined);}} options={options.data} loading={options.loading} error={options.error} reload={()=>void options.reload()}/>
+          <ErrorNotice error={contextError}/>
+          {usingPlatform&&<div className="marketplace-calculate"><button type="button" disabled={!sku||!marketplace.confirmed||isPending||!options.data} onClick={()=>void send(locale==='th'?'คำนวณกำไรตามแพลตฟอร์มและแคมเปญที่เลือก':'Calculate profit for the selected platform and campaigns')}>{locale==='th'?'คำนวณตามตัวเลือก':'Calculate selected scenario'}</button><small>{locale==='th'?'คำนวณด้วยสูตรโดยตรง ไม่เรียกโมเดล AI; ผลสำหรับสินค้าที่เลือกเท่านั้น':'Uses the deterministic engine without model inference; selected SKU only.'}</small></div>}
+          <p className="caption">{locale==='th'?'เปลี่ยนสินค้า เดือน หรือเงื่อนไข จะแสดงประวัติของชุดตัวเลือกนั้นแยกกัน':'History is separated by product, month and selected assumptions.'}</p>
         </header>
 
         {/* Message Thread */}
@@ -140,6 +155,7 @@ export default function Assistant({
                       key={idx}
                       type="button"
                       className="suggested-prompt-chip"
+                      disabled={!sku||isPending||(usingPlatform&&!marketplace.confirmed)}
                       onClick={() => void send(prompt)}
                     >
                       <Icon name="sparkles" />
@@ -174,7 +190,7 @@ export default function Assistant({
                       <div className="bubble-header-assistant">
                         <strong>MarginSight Assistant</strong>
                         <span className="badge mock">
-                          {t(msg.answer?.provider === 'deterministic-fallback' ? 'fallback' : 'aiAnswer')}
+                          {msg.answer?.provider==='deterministic-engine'?(locale==='th'?'คำนวณจากสูตร':'Calculation engine'):t(msg.answer?.provider === 'deterministic-fallback' ? 'fallback' : 'aiAnswer')}
                         </span>
                       </div>
 
@@ -198,6 +214,8 @@ export default function Assistant({
                             })}
                           </div>
 
+                          {msg.answer.scenarioContext&&<><p className="notice">{locale==='th'?'ผลลองคำนวณ ไม่ใช่ออเดอร์ที่เกิดขึ้นจริงหรือการสมัครแคมเปญ':'Hypothetical calculation, not an actual platform order or enrollment'} · {msg.answer.scenarioContext.platform} · {msg.answer.scenarioContext.sourceOrderId}</p>{!!msg.answer.result?.feeLines.length&&<details className="scenario-fee-lines"><summary>{locale==='th'?'ค่าธรรมเนียมแยกตามรายการที่คำนวณได้':'Calculated fee components'}</summary><p className="caption">{locale==='th'?'หากข้อมูลขาด รายการนี้ยังไม่ใช่ค่าธรรมเนียมทั้งหมด':'When inputs are incomplete, these are only the known components.'}</p><dl className="ledger-lines">{msg.answer.result.feeLines.map(f=><div key={f.id}><dt className="wrap">{f.type} · {f.id.replace('scenario-','').split('@')[0]}</dt><dd><Money value={f.amountSatang}/></dd></div>)}</dl></details>}</>}
+
                           {msg.answer.result?.profitSatang !== undefined && (
                             <details className="assistant-evidence-accordion">
                               <summary>{t('result')} / {t('evidence')}</summary>
@@ -208,7 +226,7 @@ export default function Assistant({
                       ) : msg.error ? (
                         <div className="notice error-notice">
                           <strong>{t('errorTitle')}</strong>
-                          <p>{t('errorGeneric')}</p>
+                          <ErrorNotice error={msg.error}/>
                         </div>
                       ) : null}
                     </div>
@@ -258,12 +276,12 @@ export default function Assistant({
               onKeyDown={handleKeyDown}
               placeholder={t('message') + '...'}
               rows={2}
-              maxLength={2000}
+              maxLength={1500}
               className="chat-textarea"
             />
             <button
               type="submit"
-              disabled={!text.trim() || isPending}
+              disabled={!text.trim() || !sku || isPending || (usingPlatform&&!marketplace.confirmed)}
               className="chat-send-button"
               aria-label={t('send')}
             >

@@ -102,3 +102,5 @@ VERIFIED_AWS (17 October 2026): yoshi/new-ui-design merged through d11f935; rele
 ## Site-wide earth theme — 17 October 2026
 
 VERIFIED_LOCAL / VERIFIED_AWS for this UI slice: source2074a52435728f6408aa13cc862d6e300cc4483e is live. Anuphan + Inter self-hosted, selected earth palette throughout landing and12workspace screens, dark desktop navigation/KPI, daily sales/profit chart and channel donut. Cognito classic colors/logo applied; external hosted auth retains service-controlled fonts/background outside the form. Dashboard aggregates API engine outputs only; one day is shown as points, incomplete profit is unknown/gapped and no loaded orders produce no points/donut. Nineteen tests and static export/package passed locally and CloudShell. Read-back, CDN completion and AWS browser checks recorded in verification. Overall remains PARTIAL_WITH_EXTERNAL_BLOCKERS (existing LINE/native platform/real OCR/two-user full workflow evidence unchanged).
+
+17Oct2026 catalog UI VERIFIED_AWS release5c76979: duplicated plus/page headings/back link removed; verified click/back and layout at390/1440px. See verification; overall PARTIAL_WITH_EXTERNAL_BLOCKERS unchanged.

@@ -6,7 +6,6 @@ import { useLanguage } from '../language';
 import { ProductSelect } from '../components/forms';
 import { EvidencePanel } from '../components/ledger';
 import { Icon } from '../ui';
-import { enrichProducts, generateChatbotReply } from '../../lib/mock-data';
 
 export default function Assistant({
   base,
@@ -20,7 +19,7 @@ export default function Assistant({
   draftRequest: number;
 }) {
   const { t, locale } = useLanguage();
-  const products = enrichProducts(rawProducts);
+  const products = rawProducts;
 
   const [sku, setSku] = useState(initialSku || products[0]?.sku || '');
   const [text, setText] = useState('');
@@ -68,21 +67,11 @@ export default function Assistant({
     }
 
     try {
-      let answer: AssistantAnswer;
-      try {
-        answer = await request<AssistantAnswer>(base + '/assistant', {
+      const answer = await request<AssistantAnswer>(base + '/assistant', {
           message: questionText,
           sku: activeSku,
           month: context
         });
-      } catch {
-        // Fallback to intelligent mock response if no backend is connected
-        await new Promise(r => setTimeout(r, 600));
-        answer = {
-          answer: generateChatbotReply(questionText, products, locale),
-          provider: 'deterministic-fallback'
-        };
-      }
 
       setHistory(old => ({
         ...old,

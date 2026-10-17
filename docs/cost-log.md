@@ -54,3 +54,8 @@ Self-service15ตุลาคม: deployโค้ดLambda/เว็บบนบ
 
 
 16 ตุลาคม 2026 Quiet Ledger: งานsource, npm install/buildและbrowserกับlocalAPI/MOCKเท่านั้น. ไม่เรียกAWS deploy/billing/model และไม่เพิ่มcloudresource; ไม่มีการอ่านยอดเครดิตใหม่ในรอบนี้. ภาพทดสอบเข้าmanualreviewเมื่อAIปิด ไม่ใช่Bedrockinference
+
+
+## Frontend feature merge / release — 17 October 2026
+
+17 October 2026 before static publish: verified account109991964227 / ap-southeast-1 / stackmarginsight UPDATE_COMPLETE. BudgetHackathon-Team10 limit350USD; ActualSpend0.02USD, LastUpdatedTime2026-10-17T02:23:35.531000+00:00 (billing delayed). Trial target25USD unchanged. Plan is only static files on the existing private web bucket and a scoped CloudFront invalidation; no new stack/role/service, model call or training.

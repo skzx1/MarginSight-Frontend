@@ -88,3 +88,8 @@ VERIFIED_LOCAL: standalone install/build/test completed for both repositories. B
 Frontend source redesign เสร็จ:4เมนูหลัก mobile-first, TH/EN, แชตเต็มหน้า, ledger/หลักฐาน, ฟอร์มทุกงาน, local fonts และ Cognito CSS source. npm run verify ผ่าน9tests/typecheck/policy/staticexport/packaging. Browser local MOCK ผ่าน11หน้าที่390/768/1440px และงานสินค้า/ต้นทุน/rule/enrollment/importซ้ำ/ข้อขัดแย้ง/manualreceipt/export ตาม docs/verification.md
 
 ยังไม่publishAWS; cloudUIและCognitoappearanceยังเป็นรุ่นก่อน. ไม่เปลี่ยนBackend/สูตรหรืออ้างliveintegrationใหม่. คงPARTIAL_WITH_EXTERNAL_BLOCKERS; ดู docs/ui-design.md สำหรับระบบภาพและข้อจำกัดAPI/การแปล
+
+
+## Frontend feature merge / release — 17 October 2026
+
+VERIFIED_LOCAL: merged yoshi/new-ui-design and prepared production static build. Seventeen tests pass. New landing and /login/ preserve the existing origin-root Cognito callback via a client redirect. API/catalog/assistant writes use confirmed responses; unsupported settings are visibly disabled. AWS release remains pending until publish/read-back/browser verification is recorded.

@@ -28,8 +28,6 @@ export function useOverviewDashboard(base: string, period: OverviewPeriod, today
       try {
         const anchor = await read(today.slice(0, 7));
         if (!active) return;
-        const synthetic = origin === 'MOCK' && anchor.dataOrigin === 'MOCK' && anchor.results.length === 1 && anchor.results[0].platform === 'mock-market';
-        if (synthetic) { setState({ key, data: anchor, loading: false }); return; }
         const selected = months ? months.split(',') : [];
         const results: Dashboard['results'] = [];
         // Bound concurrency and stop scheduling more work after the range changes.

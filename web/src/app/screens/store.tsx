@@ -10,22 +10,23 @@ import { Icon, type IconName } from '../ui';
 export default function StoreHub({
   navigate,
   canCreate,
-  create
+  create,
+  storeName
 }: {
   navigate: (screen: Screen) => void;
   canCreate: boolean;
   create: () => void;
+  storeName: string;
 }) {
   const { t } = useLanguage();
-  const [savedToast, setSavedToast] = useState(false);
 
   // Settings form states
-  const [shopName, setShopName] = useState('My Online Boutique');
+  const [shopName, setShopName] = useState(storeName);
   const [shopCategory, setShopCategory] = useState('retailGeneral');
-  const [contactEmail, setContactEmail] = useState('owner@boutique.co.th');
+  const [contactEmail, setContactEmail] = useState('');
   const [alertThreshold, setAlertThreshold] = useState('15');
-  const [dailyDigest, setDailyDigest] = useState(true);
-  const [weeklyDigest, setWeeklyDigest] = useState(true);
+  const [dailyDigest, setDailyDigest] = useState(false);
+  const [weeklyDigest, setWeeklyDigest] = useState(false);
 
   const dataRows: [Screen, IconName, string][] = [
     ['imports', 'upload', 'พร้อมนำเข้า CSV/XLSX'],
@@ -36,8 +37,7 @@ export default function StoreHub({
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
-    setSavedToast(true);
-    setTimeout(() => setSavedToast(false), 3000);
+
   };
 
   return (
@@ -47,11 +47,7 @@ export default function StoreHub({
         <p className="caption">{t('settingsSubtitle')}</p>
       </div>
 
-      {savedToast && (
-        <div className="notice success-notice" role="status">
-          <strong><Icon name="check" /> {t('settingsSaved')}</strong>
-        </div>
-      )}
+      <p className="notice">{t('settingsUnavailable')}</p>
 
       <form onSubmit={handleSave} className="settings-sections-layout">
         {/* Section 1: Shop Profile */}
@@ -69,7 +65,7 @@ export default function StoreHub({
               <label htmlFor="settings-store-name" className="field-label">
                 {t('storeName')}
               </label>
-              <input
+              <input disabled
                 id="settings-store-name"
                 type="text"
                 value={shopName}
@@ -82,7 +78,7 @@ export default function StoreHub({
               <label htmlFor="settings-category" className="field-label">
                 {t('shopCategory')}
               </label>
-              <select
+              <select disabled
                 id="settings-category"
                 value={shopCategory}
                 onChange={e => setShopCategory(e.target.value)}
@@ -96,11 +92,10 @@ export default function StoreHub({
               <label htmlFor="settings-currency" className="field-label">
                 {t('currency')}
               </label>
-              <input
+              <input disabled
                 id="settings-currency"
                 type="text"
                 value={t('thbCurrency')}
-                disabled
                 className="text-input disabled-input"
               />
             </div>
@@ -109,11 +104,10 @@ export default function StoreHub({
               <label htmlFor="settings-fiscal" className="field-label">
                 {t('fiscalPeriod')}
               </label>
-              <input
+              <input disabled
                 id="settings-fiscal"
                 type="text"
                 value={t('monthlyCycle')}
-                disabled
                 className="text-input disabled-input"
               />
             </div>
@@ -142,7 +136,7 @@ export default function StoreHub({
               <label htmlFor="settings-email" className="field-label">
                 {t('contactEmail')}
               </label>
-              <input
+              <input disabled
                 id="settings-email"
                 type="email"
                 value={contactEmail}
@@ -156,7 +150,7 @@ export default function StoreHub({
                 {t('marginAlertThreshold')}
               </label>
               <div className="input-with-affix">
-                <input
+                <input disabled
                   id="settings-alert-thresh"
                   type="number"
                   min="0"
@@ -171,7 +165,7 @@ export default function StoreHub({
 
             <div className="field-item checkbox-grid-item">
               <label className="settings-checkbox-label">
-                <input
+                <input disabled
                   type="checkbox"
                   checked={dailyDigest}
                   onChange={e => setDailyDigest(e.target.checked)}
@@ -180,7 +174,7 @@ export default function StoreHub({
               </label>
 
               <label className="settings-checkbox-label">
-                <input
+                <input disabled
                   type="checkbox"
                   checked={weeklyDigest}
                   onChange={e => setWeeklyDigest(e.target.checked)}
@@ -191,7 +185,7 @@ export default function StoreHub({
           </div>
 
           <div className="section-save-row">
-            <button type="submit" className="button-primary">
+            <button type="submit" disabled className="button-primary">
               <Icon name="check" />
               <span>{t('saveSettings')}</span>
             </button>
@@ -226,7 +220,7 @@ export default function StoreHub({
                   </div>
                 </div>
                 <div className="link-card-right">
-                  <span className="badge">{t('connected')}</span>
+                  <span className="badge">{t('details')}</span>
                   <Icon name="arrow" />
                 </div>
               </button>
@@ -260,7 +254,7 @@ export default function StoreHub({
                 </div>
               </div>
               <div className="link-card-right">
-                <span className="badge">{t('configured')}</span>
+                <span className="badge">{t('details')}</span>
                 <Icon name="arrow" />
               </div>
             </button>

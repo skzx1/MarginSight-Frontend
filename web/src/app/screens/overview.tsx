@@ -9,7 +9,7 @@ import { Empty, ErrorNotice, Field, Loading } from '../components/forms';
 import { Icon } from '../ui';
 import {
   channelSummaries, orderDateTime, ordersInPeriod, periodBounds, summarizeOrders,
-  OVERVIEW_CHANNELS, OVERVIEW_MOCK_ORDERS, OVERVIEW_MOCK_TODAY,
+  OVERVIEW_CHANNELS,
   type OverviewOrder, type OverviewPeriod
 } from '../../lib/overview-data';
 
@@ -17,16 +17,13 @@ export default function Overview({ base, origin, period, navigate, onMissingCost
   period: OverviewPeriod; navigate: (screen: Screen) => void; onMissingCosts: () => void;
 }) {
   const { t, locale } = useLanguage();
-  const today = origin === 'MOCK' ? OVERVIEW_MOCK_TODAY : bangkokDate();
+  const today = bangkokDate();
   const { data, error, loading, reload } = useOverviewDashboard(base, period, today, origin);
   const [selected, setSelected] = useState<OverviewOrder>();
   const [search, setSearch] = useState(''), [channel, setChannel] = useState('all'), [visibleCount, setVisibleCount] = useState(5);
   useEffect(() => { setSelected(undefined); setVisibleCount(5); }, [period.type, period.start, period.end]);
 
-  // Synthetic preview is restricted to a MOCK store with the original single
-  // mock-market fixture. Empty/REAL responses are never replaced with fake orders.
-  const useFixture = origin === 'MOCK' && data?.dataOrigin === 'MOCK' && data.results.length === 1 && data.results[0].platform === 'mock-market';
-  const allOrders: OverviewOrder[] = useFixture ? OVERVIEW_MOCK_ORDERS : (data?.results ?? []).map(result => ({
+  const allOrders: OverviewOrder[] = (data?.results ?? []).map(result => ({
     orderId: result.orderId, platform: result.platform, orderAt: result.orderAt,
     revenueSatang: result.revenueSatang, profitSatang: result.profitSatang,
     productCostSatang: result.cogsSatang, platformFeeSatang: result.missingFields?.some(field => field === 'base_fee_rules' || field.startsWith('rule:') || field.startsWith('cash_deduction')) ? null : result.feeSatang,
@@ -53,26 +50,15 @@ export default function Overview({ base, origin, period, navigate, onMissingCost
   ];
 
   if (selected) {
-    const calculation: Calculation | undefined = !useFixture ? data?.results.find(result => result.orderId === selected.orderId && result.platform === selected.platform) : undefined;
-    return <div className="overview-page evidence-view">
-      <button className="back-link ghost" onClick={() => setSelected(undefined)}>← {t('back')}</button>
-      <div className="section-heading"><h2>{selected.orderId}</h2><span className="badge">{selected.platform}</span></div>
-      {calculation ? <EvidencePanel result={calculation} /> : <section className="panel">
-        <DataStatus value="MOCK" /><h3>{selected.productName}</h3><time dateTime={selected.orderAt}>{orderDateTime(selected.orderAt)}</time>
-        <dl className="ledger-lines">{[
-          [t('salesCard'), selected.revenueSatang], [t('costs'), selected.productCostSatang],
-          [t('platformFees'), selected.platformFeeSatang], [t('overviewShipping'), selected.shippingSatang], [t('profitCard'), selected.profitSatang]
-        ].map(([label, value]) => <div key={String(label)}><dt>{label}</dt><dd><Money value={value as number | null} /></dd></div>)}</dl>
-        <p className="caption">{t('scope')}</p>
-      </section>}
-    </div>;
+    const calculation = data?.results.find(result => result.orderId === selected.orderId && result.platform === selected.platform);
+    return <div className="overview-page evidence-view"><button className="back-link ghost" onClick={() => setSelected(undefined)}>← {t('back')}</button><div className="section-heading"><h2>{selected.orderId}</h2><span className="badge">{selected.platform}</span></div>{calculation && <EvidencePanel result={calculation} />}</div>;
   }
 
   return <div className="overview-page" aria-busy={loading}>
     <ErrorNotice error={error} />{Boolean(error) && <button className="secondary" onClick={() => void reload()}>{t('retry')}</button>}
     {!bounds && <p className="notice" role="alert">{t('invalidRange')}</p>}
     {data && !loading && <>
-      <div className="row overview-status-bar"><DataStatus value={data.dataOrigin} /><span className="caption" data-testid="overview-coverage">{t('coverage')}: {stats.completeOrders}/{stats.totalOrders}</span>{useFixture && <span className="caption">{t('overviewMockDate')}</span>}</div>
+      <div className="row overview-status-bar"><DataStatus value={data.dataOrigin} /><span className="caption" data-testid="overview-coverage">{t('coverage')}: {stats.completeOrders}/{stats.totalOrders}</span></div>
       {stats.missingCostOrders > 0 && <button className="overview-cost-warning" onClick={onMissingCosts}><span>{t('missingCostPrefix')} {stats.missingCostOrders} {t('missingCostSuffix')}</span><Icon name="arrow" /></button>}
     </>}
 
@@ -86,7 +72,7 @@ export default function Overview({ base, origin, period, navigate, onMissingCost
         {loading ? <Loading /> : <><div className="summary-main-number" data-testid="overview-sales"><Money value={bounds ? stats.revenueSatang : null} /></div><dl className="overview-card-metric"><div><dt>{t('totalCostsFees')}</dt><dd><Money value={bounds ? stats.totalCostsSatang : null} /></dd></div></dl></>}
       </article>
     </section>}
-    <p className="caption overview-scope">{t('scope')}{useFixture ? '' : ' · ' + t('loadedOnly')}</p>
+    <p className="caption overview-scope">{t('scope')}{' · ' + t('loadedOnly')}</p>
 
     <section className="quick-actions-row" aria-label={t('quickActions')}>
       {[

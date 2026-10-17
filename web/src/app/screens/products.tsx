@@ -8,7 +8,7 @@ import { useLanguage } from '../language';
 import { Empty, ErrorNotice, Field, ProductSelect, Select, Submit } from '../components/forms';
 import { EvidencePanel, Money } from '../components/ledger';
 import { Icon } from '../ui';
-import { enrichProducts } from '../../lib/mock-data';
+import { recordedProducts } from '../../lib/catalog-actions';
 
 type SortOption =
   | 'dateDesc'
@@ -62,7 +62,7 @@ export default function Products({
   const action = useAction();
 
   // Ensure products have all required fields
-  const products = enrichProducts(rawProducts);
+  const products = recordedProducts(rawProducts);
   const product = products.find(p => p.sku === selectedSku);
 
   // Filter products
@@ -251,7 +251,7 @@ export default function Products({
             </div>
             <div>
               <dt>{t('stockQty')}</dt>
-              <dd>{product.quantity ?? 0} {product.unit}</dd>
+              <dd>{product.quantity ?? '—'} {product.unit}</dd>
             </div>
             <div>
               <dt>{t('unitProfit')}</dt>
@@ -539,7 +539,7 @@ export default function Products({
                       )}
                     </td>
                     <td className="col-qty">
-                      <span className="tabular-num">{p.quantity ?? 0}</span> {p.unit}
+                      <span className="tabular-num">{p.quantity ?? '—'}</span> {p.unit}
                     </td>
                     <td className="col-profit">
                       {p.profitSatang != null ? (
@@ -601,7 +601,7 @@ export default function Products({
                   </div>
                   <div className="card-metric">
                     <span className="metric-label">{t('stockQty')}</span>
-                    <span className="metric-val tabular-num">{p.quantity ?? 0}</span>
+                    <span className="metric-val tabular-num">{p.quantity ?? '—'}</span>
                   </div>
                   <div className="card-metric">
                     <span className="metric-label">{t('unitProfit')}</span>

@@ -174,3 +174,8 @@ Browser EdgeheadlessกับlocalguestMOCK: Overview390/768/1024/1440/1920pxร
 ControlledAPIresponsevariantsเฉพาะbrowser: missingcost3ได้7/10, profit/margin/totalcostunknown, amberwarningไปProductsmissingfilterได้1สินค้าที่โหลด; empty/loadingไม่มีfakecoverageหรือแอบแสดงmock. REALresponseถูกใช้ตามจริง; cross-monthSep+Octอ่านทั้ง2APIเดือน รวมcanonical9+9=18บาทและขาย200+200=400บาท. สิ่งนี้เป็นการทดสอบcontractผ่านmockresponse ไม่ใช่ผลรับรองร้านจริงบนAWS
 
 ตรวจEnglish/customrangeและชื่อร้านยาวทุก5ขนาด, Enter/TabเลือกsidebarstoreและEnterเลือกchannelพร้อมfocusringผ่าน. เปรียบเทียบ22ภาพหน้าอื่น(11หน้า×390/1440px)ก่อน/หลังด้วยPillow pixel-identicalทั้งหมด. หลักฐานเฉพาะเครื่อง .local/overview-ux/; ไม่มีtoken/merchantdataในGit. Safari/iPadphysicaldeviceยังต้องตรวจด้วยมือ; ไม่มีAWSdeploymentในรอบนี้
+
+
+## Frontend feature merge / release — 17 October 2026
+
+VERIFIED_LOCAL 17 October 2026: merged origin/yoshi/new-ui-design (dbb39ac) into main. npm run verify passes17tests/TypeScript/pinned preview integrity/browser policy/static export/package. Added four regression cases for no fabricated catalog metadata, exact pre-expense draft, failed product creation and partial cost-save retry. Removed browser-made assistant responses, dummy catalog enrichment and API-to-fixture overview replacement. Product cost is confirmed by API; unsaved price/quantity are labelled and excluded from stored product. Unsupported settings controls are disabled and visibly unconnected. API errors remain errors. AWS publish/browser verification is pending below; earlier feature-branch browser evidence is historical.

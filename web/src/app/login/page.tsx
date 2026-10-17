@@ -75,7 +75,7 @@ function StoreWorkspace({ stores, store, changeStore, create }: { stores: Store[
       {screen === 'receipts' && <Receipts {...props} products={products} refreshProducts={refresh} />}
       {screen === 'rules' && <Rules {...props} />}
       {screen === 'line' && <LineConnection {...props} />}
-      {screen === 'store' && <StoreHub navigate={navigate} canCreate={!guest && !stores.some(item => item.personal)} create={create} />}
+      {screen === 'store' && <StoreHub storeName={store.name ?? store.id} navigate={navigate} canCreate={!guest && !stores.some(item => item.personal)} create={create} />}
     </div>
     <div hidden={screen !== 'assistant'}><Assistant {...props} products={products} initialSku={selectedSku} draftRequest={draftRequest} /></div>
   </AppShell>;

@@ -63,6 +63,12 @@ Self-service15ตุลาคม: deployโค้ดLambda/เว็บบนบ
 
 ## AWS frontend release verified — 17 October 2026
 
+### Earth theme preparation — 17 October 2026 15:27 UTC
+
+Read STS account109991964227, Singapore stackmarginsight UPDATE_COMPLETE. BudgetHackathon-Team10 limit350USD; actual0.02USD, budgetLastUpdated2026-10-17T02:23:35.531Z (lagged); checkedAt2026-10-17T15:27:08.654760Z. Existing hosting only: static UI/fonts plus Cognito presentation and scoped invalidation. No new regional service, IAM, model inference/training or backend release in this slice. Trialtarget25USD/total350USD unchanged. Public font downloads and build run locally/CloudShell.
+
 17 October 2026 actual release: one static publish and7-path CloudFront invalidation on existing resources; existing Cognito client appearance applied/read back. No new stack, IAM role, database, reserved capacity or training; Backend not redeployed. CloudShell build/downloads and S3/CloudFront operations may incur standard usage; no dollar spend estimate presented as actual. Billing before release still ActualSpend0.02USD at02:23:35.531Z (lagged), limit350USD total/trialtarget25USD.
 
 Browser used one fresh MOCK demo session, one simulation, two catalog writes (product/cost), data reads/reload/menu checks. No assistant/OCR inference or LINE messages in this slice. Demo records retain normal expiry policies. Existing retained resources still count toward the team budget. Rollback HTML/config was backed up under /tmp/marginsight-fe-20261017-x4guow2_/.local/pre-release in that CloudShell session (ephemeral); durable source rollback is prior main532bceb plus its verified build/publish and Cognito CSS. Do not delete store data to roll back UI.
+
+Earth theme published17Oct2026: two static publishes/two7-path invalidations during visual QA, one existing Cognito presentation update; finalcommit2074a52. No new AWS resource/backend/IAM/model capacity/training. One fresh MOCK demo session and screen/data reads; no AI inference or merchant data writes. Before-release budget reading0.02USD is lagged at02:23:35.531Z, not a current remaining-credit figure. Temporary rollback snapshots under/tmp/marginsight-earth-091owfib/.local/pre-release and pre-release-final; source rollbackcb11f7f/3560e36 available in Git. No store data deleted for UI rollback.

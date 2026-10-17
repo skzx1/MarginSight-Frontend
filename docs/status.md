@@ -81,3 +81,10 @@ VERIFIED_AWS_BROWSER: เผยแพร่staticจากad7bb9fบนS3/CloudF
 ## Repository split — 15 October 2026
 
 VERIFIED_LOCAL: standalone install/build/test completed for both repositories. Backend43 tests and bundled handlers pass; Frontend5 golden/artifact checks, TypeScript and Next static export pass. No new AWS deployment or resources in this split. Project remains PARTIAL_WITH_EXTERNAL_BLOCKERS. See AWS-HANDOFF.md for current runbook.
+
+
+## Quiet Ledger — 16 October 2026
+
+Frontend source redesign เสร็จ:4เมนูหลัก mobile-first, TH/EN, แชตเต็มหน้า, ledger/หลักฐาน, ฟอร์มทุกงาน, local fonts และ Cognito CSS source. npm run verify ผ่าน9tests/typecheck/policy/staticexport/packaging. Browser local MOCK ผ่าน11หน้าที่390/768/1440px และงานสินค้า/ต้นทุน/rule/enrollment/importซ้ำ/ข้อขัดแย้ง/manualreceipt/export ตาม docs/verification.md
+
+ยังไม่publishAWS; cloudUIและCognitoappearanceยังเป็นรุ่นก่อน. ไม่เปลี่ยนBackend/สูตรหรืออ้างliveintegrationใหม่. คงPARTIAL_WITH_EXTERNAL_BLOCKERS; ดู docs/ui-design.md สำหรับระบบภาพและข้อจำกัดAPI/การแปล

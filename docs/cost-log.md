@@ -51,3 +51,6 @@ Self-service15ตุลาคม: deployโค้ดLambda/เว็บบนบ
 ## Repository split — 15 October 2026
 
 15 October 2026 repository split: local installs/builds/tests and GitHub source publication only; no AWS API/model/deploy/resource actions performed in this slice. No new spend/credit reading claimed. Team total cap350USD and trial target25USD remain; re-read billing before the next cloud operation.
+
+
+16 ตุลาคม 2026 Quiet Ledger: งานsource, npm install/buildและbrowserกับlocalAPI/MOCKเท่านั้น. ไม่เรียกAWS deploy/billing/model และไม่เพิ่มcloudresource; ไม่มีการอ่านยอดเครดิตใหม่ในรอบนี้. ภาพทดสอบเข้าmanualreviewเมื่อAIปิด ไม่ใช่Bedrockinference

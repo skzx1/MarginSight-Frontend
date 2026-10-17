@@ -22,7 +22,9 @@ npm run verify
 - `web/`: หน้าจอ Next.js, assets, Cognito branding, แบบฟอร์มและตัวอย่างไฟล์ MOCK
 - `web/src/lib/domain.generated.*`, `domain-types/`, `manifest.json`: snapshot จาก canonical engine ที่ตรวจ hash ก่อน build
 - `scripts/cloud-publish.sh`: publish S3/CloudFront เดิม; ไม่สร้าง infrastructure
-- `tests/`: golden checks ของ artifact ที่ส่งเข้า browser
+- `web/src/app/screens/`, `components/`: หน้างานและ UI ร่วมแบบ Quiet Ledger; 4 เมนูหลักและ TH/EN
+- `web/src/lib/copy.ts`, `use-resource.ts`: คำแปลและการโหลดข้อมูล; ดู [ระบบดีไซน์](docs/ui-design.md)
+- `tests/`: golden checks ของ artifact, เงิน/วันที่ และความครบถ้วนของคำแปล
 
 ## ขึ้น AWS / ส่งต่อให้ AI
 

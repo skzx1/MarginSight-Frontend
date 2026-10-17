@@ -1,3 +1,69 @@
+# MarginSight — Quiet Ledger
+
+อัปเดต 17 ตุลาคม 2026 · การเปลี่ยนรอบนี้เป็น source/local เท่านั้น ยังไม่เผยแพร่ AWS
+
+## ทิศทาง
+
+อ่านโจทย์เป็นสมุดกำไรที่เจ้าของร้านอ่านแล้วตัดสินใจได้บนมือถือ ให้ตัวเลขและที่มาชัด แล้วถามต่อในแชตได้ทันที
+
+- DESIGN_VARIANCE 3/10: ใช้รูปแบบบัญชีที่คุ้นเคย มีเส้นเขียวกำกับยอดกำไรเป็นเอกลักษณ์เดียว
+- MOTION_INTENSITY 3/10: เฉพาะสถานะรอและปฏิกิริยาปุ่ม 150ms; รองรับ reduced motion ไม่มีตัวเลขวิ่ง
+- VISUAL_DENSITY 3/10: ทีละงาน ใช้รายการและรายละเอียดพับได้แทนกริดการ์ดแน่น ๆ
+- ไม่ใช้ purple gradients, glassmorphism, cream premium, sidebar บนมือถือ หรือกราฟตกแต่ง
+
+## ระบบภาพ
+
+พื้น #F5F8F7 / กระดาษ #FFFFFF / ตัวอักษร #172D28 / รอง #52665E / emerald #087563 / sage #E6EFEA / เส้นฟอร์ม #73867D. กำไร #116846, ขาดทุน #B42318, ข้อมูลขาด #815300 บน #FFF4D6 พร้อมข้อความสถานะ ไม่สื่อด้วยสีอย่างเดียว
+
+Noto Sans Thai 400–700 สำหรับข้อความ, IBM Plex Sans สำหรับตัวเลขแบบ tabular; เก็บ TTF และ OFL ใน web/public/fonts ไม่โหลดจาก Google ขณะเปิดเว็บ. ข้อความหลัก16px line-height1.65, หัวข้อ26–30px, กำไร40–48px. ปุ่ม/input48px, ปุ่มภาษา44px, โฟกัสเส้นเขียว3px. ช่องว่างรองรับอักษรไทยและ safe area ด้านล่าง
+
+## แผนผังหน้าที่ใช้งานจริง
+
+| เมนูหลัก | หน้าย่อย |
+|---|---|
+| ภาพรวม | กำไร/coverage, ออเดอร์, หลักฐานตัวเลข, ยืนยันเงินหัก, ตรวจยอดรับสินค้า, ส่งออก |
+| สินค้า | ค้นหา/กรอง, รายละเอียด, เพิ่มสินค้า, ต้นทุนตามวันมีผล, ลองราคา, ถามต่อเกี่ยวกับ SKU |
+| ถามผู้ช่วย | เลือกสินค้า/เดือน, คำถามแนะนำ, คำตอบ, หลักฐาน, ป้าย fallback |
+| ข้อมูลร้าน | นำเข้ารายงาน/ตรวจแถว/ข้อขัดแย้ง, อ่านบิล, กฎและแคมเปญ, LINE, ภาษา, บัญชี |
+
+มือถือ390px: โลโก้ → ชื่อหน้า/บริบทร้านและเดือน → เนื้อหาคอลัมน์เดียว → เมนูล่าง4รายการ. 768–1023px ใช้ drawer ด้านซ้ายเริ่มต้น80pxเฉพาะไอคอน กดขยายเป็น240pxได้; ตั้งแต่1024px แสดง drawer240pxตลอด. Workspace ยืดเต็มพื้นที่ที่เหลือ มี safety cap1920pxเฉพาะจอใหญ่มาก. Dashboard ใช้1/2/3คอลัมน์ตามความกว้างเนื้อหาจริง โดย container query รองรับตอน iPad ขยายเมนู; ฟอร์มทั่วไปจำกัด760pxและแชต760pxเพื่อให้อ่านง่าย. Landing, onboarding, preview, error,404 ใช้ภาษาภาพเดียวกัน. Cognito เป็น hosted UI เดิม; ปรับเฉพาะไฟล์ branding CSS ใน repo ยังไม่ได้ apply cloud
+
+## Drawer และการตรวจ 17 ตุลาคม
+
+เฉพาะ authenticated app shell ช่วง768pxขึ้นไป ใช้ CSS Grid แบ่ง drawer กับ content; padding24/28pxและgap28pxตามชุดเดิม. Drawer transition180msและเคารพ reduced motion. มี brand/ร้านด้านบน, nav landmark, active state ตาม parentScreen เดิม, aria-current, toggle aria-expanded/aria-controls, accessible label แม้ซ่อนข้อความ, focus ring และ Escape ย่อเมนูพร้อมคืนโฟกัส. สถานะขยายอยู่เฉพาะ component; reload เริ่มย่อบน iPad. หน้า nested และ4routesหลักคงโครงเดิม
+
+ตรวจ Edge headlessกับlocalAPI/MOCK:11หน้าที่768/834/1023pxทั้งย่อและขยาย และ1024/1440/1920pxแบบdrawerเต็ม ไม่มี horizontal overflow/ทับเนื้อหา. ภาพมือถือ390pxทั้ง11หน้า pixel-identicalกับก่อนแก้ พร้อมตำแหน่ง/typography/spacingเท่าเดิม. ทดสอบคีย์บอร์ด Enter/Escape/focus, resizeแนวตั้ง–แนวนอนและภาษาอังกฤษ. ไม่ใช้ผล browser emulation อ้างว่าได้ตรวจSafariบนiPadเครื่องจริงแล้ว
+
+## โครงสร้างและข้อมูล
+
+- page.tsx ประกอบหน้าและบริบทร้าน/เดือน; components/shell.tsx จัด hash navigation และโฟกัสหัวข้อ รองรับ Back/Forward
+- screens/ แยกแต่ละงาน; components/forms.tsx ใช้ label/error/loading ร่วมกัน; ledger.tsx รวมตัวเลข สถานะ และหลักฐาน
+- lib/copy.ts กับ app/language.tsx ดูแล TH/EN. เก็บเฉพาะ locale ใน localStorage; ภาษาเริ่มต้นไทย
+- lib/use-resource.ts ป้องกัน response เก่าเขียนทับ มี retry แบบกดเองและ polling เฉพาะงานค้าง; useAction ป้องกัน submit ซ้ำ
+- API client เดิมใช้ Cognito PKCE/guest token. ผลเงินจริงทั้งหมดจาก Backend; domain.generated.js ใช้เฉพาะ MOCK preview และตรวจ SHA-256 เดิม
+- แชตเก็บประวัติในหน่วยความจำแยกร้านและเดือน ไม่ persist หลัง reload และไม่ส่งบทสนทนาย้อนหลังเสมือน backend มี memory. แต่ละคำถามส่ง message/SKU/month ตาม contract เดิม
+- Import ใช้ canonical CSV/XLSX หรือ mock-v1 ตามชนิดร้าน, ตรวจไฟล์, แสดง accepted/duplicate/rejected/conflict, review พร้อมเหตุผล. ไม่มี native marketplace adapter ใหม่
+- Receipt ต้องตรวจ SKU/หน่วย/ยอด/วันมีผลและยืนยันด้วยคนเสมอ เปิดต้นฉบับย้อนหลังได้. ฟอร์มปัจจุบันยืนยันหนึ่งรายการต่อครั้งตาม UI เดิม
+
+## ขอบเขตและความคลาดเคลื่อนที่ไม่ปิดบัง
+
+- “กำไรจากข้อมูลที่บันทึก / Profit from recorded sales” ยังไม่รวมค่าใช้จ่ายประจำและภาษีเงินได้ จึงไม่เรียกว่า net profit after all costs
+- API catalog มีต้นทุน ไม่มียอดกำไรแยก SKU สำหรับแสดงทุกสินค้าพร้อมกัน หน้าสินค้าแสดงต้นทุน และเชื่อมไปการจำลอง/ผู้ช่วย ไม่สร้างสูตรรวมยอดใหม่ใน browser
+- ค้นหา/กรองเฉพาะสินค้าที่โหลดแล้ว มีปุ่มโหลดเพิ่ม; การ refresh คงจำนวนรายการที่เคยโหลดและตามหารายการที่เพิ่งบันทึก
+- คุ้มทุนเป็นราคาที่ตรวจในช่วงที่สูตรรองรับ ไม่รับรอง global minimum; ตรวจยอดรับสินค้าไม่เท่ากับกระทบยอดธนาคารครบทั้งหมด
+- ชื่อสินค้าจากร้าน, ข้อความ API, คำตอบผู้ช่วย และรายละเอียดหลักฐานไม่ถูกแปลอัตโนมัติ การสลับภาษาครอบคลุม UI; backend assistant ปัจจุบันตอบภาษาไทย
+- LINE และ OCR จริงยังมี external gates เดิม; local deterministic fallback ไม่ใช่หลักฐานเรียกโมเดลจริง
+
+## การตรวจและการรัน
+
+ดูผลล่าสุดที่ docs/verification.md. ใช้ npm ci แล้ว npm run dev จากราก repo (port4050); backend เป็น repo แยก port4051. npm run verify ตรวจ contract, TypeScript, policy, tests, static export และ packaging. ไม่ต้องใช้ backend source ใน frontend build
+
+---
+
+## ประวัติดีไซน์และหลักฐานก่อน Quiet Ledger
+
+เนื้อหาต่อไปนี้เป็นผลวันที่15ตุลาคมของ UI รุ่นก่อน ไม่ใช่ผล deploy ของ source รอบ16ตุลาคม
+
 # MarginSight UI — 15 October 2026
 
 ## แนวทางที่ส่งมอบ

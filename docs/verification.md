@@ -137,3 +137,29 @@ VERIFIED_AWS_BROWSER: เผยแพร่staticจากad7bb9fบนS3/CloudF
 VERIFIED_LOCAL (15 October 2026): npm ci independently installed Backend249 packages / Frontend29 packages from their own pruned workspace lockfiles. Backend npm run verify passed: TypeScript,43 tests,4 built handler loads/auth rejection checks, browser contract export, local template structural checks and deploy packaging. Frontend npm run verify passed: SHA-256 contract check, TypeScript, browser secret policy,5 independently expected financial/artifact checks, Next16.4 static export and packaging. Declaration-only cleanup/portable file URL change passed Frontend tests/typecheck again. SAM/live AWS verification was not run for this source-only split. Previous AWS results above are historical; external blockers remain. Files .local/output/private evidence were excluded.
 
 GitHub Actions VERIFIED (15 October 2026): clean Ubuntu checkout/npm ci/npm run verify completed successfully for initial split commit 55f5d6c. This independently verifies no sibling monorepo/dependencies are required. Run: https://github.com/skzx1/MarginSight-Frontend/actions/runs/38744557321 . This is CI/local build evidence, not AWS deployment evidence.
+
+
+## Quiet Ledger redesign — 16 October 2026
+
+VERIFIED_LOCAL (source รอบนี้): npm ci สำเร็จ; npm run verify ผ่าน pinned preview SHA-256, TypeScript, browser secret policy, 9 tests, Next16.4 static export และ deployment packaging. ไม่เปลี่ยนสูตร generated หรือ Backend API และไม่ต้องใช้ source ของ repo Backend เพื่อ build
+
+Browser ที่ localhost4050 + local Backend4051 (Edge headless, ร้าน guest MOCK แยก):
+
+- เปิด11หน้าที่390/768/1440px ไม่มีแนวนอนล้นและปุ่มแอปสูงอย่างน้อย44px; ตรวจ11หน้าไทยที่390px; locale/hashคงหลัง reload. ไม่มี pageerror/console error ในรอบ navigation
+- Preview และ API: กำไรฐาน9บาท, ลด15%=-14.10บาท, ราคาที่ตรวจแล้วไม่ขาดทุน188.31บาท
+- ผู้ช่วยได้ deterministic fallback จาก API; ประวัติอยู่เมื่อสลับเมนูและแยกตามเดือน. ตรวจท้ายคำตอบไม่ทับ composer ที่390px. ไม่อ้างว่าเรียกโมเดลจริงหรือทดสอบคีย์บอร์ดบนอุปกรณ์จริงแล้ว
+- เพิ่มสินค้า MOCK และต้นทุนเวอร์ชัน154.50บาท, บันทึกกฎ1.25%และprogram enrollmentผ่านUI
+- XLSXรับ1แถว, ส่งซ้ำได้duplicate1, ดาวน์โหลดต้นฉบับชื่อorders.xlsx; importสินค้าขัดแย้งเลือกคงเดิมและยอมรับเฉพาะแถวที่ตรวจแล้วผ่าน
+- อัปโหลดภาพสังเคราะห์เข้าสถานะMANUAL_REVIEW, กรอกSKU/จำนวน/หน่วย/ยอด/วันและยืนยันต้นทุนผ่านUI. ไม่ใช่การประเมินOCRภาพบิลจริง
+- ส่งออก reconciliation CSV ผ่านUI; local fontsโหลดได้. รายละเอียดและภาพเป็นหลักฐานเฉพาะเครื่องใน .local/quiet-ledger/ ไม่ส่งร้าน/tokenเข้าGit
+
+ข้อจำกัดผลตรวจรอบนี้: ไม่ทำfreshCognitosignup/การทดสอบสองบัญชี, liveLINE, liveBedrockOCR, native marketplace, stale-hash fee confirmation หรือการกู้workerค้างครบวงจร. ไม่มีAWSdeploy/Cognito branding apply; ผลAWSวันที่15ตุลาคมด้านบนเป็นประวัติของUIรุ่นก่อน. สถานะรวมยังPARTIAL_WITH_EXTERNAL_BLOCKERS
+
+
+## Desktop / iPad drawer — 17 October 2026
+
+VERIFIED_LOCAL: npm ciสำเร็จหลังหยุดเฉพาะFrontenddevที่ล็อกswcชั่วคราวและเปิดกลับ. npm run verifyผ่านpreviewhash/TypeScript/policy/9tests/Nextstaticexport/deploymentpackaging
+
+EdgeheadlessกับlocalAPI4051/guestMOCK:เก็บbaseline390pxก่อนแก้และหลังแก้11หน้าแล้วเปรียบเทียบภาพด้วยPillow ผลidenticalทุกภาพ รวมgeometry/typography/spacing. ตรวจ11หน้าที่768×1024,834×1194,1023×768ทั้งrail80pxและdrawer240px;1024×768,1440×900,1920×1080แบบpersistent240px. ไม่มีpagehorizontaloverflowหรือdrawerทับmain;mainกินพื้นที่ที่เหลือทั้งหมด;ปุ่มnav/toggleอย่างน้อย44×44px;activeparentเดียวต่อหน้า. Enterขยาย/Escapeย่อคืนfocus,focusring,defaultย่อหลังreload,portrait/landscape resizeและEnglishlabelsผ่าน. Browsererrors=[]
+
+หลักฐานเฉพาะเครื่อง: .local/drawer-layout/ (ภาพก่อน/หลัง, geometryJSON, results.json). ผลรอบนี้เป็นlayoutกับข้อมูลMOCKในเครื่อง ไม่ใช่Safari/iPadphysicaldeviceหรือAWSdeployment. หน้าnested/routes/formulas/APIไม่เปลี่ยนจากรอบก่อน

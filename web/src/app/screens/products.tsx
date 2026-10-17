@@ -321,7 +321,7 @@ export default function Products({
           }}
         >
           <Icon name="plus" />
-          <span>+ {t('addProduct')}</span>
+          <span>{t('addProduct')}</span>
         </button>
       </div>
 

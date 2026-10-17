@@ -80,22 +80,7 @@ export default function AddProductPage({
 
   return (
     <div className="add-product-full-page" role="region" aria-label={t('addProductTitle')}>
-      {/* Page Header */}
-      <div className="add-product-header">
-        <button
-          type="button"
-          className="ghost back-link"
-          onClick={onCancel}
-        >
-          ← {t('products')}
-        </button>
-        <div className="section-heading">
-          <div>
-            <h1 className="add-product-main-title">{t('addProductTitle')}</h1>
-            <p className="caption">{t('addProductSubtitle')}</p>
-          </div>
-        </div>
-      </div>
+      <p className="screen-note">{t('addProductSubtitle')}</p>
 
       {success ? (
         <div className="success-banner" role="status">

@@ -310,7 +310,6 @@ export default function Products({
       <div className="section-heading">
         <div>
           <span className="eyebrow">{products.length} {t('loaded')}</span>
-          <h2>{t('products')}</h2>
         </div>
         <button
           type="button"

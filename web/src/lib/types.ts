@@ -1,0 +1,24 @@
+import type { calculate } from './domain.generated';
+import type { Cost, Fee, Product, Rule, Enrollment } from './domain-types/model';
+export type Calculation = ReturnType<typeof calculate> & { inputHash?: string; postedFees?: Fee[] };
+export type CatalogProduct = Product & {
+  cost?: Cost | null;
+  sellingPriceSatang?: number | null;
+  quantity?: number;
+  profitSatang?: number | null;
+  dateAdded?: string;
+};
+export type Store = { id: string; name?: string; personal?: boolean; dataOrigin?: 'MOCK' | 'REAL' };
+export type PageResult<T> = { items: T[]; next?: string };
+export type Dashboard = { totalOrders: number; completeOrders: number; incompleteOrders: number; revenueSatang: number; feeSatang: number; profitSatang: number | null; marginPct: number | null; ttrPct: number | null; dataOrigin: string; results: Calculation[] };
+export type OrderSummary = { key: string; orderId: string; platform: string; orderAt: string; feesConfirmed: boolean };
+export type Scenario = { baseline?: Calculation; scenario: Calculation; breakEven: { priceSatang: number; rangeChecked?: number[] }; incrementalTtrPercentagePoints?: number | null };
+export type AssistantAnswer = { answer: string; provider?: string; reason?: string; result?: Calculation };
+export type ChatMessage = { id: string; question: string; sku: string; answer?: AssistantAnswer; error?: unknown };
+export type Job = { id: string; kind: string; fileName: string; status: string; accepted?: number; duplicate?: number; rejected?: number; conflict?: number; error?: string; errors?: unknown[]; review?: { reviewedBy: string; reason: string }; totalsMatch?: boolean; draft?: { date?: string; totalTHB?: string | number; items?: { name?: string; quantity?: number; unit?: string; lineTotalTHB?: string | number }[] } };
+export type UploadJob = { id: string; uploadUrl: string; contentType: string };
+export type Conflict = { id: string; orderId?: string; key: string; existing: Record<string, unknown>; incoming: Record<string, unknown>; resolution?: unknown };
+export type Reconciliation = { key: string; orderId: string; estimatedFeeSatang: number | null; actualFeeSatang: number | null; varianceSatang: number | null; payoutReconciled: boolean | null };
+export type RulesData = { rules: Rule[]; enrollments: Enrollment[] };
+export type FeatureProps = { base: string; month: string; guest: boolean; realStore: boolean; origin: 'MOCK' | 'REAL' };
+export type Screen = 'overview' | 'products' | 'addProduct' | 'assistant' | 'store' | 'orders' | 'reconciliation' | 'imports' | 'receipts' | 'rules' | 'line' | 'simulation';

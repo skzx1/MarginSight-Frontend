@@ -1,4 +1,6 @@
+'use client';
 import type { ReactNode } from 'react';
+import { useLanguage } from './language';
 export type IconName = 'overview' | 'upload' | 'products' | 'orders' | 'simulation' | 'assistant' | 'receipt' | 'rules' | 'reconcile' | 'line' | 'arrow' | 'check' | 'shield' | 'refresh' | 'logout' | 'menu' | 'close' | 'settings' | 'search' | 'calculator' | 'plus' | 'sparkles' | 'chevronRight';
 const paths: Record<IconName, ReactNode> = {
   overview: <><rect x="3" y="3" width="7" height="7" rx="2" /><rect x="14" y="3" width="7" height="7" rx="2" /><rect x="3" y="14" width="7" height="7" rx="2" /><rect x="14" y="14" width="7" height="7" rx="2" /></>,
@@ -33,7 +35,8 @@ export function Icon({
   return <svg className="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{paths[name]}</svg>;
 }
 export function Brand() {
-  return <div className="brand"><span className="logo"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 17V7l8 7 8-7v10" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" /></svg></span><span>MarginSight<small>เห็นกำไร เข้าใจร้าน</small></span></div>;
+  const { t } = useLanguage();
+  return <div className="brand"><span className="logo"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 17V7l8 7 8-7v10" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" /></svg></span><span>MarginSight<small>{t('tagline')}</small></span></div>;
 }
 export function EmptyState({
   icon = 'orders',

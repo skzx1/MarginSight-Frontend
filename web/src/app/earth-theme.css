@@ -49,6 +49,7 @@ body{font-optical-sizing:auto}
  .topbar .desktop-store{border-color:var(--olive)}
  .topbar .overview-store-choice summary{color:#f7f6f1}
  .topbar .logo{background:var(--olive-deep)}
+ .topbar .primary-nav{background:transparent;box-shadow:none}
  .topbar .primary-nav button,.topbar button.ghost{color:#e4e6d7;background:transparent}
  .topbar .primary-nav button:hover,.topbar button.ghost:hover{background:var(--olive-deep)}
  .topbar .primary-nav button.active{background:var(--olive-deep);border-color:var(--olive);color:#fff}

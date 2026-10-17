@@ -109,3 +109,18 @@ Noto Sans Thai 400–700 สำหรับข้อความ, IBM Plex Sans 
 - [shadcn/ui Dashboard](https://ui.shadcn.com/examples/dashboard)
 - [FlowAccount Dashboard](https://flowaccount.com/help-center/category/dashboard/guide-business-dashboard)
 - [sellerboard Profitability Dashboard](https://blog.sellerboard.com/2025/06/28/mastering-sellerboards-profitability-dashboard-tiles-charts-pl-map-and-trends/)
+
+
+## Overview UX refinement — 17 ตุลาคม 2026
+
+เฉพาะ Overview: สรุปกำไรสุทธิ/ยอดขายรวมสองการ์ดน้ำหนักเท่ากัน ใช้ date control เดียวในหัวหน้า (วันนี้/สัปดาห์นี้/เดือนนี้/กำหนดเอง) และป้ายช่วงอ่านอย่างเดียวในแต่ละการ์ด. เพิ่ม margin/ต้นทุนและค่าธรรมเนียมรวม; รายการแบ่งยอดขายและกำไรแยกช่องทางอยู่หลัง disclosure เดียวเพื่อลดความแน่น. Quick actions สามรายการสูงเท่ากันและใช้ title/helper โครงเดียวกัน. Search/channel pills ค้นและกรองออเดอร์ที่โหลดแล้วในช่วงเดียวกัน แสดง5รายการแรกพร้อมปุ่มเพิ่มและจำนวนทั้งหมด ความครบคำนวณจากทั้งชุดในช่วงนั้น ไม่ใช้จำนวน5แถวที่แสดงแทนทั้งชุด
+
+ตัวเลือกร้านของ Overview อยู่ใน sidebar เท่านั้น ชื่อร้านยาวตัดบรรทัดแทน ellipsis. iPad rail มีปุ่มเปิดตัวเลือกร้าน; หน้าจออื่นใช้ header/sidebar เดิม. Products เพิ่มเฉพาะตัวกรอง missing cost ที่เปิดมาจากคำเตือนและล้างได้ ไม่มีการเปลี่ยนหน้าปกติ
+
+Data assumptions: overview-data.ts เป็น fixture MOCK10ออเดอร์และจำนวนเงินองค์ประกอบที่ระบุไว้ชัดเจน ไม่ใช่อัตราทางการ. วันอ้างอิงMOCK17ต.ค.2026, เขตเวลาAsia/Bangkok, สัปดาห์เริ่มจันทร์และเดือน/สัปดาห์นับถึงวันอ้างอิง. #TT-31892 sourceISOเดิมถูกต้อง ปัญหาอยู่ที่ renderer บวก7ชั่วโมงไม่เลื่อนวัน; เปลี่ยนเป็นIntl hourCycleh23 ได้17ต.ค.02:30. ตรวจtimestampทั้งหมดด้วยtests
+
+Synthetic preview ใช้เฉพาะร้านMOCKที่APIคืนoriginalmock-market1ออเดอร์; REAL/ข้อมูลว่างไม่ถูกแทนด้วยmock. ค่าเงินเป็นinteger satang; mockขาย472600 = ต้นทุน214000 + ค่าธรรมเนียม42270 + ส่ง35500 + กำไร180830. Net margin38.3%เมื่อปัดแสดงหนึ่งตำแหน่ง. หมายเหตุค่าใช้จ่ายประจำ/ภาษีเดิมยังแสดง ไม่มีการสร้างเปอร์เซ็นต์เปรียบเทียบช่วงก่อนหน้าที่ไม่มีหลักฐาน
+
+use-overview-dashboard.tsอ่านAPIรายเดือนตามช่วงของOverviewเอง รองรับข้ามเดือนและข้ามปี cache snapshotในหน้านี้, concurrency3, ป้องกันresponseเก่าทับช่วงใหม่. UIรวมจำนวนเงินจากcanonicalAPIเท่านั้น ไม่ประเมินfee rulesใหม่; สูตรgenerated/Backendไม่เปลี่ยน. ความครบ/กำไร/margin/ต้นทุนรวมยังเป็นunknownเมื่อข้อมูลที่ต้องใช้ขาด ไม่แทนnullด้วย0. Amber calloutแสดงจำนวนออเดอร์ขาดต้นทุนและนำไปProductsที่กรองmissingcost
+
+ข้อความนำเข้าShopee/TikTokที่ขอแสดงตามเดิม พร้อมคำอธิบายแบบพับได้ว่าต้องจัดคอลัมน์ตามMarginSighttemplate; ไม่เพิ่มnativeadapters. ดูผลตรวจในverification.md

@@ -163,3 +163,14 @@ VERIFIED_LOCAL: npm ciสำเร็จหลังหยุดเฉพาะF
 EdgeheadlessกับlocalAPI4051/guestMOCK:เก็บbaseline390pxก่อนแก้และหลังแก้11หน้าแล้วเปรียบเทียบภาพด้วยPillow ผลidenticalทุกภาพ รวมgeometry/typography/spacing. ตรวจ11หน้าที่768×1024,834×1194,1023×768ทั้งrail80pxและdrawer240px;1024×768,1440×900,1920×1080แบบpersistent240px. ไม่มีpagehorizontaloverflowหรือdrawerทับmain;mainกินพื้นที่ที่เหลือทั้งหมด;ปุ่มnav/toggleอย่างน้อย44×44px;activeparentเดียวต่อหน้า. Enterขยาย/Escapeย่อคืนfocus,focusring,defaultย่อหลังreload,portrait/landscape resizeและEnglishlabelsผ่าน. Browsererrors=[]
 
 หลักฐานเฉพาะเครื่อง: .local/drawer-layout/ (ภาพก่อน/หลัง, geometryJSON, results.json). ผลรอบนี้เป็นlayoutกับข้อมูลMOCKในเครื่อง ไม่ใช่Safari/iPadphysicaldeviceหรือAWSdeployment. หน้าnested/routes/formulas/APIไม่เปลี่ยนจากรอบก่อน
+
+
+## Overview UX refinement — 17 October 2026
+
+VERIFIED_LOCAL: npm ciสำเร็จ, npm run verifyผ่าน13tests/TypeScript/previewhash/policy/Nextstaticexport/packaging. เพิ่ม4testsสำหรับทุกmocktimestamp/24-hourmidnightrollover, Bangkokperiod/calendarweek/custominvalid/crossyearmonths, fixture/summary/channelreconciliation, missingcostunknownเทียบconfirmedzero
+
+Browser EdgeheadlessกับlocalguestMOCK: Overview390/768/1024/1440/1920pxรวมiPadexpanded ไม่มีhorizontaloverflowหรือข้อความellipsis, summarywidth/actionsheightเท่ากัน, button/input/selectอย่างน้อย44px. สลับtoday3/week7/month10ออเดอร์, custom6Octได้149บาท, rangeผิดแสดงalert. Search#TT-31892ได้02:30, TikTokfilterค้นทั้งloadedsetได้2ออเดอร์. Headerdatecontrolเดียว ไม่มีperiodselectในการ์ด; coverage10/10จากชุด10ออเดอร์และ5recentrowsพร้อมcounter
+
+ControlledAPIresponsevariantsเฉพาะbrowser: missingcost3ได้7/10, profit/margin/totalcostunknown, amberwarningไปProductsmissingfilterได้1สินค้าที่โหลด; empty/loadingไม่มีfakecoverageหรือแอบแสดงmock. REALresponseถูกใช้ตามจริง; cross-monthSep+Octอ่านทั้ง2APIเดือน รวมcanonical9+9=18บาทและขาย200+200=400บาท. สิ่งนี้เป็นการทดสอบcontractผ่านmockresponse ไม่ใช่ผลรับรองร้านจริงบนAWS
+
+ตรวจEnglish/customrangeและชื่อร้านยาวทุก5ขนาด, Enter/TabเลือกsidebarstoreและEnterเลือกchannelพร้อมfocusringผ่าน. เปรียบเทียบ22ภาพหน้าอื่น(11หน้า×390/1440px)ก่อน/หลังด้วยPillow pixel-identicalทั้งหมด. หลักฐานเฉพาะเครื่อง .local/overview-ux/; ไม่มีtoken/merchantdataในGit. Safari/iPadphysicaldeviceยังต้องตรวจด้วยมือ; ไม่มีAWSdeploymentในรอบนี้

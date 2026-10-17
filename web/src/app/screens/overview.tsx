@@ -1,357 +1,124 @@
 'use client';
-import { useId, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useLanguage } from '../language';
-import { useResource } from '../../lib/use-resource';
-import { bangkokDate, money } from '../../lib/format';
-import type { Calculation, Dashboard, FeatureProps, Screen } from '../../lib/types';
+import { useOverviewDashboard } from '../../lib/use-overview-dashboard';
+import { bangkokDate } from '../../lib/format';
+import type { Calculation, FeatureProps, Screen } from '../../lib/types';
 import { DataStatus, EvidencePanel, Money } from '../components/ledger';
-import { Empty, ErrorNotice, Loading } from '../components/forms';
+import { Empty, ErrorNotice, Field, Loading } from '../components/forms';
 import { Icon } from '../ui';
 import {
-  getPeriodStats,
-  OVERVIEW_MOCK_ORDERS,
-  type MockOrderRecord,
-  type PeriodType
-} from '../../lib/mock-data';
+  channelSummaries, orderDateTime, ordersInPeriod, periodBounds, summarizeOrders,
+  OVERVIEW_CHANNELS, OVERVIEW_MOCK_ORDERS, OVERVIEW_MOCK_TODAY,
+  type OverviewOrder, type OverviewPeriod
+} from '../../lib/overview-data';
 
-export default function Overview({
-  base,
-  month,
-  guest,
-  navigate,
-  sampleMonth
-}: FeatureProps & { navigate: (screen: Screen) => void; sampleMonth: () => void }) {
+export default function Overview({ base, origin, period, navigate, onMissingCosts }: FeatureProps & {
+  period: OverviewPeriod; navigate: (screen: Screen) => void; onMissingCosts: () => void;
+}) {
   const { t, locale } = useLanguage();
-  const { data, error, loading, reload } = useResource<Dashboard>(base + '/dashboard?month=' + month);
-  const [selected, setSelected] = useState<Calculation | MockOrderRecord>();
+  const today = origin === 'MOCK' ? OVERVIEW_MOCK_TODAY : bangkokDate();
+  const { data, error, loading, reload } = useOverviewDashboard(base, period, today, origin);
+  const [selected, setSelected] = useState<OverviewOrder>();
+  const [search, setSearch] = useState(''), [channel, setChannel] = useState('all'), [visibleCount, setVisibleCount] = useState(5);
+  useEffect(() => { setSelected(undefined); setVisibleCount(5); }, [period.type, period.start, period.end]);
 
-  // Summary Card Period States (Independent per card)
-  const [profitPeriod, setProfitPeriod] = useState<PeriodType>('month');
-  const [profitRange, setProfitRange] = useState({ start: '2026-10-01', end: '2026-10-17' });
-  const [salesPeriod, setSalesPeriod] = useState<PeriodType>('month');
-  const [salesRange, setSalesRange] = useState({ start: '2026-10-01', end: '2026-10-17' });
-
-  const profitPeriodId = useId();
-  const salesPeriodId = useId();
-
-  // Combine loaded calculations and mock orders
-  const ordersFromData: MockOrderRecord[] = (data?.results ?? []).map(r => ({
-    orderId: r.orderId,
-    platform: (r.platform === 'mock-market' ? 'Shopee' : r.platform) as MockOrderRecord['platform'],
-    orderAt: r.orderAt,
-    revenueSatang: r.revenueSatang,
-    profitSatang: r.profitSatang,
-    productName: r.items?.[0]?.sku || t('products'),
-    status: r.status
+  // Synthetic preview is restricted to a MOCK store with the original single
+  // mock-market fixture. Empty/REAL responses are never replaced with fake orders.
+  const useFixture = origin === 'MOCK' && data?.dataOrigin === 'MOCK' && data.results.length === 1 && data.results[0].platform === 'mock-market';
+  const allOrders: OverviewOrder[] = useFixture ? OVERVIEW_MOCK_ORDERS : (data?.results ?? []).map(result => ({
+    orderId: result.orderId, platform: result.platform, orderAt: result.orderAt,
+    revenueSatang: result.revenueSatang, profitSatang: result.profitSatang,
+    productCostSatang: result.cogsSatang, platformFeeSatang: result.missingFields?.some(field => field === 'base_fee_rules' || field.startsWith('rule:') || field.startsWith('cash_deduction')) ? null : result.feeSatang,
+    shippingSatang: result.sellerShippingSatang, otherCostSatang: result.packagingSatang + result.adsSatang,
+    productName: result.items.map(item => item.sku).join(', '), skus: result.items.map(item => item.sku),
+    status: result.status, missingFields: result.missingFields
   }));
-
-  const allOrders: MockOrderRecord[] = ordersFromData.length > 1
-    ? ordersFromData
-    : OVERVIEW_MOCK_ORDERS;
-
-  const profitStats = getPeriodStats(allOrders, profitPeriod, profitRange);
-  const salesStats = getPeriodStats(allOrders, salesPeriod, salesRange);
-
-  // 5 Most recent orders sorted newest first
-  const recentOrders = [...allOrders]
-    .sort((a, b) => new Date(b.orderAt).getTime() - new Date(a.orderAt).getTime())
-    .slice(0, 5);
-
-  const formatOrderTime = (iso: string) => {
-    try {
-      const d = new Date(iso);
-      const bDate = bangkokDate(iso);
-      const hours = String(d.getUTCHours() + 7).padStart(2, '0');
-      const mins = String(d.getUTCMinutes()).padStart(2, '0');
-      return `${bDate} ${hours}:${mins}`;
-    } catch {
-      return iso.slice(0, 16).replace('T', ' ');
-    }
-  };
+  const bounds = periodBounds(period, today);
+  const periodLabel = bounds ? `${t(period.type === 'today' ? 'today' : period.type === 'week' ? 'thisWeek' : period.type === 'month' ? 'thisMonth' : 'customRange')} · ${bounds.start}${bounds.end !== bounds.start ? ' – ' + bounds.end : ''}` : t('invalidRange');
+  const orders = ordersInPeriod(allOrders, period, today);
+  const stats = summarizeOrders(orders);
+  const channels = channelSummaries(orders);
+  const channelOptions = [...new Set([...OVERVIEW_CHANNELS, ...orders.map(order => order.platform)])];
+  const matches = orders.filter(order => (channel === 'all' || order.platform === channel) &&
+    `${order.orderId} ${order.productName} ${order.skus.join(' ')}`.toLocaleLowerCase().includes(search.trim().toLocaleLowerCase()))
+    .sort((a, b) => Date.parse(b.orderAt) - Date.parse(a.orderAt));
+  const percent = (value: number | null) => value == null ? '—' : new Intl.NumberFormat(locale === 'th' ? 'th-TH' : 'en-GB', { maximumFractionDigits: 1 }).format(value) + '%';
+  const breakdown = [
+    { label: t('costs'), value: stats.productCostSatang },
+    { label: t('platformFees'), value: stats.platformFeeSatang },
+    { label: t('overviewShipping'), value: stats.shippingSatang },
+    ...(stats.otherCostSatang !== 0 ? [{ label: t('otherCosts'), value: stats.otherCostSatang }] : []),
+    { label: t('profitCard'), value: stats.profitSatang }
+  ];
 
   if (selected) {
-    const calc = 'formulaVersion' in selected ? (selected as Calculation) : undefined;
-    return (
-      <div className="evidence-view">
-        <button className="back-link ghost" onClick={() => setSelected(undefined)}>
-          ← {t('back')}
-        </button>
-        <div className="section-heading">
-          <h2>{selected.orderId}</h2>
-          <span className="badge">{selected.platform}</span>
-        </div>
-        {calc ? (
-          <EvidencePanel result={calc} />
-        ) : (
-          <section className="panel">
-            <h3>{'productName' in selected ? selected.productName : selected.orderId}</h3>
-            <p className="caption">{formatOrderTime(selected.orderAt)}</p>
-            <dl className="ledger-lines">
-              <div>
-                <dt>{t('revenue')}</dt>
-                <dd><Money value={selected.revenueSatang} /></dd>
-              </div>
-              <div>
-                <dt>{t('profit')}</dt>
-                <dd><Money value={selected.profitSatang} /></dd>
-              </div>
-            </dl>
-          </section>
-        )}
-      </div>
-    );
+    const calculation: Calculation | undefined = !useFixture ? data?.results.find(result => result.orderId === selected.orderId && result.platform === selected.platform) : undefined;
+    return <div className="overview-page evidence-view">
+      <button className="back-link ghost" onClick={() => setSelected(undefined)}>← {t('back')}</button>
+      <div className="section-heading"><h2>{selected.orderId}</h2><span className="badge">{selected.platform}</span></div>
+      {calculation ? <EvidencePanel result={calculation} /> : <section className="panel">
+        <DataStatus value="MOCK" /><h3>{selected.productName}</h3><time dateTime={selected.orderAt}>{orderDateTime(selected.orderAt)}</time>
+        <dl className="ledger-lines">{[
+          [t('salesCard'), selected.revenueSatang], [t('costs'), selected.productCostSatang],
+          [t('platformFees'), selected.platformFeeSatang], [t('overviewShipping'), selected.shippingSatang], [t('profitCard'), selected.profitSatang]
+        ].map(([label, value]) => <div key={String(label)}><dt>{label}</dt><dd><Money value={value as number | null} /></dd></div>)}</dl>
+        <p className="caption">{t('scope')}</p>
+      </section>}
+    </div>;
   }
 
-  return (
-    <div className="overview-page">
-      <ErrorNotice error={error} />
-      {Boolean(error) && (
-        <button className="secondary" onClick={() => void reload()}>
-          {t('retry')}
-        </button>
-      )}
-      {loading && <Loading />}
+  return <div className="overview-page" aria-busy={loading}>
+    <ErrorNotice error={error} />{Boolean(error) && <button className="secondary" onClick={() => void reload()}>{t('retry')}</button>}
+    {!bounds && <p className="notice" role="alert">{t('invalidRange')}</p>}
+    {data && !loading && <>
+      <div className="row overview-status-bar"><DataStatus value={data.dataOrigin} /><span className="caption" data-testid="overview-coverage">{t('coverage')}: {stats.completeOrders}/{stats.totalOrders}</span>{useFixture && <span className="caption">{t('overviewMockDate')}</span>}</div>
+      {stats.missingCostOrders > 0 && <button className="overview-cost-warning" onClick={onMissingCosts}><span>{t('missingCostPrefix')} {stats.missingCostOrders} {t('missingCostSuffix')}</span><Icon name="arrow" /></button>}
+    </>}
 
-      <div className="row overview-status-bar">
-        <DataStatus value={data?.dataOrigin ?? 'MOCK'} />
-        <span className="caption">
-          {t('coverage')}: {data?.completeOrders ?? 10}/{data?.totalOrders ?? 10}
-        </span>
+    {(loading || data) && <section className="summary-cards-container" aria-label={t('overviewSummary')}>
+      <article className="summary-card profit-card">
+        <div className="summary-card-header"><div className="summary-card-title"><span className="summary-mark profit-mark" aria-hidden="true" /><h2>{t('profitCard')}</h2></div><small className="overview-active-period">{periodLabel}</small></div>
+        {loading ? <Loading /> : <><div className={'summary-main-number' + (stats.profitSatang != null && stats.profitSatang < 0 ? ' negative' : '')} data-testid="overview-profit"><Money value={bounds ? stats.profitSatang : null} /></div><dl className="overview-card-metric"><div><dt>{t('netMargin')}</dt><dd>{percent(bounds ? stats.marginPct : null)}</dd></div></dl>{stats.profitSatang == null && <p className="caption">{t('missingProfitNote')}</p>}</>}
+      </article>
+      <article className="summary-card sales-card">
+        <div className="summary-card-header"><div className="summary-card-title"><span className="summary-mark sales-mark" aria-hidden="true" /><h2>{t('salesCard')}</h2></div><small className="overview-active-period">{periodLabel}</small></div>
+        {loading ? <Loading /> : <><div className="summary-main-number" data-testid="overview-sales"><Money value={bounds ? stats.revenueSatang : null} /></div><dl className="overview-card-metric"><div><dt>{t('totalCostsFees')}</dt><dd><Money value={bounds ? stats.totalCostsSatang : null} /></dd></div></dl></>}
+      </article>
+    </section>}
+    <p className="caption overview-scope">{t('scope')}{useFixture ? '' : ' · ' + t('loadedOnly')}</p>
+
+    <section className="quick-actions-row" aria-label={t('quickActions')}>
+      {[
+        { screen: 'assistant' as const, icon: 'assistant' as const, title: t('assistant'), helper: t('askDiscount') },
+        { screen: 'addProduct' as const, icon: 'plus' as const, title: t('addProduct'), helper: t('overviewAddHelper') },
+        { screen: 'imports' as const, icon: 'upload' as const, title: t('imports'), helper: t('overviewImportHelper') }
+      ].map(action => <button key={action.screen} className={'overview-quick-action' + (action.screen === 'assistant' ? ' assistant-action' : '')} onClick={() => navigate(action.screen)}><Icon name={action.icon} /><span><strong>{action.title}</strong><small>{action.helper}</small></span><Icon name="arrow" /></button>)}
+    </section>
+    <details className="overview-insights"><summary>{t('salesAllocation')} · {t('channelInsight')}</summary>
+      <p className="caption">{periodLabel}</p>
+      <div className="overview-insight-grid">
+        <div><h3>{t('salesAllocation')}</h3>{loading ? <Loading /> : !orders.length ? <p className="caption">{t('noOrdersInPeriod')}</p> : <dl className="ledger-lines">{breakdown.map(row => <div key={row.label}><dt>{row.label}</dt><dd><Money value={row.value} /></dd></div>)}</dl>}</div>
+        <div><h3>{t('channelInsight')}</h3>{loading ? <Loading /> : !orders.length ? <p className="caption">{t('noOrdersInPeriod')}</p> : <ul className="overview-channels">{channels.map(row => <li className="overview-channel-row" key={row.platform}><strong>{row.platform}</strong><span className={row.profitSatang != null && row.profitSatang < 0 ? 'negative' : ''}><small>{t('profitCard')}</small>{row.totalOrders ? <Money value={row.profitSatang} /> : '—'}</span><span><small>{t('netMargin')}</small>{row.totalOrders ? percent(row.marginPct) : '—'}{!row.totalOrders && <small>{t('noChannelOrders')}</small>}</span></li>)}</ul>}</div>
+      </div><p className="caption">{t('overviewImportNote')}</p>
+    </details>
+
+    <section className="recent-orders-section">
+      <div className="section-heading"><div><h2>{t('recentOrders')}</h2><p className="caption">{t('loadedOnly')} · {orders.length} {t('orders')}</p></div><button className="ghost view-all-link" onClick={() => navigate('orders')}>{t('allOrders')} →</button></div>
+      <div className="overview-order-filters"><Field label={t('overviewSearch')} type="search" value={search} onChange={e => { setSearch(e.target.value); setVisibleCount(5); }} />
+        <div className="overview-channel-filters" role="group" aria-label={t('channel')}>{['all', ...channelOptions].map(value => <button type="button" className="secondary" key={value} aria-pressed={channel === value} onClick={() => { setChannel(value); setVisibleCount(5); }}>{value === 'all' ? t('all') : value}</button>)}</div>
       </div>
-
-      {/* Two Large Summary Cards */}
-      <section className="summary-cards-container" aria-label="สรุปกำไรและยอดขาย">
-        {/* Profit Card */}
-        <article className="summary-card profit-card">
-          <div className="summary-card-header">
-            <div className="summary-card-title">
-              <span className="summary-mark profit-mark" aria-hidden="true" />
-              <h2>{t('profitCard')}</h2>
-            </div>
-            <div className="period-selector">
-              <label htmlFor={profitPeriodId} className="sr-only">
-                {t('profitCard')} {t('month')}
-              </label>
-              <select
-                id={profitPeriodId}
-                value={profitPeriod}
-                onChange={e => setProfitPeriod(e.target.value as PeriodType)}
-                className="period-select"
-              >
-                <option value="today">{t('today')}</option>
-                <option value="week">{t('thisWeek')}</option>
-                <option value="month">{t('thisMonth')}</option>
-                <option value="custom">{t('customRange')}</option>
-              </select>
-            </div>
-          </div>
-
-          {profitPeriod === 'custom' && (
-            <div className="custom-range-inputs">
-              <label className="field-inline">
-                <span className="sr-only">{t('customStartDate')}</span>
-                <input
-                  type="date"
-                  value={profitRange.start}
-                  onChange={e => setProfitRange(prev => ({ ...prev, start: e.target.value }))}
-                  aria-label={t('customStartDate')}
-                />
-              </label>
-              <span>—</span>
-              <label className="field-inline">
-                <span className="sr-only">{t('customEndDate')}</span>
-                <input
-                  type="date"
-                  value={profitRange.end}
-                  onChange={e => setProfitRange(prev => ({ ...prev, end: e.target.value }))}
-                  aria-label={t('customEndDate')}
-                />
-              </label>
-            </div>
-          )}
-
-          <div className="summary-main-number">
-            <span className="currency-symbol">฿</span>
-            <strong className="tabular-number">
-              {money(profitStats.currentProfitSatang, locale)}
-            </strong>
-          </div>
-
-          <div className="summary-comparison">
-            {profitStats.profitChangePct != null ? (
-              <span
-                className={
-                  'trend-pill ' + (profitStats.profitChangePct >= 0 ? 'trend-up' : 'trend-down')
-                }
-              >
-                {profitStats.profitChangePct >= 0 ? '↑ +' : '↓ '}
-                {profitStats.profitChangePct}%
-              </span>
-            ) : null}
-            <span className="comparison-caption">{t('vsPrevious')}</span>
-          </div>
-        </article>
-
-        {/* Sales Card */}
-        <article className="summary-card sales-card">
-          <div className="summary-card-header">
-            <div className="summary-card-title">
-              <span className="summary-mark sales-mark" aria-hidden="true" />
-              <h2>{t('salesCard')}</h2>
-            </div>
-            <div className="period-selector">
-              <label htmlFor={salesPeriodId} className="sr-only">
-                {t('salesCard')} {t('month')}
-              </label>
-              <select
-                id={salesPeriodId}
-                value={salesPeriod}
-                onChange={e => setSalesPeriod(e.target.value as PeriodType)}
-                className="period-select"
-              >
-                <option value="today">{t('today')}</option>
-                <option value="week">{t('thisWeek')}</option>
-                <option value="month">{t('thisMonth')}</option>
-                <option value="custom">{t('customRange')}</option>
-              </select>
-            </div>
-          </div>
-
-          {salesPeriod === 'custom' && (
-            <div className="custom-range-inputs">
-              <label className="field-inline">
-                <span className="sr-only">{t('customStartDate')}</span>
-                <input
-                  type="date"
-                  value={salesRange.start}
-                  onChange={e => setSalesRange(prev => ({ ...prev, start: e.target.value }))}
-                  aria-label={t('customStartDate')}
-                />
-              </label>
-              <span>—</span>
-              <label className="field-inline">
-                <span className="sr-only">{t('customEndDate')}</span>
-                <input
-                  type="date"
-                  value={salesRange.end}
-                  onChange={e => setSalesRange(prev => ({ ...prev, end: e.target.value }))}
-                  aria-label={t('customEndDate')}
-                />
-              </label>
-            </div>
-          )}
-
-          <div className="summary-main-number">
-            <span className="currency-symbol">฿</span>
-            <strong className="tabular-number">
-              {money(salesStats.currentSalesSatang, locale)}
-            </strong>
-          </div>
-
-          <div className="summary-comparison">
-            {salesStats.salesChangePct != null ? (
-              <span
-                className={
-                  'trend-pill ' + (salesStats.salesChangePct >= 0 ? 'trend-up' : 'trend-down')
-                }
-              >
-                {salesStats.salesChangePct >= 0 ? '↑ +' : '↓ '}
-                {salesStats.salesChangePct}%
-              </span>
-            ) : null}
-            <span className="comparison-caption">{t('vsPrevious')}</span>
-          </div>
-        </article>
-      </section>
-
-      {/* Quick Action Cards */}
-      <section className="quick-actions-row" aria-label="การทำงานด่วน">
-        <button className="ask-card" onClick={() => navigate('assistant')}>
-          <Icon name="assistant" />
-          <span>
-            <strong>{t('askDiscount')}</strong>
-            <small>{t('assistant')}</small>
-          </span>
-          <Icon name="arrow" />
-        </button>
-        <button className="list-link quick-link" onClick={() => navigate('addProduct')}>
-          <Icon name="plus" />
-          <span>{t('addProduct')}</span>
-          <Icon name="arrow" />
-        </button>
-        <button className="list-link quick-link" onClick={() => navigate('imports')}>
-          <Icon name="upload" />
-          <span>{t('imports')}</span>
-          <Icon name="arrow" />
-        </button>
-      </section>
-
-      {/* Recent Orders Section */}
-      <section className="recent-orders-section">
-        <div className="section-heading">
-          <div>
-            <h2>{t('recentOrders')}</h2>
-            <p className="caption">{t('loadedOnly')}</p>
-          </div>
-          <button className="ghost view-all-link" onClick={() => navigate('orders')}>
-            {t('allOrders')} →
-          </button>
-        </div>
-
-        {recentOrders.length === 0 ? (
-          <Empty title={t('noOrdersInPeriod')}>
-            <button className="secondary" onClick={() => setProfitPeriod('month')}>
-              {t('thisMonth')}
-            </button>
-          </Empty>
-        ) : (
-          <div className="orders-table-wrapper">
-            <div className="recent-orders-list" role="list">
-              {recentOrders.map((order, idx) => {
-                const matchCalc = (data?.results ?? []).find(r => r.orderId === order.orderId);
-                return (
-                  <button
-                    key={order.orderId + idx}
-                    type="button"
-                    className="order-row-item"
-                    onClick={() => setSelected(matchCalc || order)}
-                  >
-                    <div className="order-col-id">
-                      <strong className="order-id-text">{order.orderId}</strong>
-                      <span className="order-product-text">{order.productName}</span>
-                    </div>
-
-                    <div className="order-col-channel">
-                      <span className={`channel-badge channel-${order.platform.toLowerCase().replace(/\s+/g, '')}`}>
-                        {order.platform}
-                      </span>
-                    </div>
-
-                    <div className="order-col-time">
-                      <time dateTime={order.orderAt}>{formatOrderTime(order.orderAt)}</time>
-                    </div>
-
-                    <div className="order-col-amount">
-                      <strong className="order-amount-text">
-                        <Money value={order.revenueSatang} />
-                      </strong>
-                      {order.profitSatang != null && (
-                        <small className="order-profit-sub">
-                          {t('profit')}: ฿{money(order.profitSatang, locale)}
-                        </small>
-                      )}
-                    </div>
-
-                    <div className="order-col-arrow" aria-hidden="true">
-                      <Icon name="arrow" />
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        )}
-      </section>
-    </div>
-  );
+      {loading ? <Loading /> : !matches.length ? <Empty title={orders.length ? t('noMatchingOrders') : t('noOrdersInPeriod')} action={(search || channel !== 'all') ? <button className="secondary" onClick={() => { setSearch(''); setChannel('all'); }}>{t('clearFilters')}</button> : undefined} /> : <>
+        <p className="caption" aria-live="polite">{Math.min(visibleCount, matches.length)} / {matches.length} · {t('overviewLoaded')}: {orders.length}</p>
+        <ul className="recent-orders-list">{matches.slice(0, visibleCount).map(order => <li key={order.platform + order.orderId}><button type="button" className="order-row-item" onClick={() => setSelected(order)}>
+          <span className="order-col-id"><strong className="order-id-text">{order.orderId}</strong><span className="order-product-text">{order.productName}</span></span>
+          <span className="order-col-channel"><span className="channel-badge">{order.platform}</span></span>
+          <time className="order-col-time" dateTime={order.orderAt}>{orderDateTime(order.orderAt)}</time>
+          <span className="order-col-amount"><strong className="order-amount-text"><Money value={order.revenueSatang} /></strong><small className={'order-profit-sub' + (order.profitSatang != null && order.profitSatang < 0 ? ' negative' : '')}>{t('profitCard')}: <Money value={order.profitSatang} /></small></span>
+          <span className="order-col-arrow" aria-hidden="true"><Icon name="arrow" /></span>
+        </button></li>)}</ul>
+        {matches.length > visibleCount && <button className="secondary" onClick={() => setVisibleCount(count => count + 5)}>{t('showMoreOrders')}</button>}
+      </>}
+    </section>
+  </div>;
 }

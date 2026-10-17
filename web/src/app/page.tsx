@@ -7,6 +7,8 @@ import type { CatalogProduct, FeatureProps, PageResult, Store } from '../lib/typ
 import { LanguageSwitch, useLanguage } from './language';
 import { Brand, Icon } from './ui';
 import { AppShell, useNavigation } from './components/shell';
+import OverviewPeriodControl from './components/overview-period';
+import type { OverviewPeriod } from '../lib/overview-data';
 import { ErrorNotice, Loading } from './components/forms';
 import Onboarding from './onboarding';
 import Preview from './preview';
@@ -24,6 +26,9 @@ function StoreWorkspace({ stores, store, changeStore, create }: { stores: Store[
   const { screen, navigate } = useNavigation();
   const { t } = useLanguage();
   const [month, setMonth] = useState(bangkokDate().slice(0, 7));
+  const [overviewPeriod, setOverviewPeriod] = useState<OverviewPeriod>({ type: 'month', start: bangkokDate().slice(0, 7) + '-01', end: bangkokDate() });
+  const [missingCostsOnly, setMissingCostsOnly] = useState(false);
+  useEffect(() => { if (screen !== 'products') setMissingCostsOnly(false); }, [screen]);
   const [products, setProducts] = useState<CatalogProduct[]>([]), [more, setMore] = useState<string>();
   const [loading, setLoading] = useState(true), [catalogError, setCatalogError] = useState<unknown>();
   const [selectedSku, setSelectedSku] = useState(''), [draftRequest, setDraftRequest] = useState(0);
@@ -56,11 +61,11 @@ function StoreWorkspace({ stores, store, changeStore, create }: { stores: Store[
   const ask = (sku: string) => { setSelectedSku(sku); setDraftRequest(n => n + 1); navigate('assistant'); };
   const simulate = (sku: string) => { setSelectedSku(sku); navigate('simulation'); };
   const key = store.id + '|' + month;
-  return <AppShell screen={screen} navigate={navigate} stores={stores} store={store} changeStore={changeStore} month={month} changeMonth={setMonth} guest={guest}>
+  return <AppShell screen={screen} navigate={navigate} stores={stores} store={store} changeStore={changeStore} month={month} changeMonth={setMonth} guest={guest} overviewControls={<OverviewPeriodControl value={overviewPeriod} onChange={setOverviewPeriod} />}>
     {['products','addProduct','simulation','assistant','receipts'].includes(screen) && <><ErrorNotice error={catalogError} />{catalogError && <button className="secondary" onClick={() => void refresh()}>{t('retry')}</button>}{loading && <Loading />}{more && screen !== 'products' && screen !== 'addProduct' && <button className="secondary" disabled={loading} onClick={() => void loadMore()}>{t('next')} · {t('products')}</button>}</>}
     <div key={key} className={'screen-content screen-' + screen}>
-      {screen === 'overview' && <Overview {...props} navigate={navigate} sampleMonth={() => setMonth('2026-10')} />}
-      {screen === 'products' && <Products {...props} products={products} more={more} loadMore={() => void loadMore()} refresh={refresh} ask={ask} simulate={simulate} onAddProduct={() => navigate('addProduct')} />}
+      {screen === 'overview' && <Overview {...props} navigate={navigate} period={overviewPeriod} onMissingCosts={() => { setMissingCostsOnly(true); navigate('products'); }} />}
+      {screen === 'products' && <Products {...props} products={products} more={more} loadMore={() => void loadMore()} refresh={refresh} ask={ask} simulate={simulate} onAddProduct={() => navigate('addProduct')} initialMissingCostsOnly={missingCostsOnly} />}
       {screen === 'addProduct' && <AddProductPage {...props} onCancel={() => navigate('products')} onSaved={newProd => { setProducts(old => [newProd, ...old.filter(p => p.sku !== newProd.sku)]); navigate('products'); }} />}
       {screen === 'simulation' && <Simulation {...props} products={products} initialSku={selectedSku} />}
       {screen === 'orders' && <Orders {...props} />}

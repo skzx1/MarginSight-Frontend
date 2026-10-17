@@ -28,6 +28,7 @@ type CatalogProps = {
   ask: (sku: string) => void;
   simulate: (sku: string) => void;
   onAddProduct?: () => void;
+  initialMissingCostsOnly?: boolean;
 };
 
 export default function Products({
@@ -39,7 +40,8 @@ export default function Products({
   refresh,
   ask,
   simulate,
-  onAddProduct
+  onAddProduct,
+  initialMissingCostsOnly = false
 }: FeatureProps & CatalogProps) {
   const { t, locale } = useLanguage();
   const searchId = useId();
@@ -47,6 +49,7 @@ export default function Products({
   const filterId = useId();
 
   const [search, setSearch] = useState('');
+  const [missingCostsOnly, setMissingCostsOnly] = useState(initialMissingCostsOnly);
   const [priceFilter, setPriceFilter] = useState<'all' | 'listed' | 'unlisted'>('all');
   const [sort, setSort] = useState<SortOption>('dateDesc');
   const [selectedSku, setSelectedSku] = useState('');
@@ -73,7 +76,7 @@ export default function Products({
       priceFilter === 'all' ||
       (priceFilter === 'listed' ? hasPrice : !hasPrice);
 
-    return matchesSearch && matchesPriceFilter;
+    return matchesSearch && matchesPriceFilter && (!missingCostsOnly || p.cost?.unitCostSatang == null);
   });
 
   // Sort products (one active at a time)
@@ -117,6 +120,7 @@ export default function Products({
   });
 
   const clearAllFilters = () => {
+    setMissingCostsOnly(false);
     setSearch('');
     setPriceFilter('all');
   };
@@ -301,6 +305,7 @@ export default function Products({
 
   return (
     <div className="products-screen-content">
+      {missingCostsOnly && <div className="active-filter-chips"><span className="filter-chip">{t('missingCost')}<button type="button" onClick={() => setMissingCostsOnly(false)} aria-label={t('clearFilters')}>✕</button></span></div>}
       {/* Top Action Header */}
       <div className="section-heading">
         <div>

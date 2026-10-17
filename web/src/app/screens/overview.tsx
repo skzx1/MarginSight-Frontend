@@ -7,6 +7,7 @@ import type { Calculation, FeatureProps, Screen } from '../../lib/types';
 import { DataStatus, EvidencePanel, Money } from '../components/ledger';
 import { Empty, ErrorNotice, Field, Loading } from '../components/forms';
 import { Icon } from '../ui';
+import { OverviewCharts } from '../components/overview-charts';
 import {
   channelSummaries, orderDateTime, ordersInPeriod, periodBounds, summarizeOrders,
   OVERVIEW_CHANNELS,
@@ -73,6 +74,7 @@ export default function Overview({ base, origin, period, navigate, onMissingCost
       </article>
     </section>}
     <p className="caption overview-scope">{t('scope')}{' · ' + t('loadedOnly')}</p>
+    {!loading && data && bounds && <OverviewCharts orders={orders} />}
 
     <section className="quick-actions-row" aria-label={t('quickActions')}>
       {[

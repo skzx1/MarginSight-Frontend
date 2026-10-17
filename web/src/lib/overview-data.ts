@@ -87,6 +87,13 @@ export function channelSummaries(orders: OverviewOrder[]) {
     .sort((a, b) => (b.profitSatang ?? -Infinity) - (a.profitSatang ?? -Infinity));
 }
 
+// Aggregate recorded engine results only. A day with incomplete evidence has no
+// profit point; days without loaded orders are not invented as zero sales.
+export function dailySummaries(orders: OverviewOrder[]) {
+  const days = [...new Set(orders.map(order => orderDateTime(order.orderAt).slice(0, 10)))].filter(day => day !== '—').sort();
+  return days.map(day => ({ day, ...summarizeOrders(orders.filter(order => orderDateTime(order.orderAt).startsWith(day))) }));
+}
+
 export const OVERVIEW_MOCK_ORDERS: OverviewOrder[] = [
   {
     orderId: '#SHP-98214',

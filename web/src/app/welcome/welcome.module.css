@@ -46,9 +46,9 @@
 .heroProfit small{display:block;font-size:10px}
 .miniStrip,.flowStrip,.closingStrip{display:flex;gap:4px;height:10px;overflow:hidden;border-radius:3px}
 .miniStrip{margin-top:24px;height:6px}
-.miniStrip span:nth-child(1),.flowStrip span:nth-child(1),.closingStrip span:nth-child(1){width:29.62%;background:#9bb6a7}
-.miniStrip span:nth-child(2),.flowStrip span:nth-child(2),.closingStrip span:nth-child(2){width:11%;background:#627e70}
-.miniStrip span:nth-child(3),.flowStrip span:nth-child(3),.closingStrip span:nth-child(3){width:4.66%;background:#c9d9cf}
+.miniStrip span:nth-child(1),.flowStrip span:nth-child(1),.closingStrip span:nth-child(1){width:29.62%;background:#a4ac86}
+.miniStrip span:nth-child(2),.flowStrip span:nth-child(2),.closingStrip span:nth-child(2){width:11%;background:#656d4a}
+.miniStrip span:nth-child(3),.flowStrip span:nth-child(3),.closingStrip span:nth-child(3){width:4.66%;background:#c2c5aa}
 .miniStrip span:nth-child(4),.flowStrip span:nth-child(4),.closingStrip span:nth-child(4){width:54.72%;background:var(--green)}
 .miniDeductions{display:flex;justify-content:space-between;gap:10px;margin:12px 0 26px}
 .miniDeductions>div{font-size:11px}
@@ -81,7 +81,7 @@
 .page .how{padding-block:100px 80px;scroll-margin-top:30px}
 .steps{list-style:none;display:grid;grid-template-columns:repeat(3,1fr);gap:48px;margin:0;padding:0;counter-reset:steps}
 .steps li{border-top:1px solid var(--border);padding-top:24px;position:relative}
-.stepNumber{font-family:'IBM Plex Sans',sans-serif;font-size:14px;color:var(--green);display:inline-grid;place-items:center;width:32px;height:32px;background:var(--sage);border-radius:50%;margin:0 12px 18px 0}
+.stepNumber{font-family:'Inter',sans-serif;font-size:14px;color:var(--green);display:inline-grid;place-items:center;width:32px;height:32px;background:var(--sage);border-radius:50%;margin:0 12px 18px 0}
 .steps li>svg{color:var(--green);width:24px;height:24px}
 .steps h3{font-size:21px;margin-bottom:12px}
 .steps p{font-size:15px;line-height:1.9;margin:0;max-width:38ch}
@@ -124,7 +124,7 @@
 .chat{background:white;border:1px solid var(--border);border-radius:14px;overflow:hidden;min-width:0}
 .chatHeader{display:flex;align-items:center;gap:12px;padding:20px 24px;border-bottom:1px solid var(--border)}
 .chatAvatar{width:40px;height:40px;border-radius:9px;background:var(--sage);color:var(--green);display:grid;place-items:center}
-.chatHeader strong{font-family:'IBM Plex Sans',sans-serif;font-size:16px}
+.chatHeader strong{font-family:'Inter',sans-serif;font-size:16px}
 .chatHeader small{display:block;font-size:11px;margin-top:2px}
 .chatBody{padding:20px 24px 28px}
 .chatBody .chatContext{font-size:11px;margin:0 0 20px}
@@ -141,13 +141,13 @@
 .channelSection h2{max-width:860px;margin-inline:auto}
 .channelSection p{max-width:790px;margin:0 auto;font-size:16px;line-height:1.9}
 .sourceBadges{display:flex;flex-wrap:wrap;justify-content:center;gap:12px;list-style:none;padding:0;margin:32px 0}
-.sourceBadges li{font-family:'IBM Plex Sans','Noto Sans Thai',sans-serif;background:var(--canvas);border:1px solid var(--border);padding:12px 24px;border-radius:8px;font-size:17px;font-weight:500}
+.sourceBadges li{font-family:'Inter','Anuphan',sans-serif;background:var(--canvas);border:1px solid var(--border);padding:12px 24px;border-radius:8px;font-size:17px;font-weight:500}
 .channelSection .channelNote{font-size:12px;max-width:820px}
 .page .pricing{padding-block:100px 80px;scroll-margin-top:30px}
 .priceGrid{display:grid;grid-template-columns:1fr 1fr;gap:28px;max-width:1040px}
 .priceCard{border:1px solid var(--border);border-radius:12px;background:white;padding:34px 36px;display:flex;flex-direction:column;align-items:flex-start}
 .priceCard h3{font-size:21px;margin:0}
-.priceCard .price{font-size:42px;line-height:1.5;font-weight:600;color:var(--green);margin:18px 0 8px;font-family:'IBM Plex Sans','Noto Sans Thai',sans-serif}
+.priceCard .price{font-size:42px;line-height:1.5;font-weight:600;color:var(--green);margin:18px 0 8px;font-family:'Inter','Anuphan',sans-serif}
 .priceCard>p:not(.price){font-size:14px;margin:0}
 .priceCard ul{list-style:none;padding:24px 0;margin:20px 0 28px;border-top:1px solid var(--border);width:100%;flex:1}
 .priceCard li{display:flex;align-items:flex-start;gap:10px;font-size:14px;line-height:1.9;margin:12px 0}
@@ -169,8 +169,8 @@
 .page .closing{background:var(--green-dark);padding-block:76px;color:white}
 .closing>.container{position:relative}
 .closing h2{font-size:clamp(32px,4vw,52px);max-width:850px;margin-bottom:18px}
-.closing p{color:#d4e8df;font-size:18px;margin:0 0 28px;max-width:650px}
-.closing small{display:block;color:#d4e8df;font-size:12px;margin-top:18px}
+.closing p{color:#c2c5aa;font-size:18px;margin:0 0 28px;max-width:650px}
+.closing small{display:block;color:#c2c5aa;font-size:12px;margin-top:18px}
 .page .lightCta{background:white;color:var(--green-dark);border-color:white}
 .page .lightCta:hover{background:var(--sage);border-color:var(--sage)}
 .closingDemo{color:white}

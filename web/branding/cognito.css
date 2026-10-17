@@ -1,13 +1,13 @@
 .logo-customizable { max-width: 85%; max-height: 100%; }
-.banner-customizable { padding: 24px 20px 24px 20px; background-color: #f5f8f7; }
-.label-customizable { font-weight: 600; color: #52665e; }
-.textDescription-customizable { padding-top: 12px; padding-bottom: 16px; display: block; font-size: 16px; color: #172d28; }
-.submitButton-customizable { font-size: 16px; font-weight: bold; margin: 20px 0px 12px 0px; height: 48px; width: 100%; color: #ffffff; background-color: #087563; }
-.submitButton-customizable:hover { color: #ffffff; background-color: #065d4e; }
-.inputField-customizable { width: 100%; height: 48px; color: #172d28; background-color: #ffffff; border: 1px solid #73867d; border-radius: 8px; }
-.inputField-customizable:focus { border-color: #087563; outline: 2px; }
+.banner-customizable { padding: 24px 20px 24px 20px; background-color: #f7f6f1; }
+.label-customizable { font-weight: 600; color: #656d4a; }
+.textDescription-customizable { padding-top: 12px; padding-bottom: 16px; display: block; font-size: 16px; color: #333d29; }
+.submitButton-customizable { font-size: 16px; font-weight: bold; margin: 20px 0px 12px 0px; height: 48px; width: 100%; color: #ffffff; background-color: #414833; }
+.submitButton-customizable:hover { color: #ffffff; background-color: #333d29; }
+.inputField-customizable { width: 100%; height: 48px; color: #333d29; background-color: #ffffff; border: 1px solid #858971; border-radius: 8px; }
+.inputField-customizable:focus { border-color: #414833; outline: 2px; }
 .errorMessage-customizable { padding: 12px; font-size: 13px; width: 100%; background: #fff2f0; border: 1px solid #efd1ca; color: #b42318; }
-.legalText-customizable { color: #52665e; font-size: 12px; }
-.background-customizable { background-color: #f5f8f7; }
-.passwordCheck-valid-customizable { color: #087563; }
+.legalText-customizable { color: #656d4a; font-size: 12px; }
+.background-customizable { background-color: #f7f6f1; }
+.passwordCheck-valid-customizable { color: #414833; }
 .passwordCheck-notValid-customizable { color: #b42318; }

@@ -11,6 +11,22 @@ body{font-optical-sizing:auto}
 .profit-card .summary-main-number.negative{color:#ffcebf}
 .sales-card{border-top:1px solid var(--border)}
 .summary-card{box-shadow:none}
+.marketplace-context{margin-top:20px;padding-top:20px;border-top:1px solid var(--border)}
+.marketplace-context>.field{max-width:520px}
+.marketplace-fields{display:grid;grid-template-columns:minmax(0,1fr);gap:0 18px}
+.marketplace-fields>*{min-width:0}.marketplace-fields .field select{white-space:normal}
+.marketplace-campaigns legend{font-weight:600;font-size:15px}
+.marketplace-campaign{border-top:1px solid var(--border);padding:8px 0}
+.marketplace-campaign .check-field{margin:0;padding:8px 0;align-items:flex-start}
+.marketplace-campaign p{margin:0 0 8px 34px;font-size:12px}
+.marketplace-assumptions{background:var(--surface);border:1px solid var(--border);padding:16px;border-radius:12px}
+.marketplace-context .notice{font-size:13px;margin:14px 0 20px}
+.marketplace-confirm{align-items:flex-start}
+.marketplace-calculate{display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin-top:16px}
+.marketplace-calculate small{max-width:420px;font-size:12px}
+.marketplace-context .check-field input{flex-shrink:0}
+.scenario-fee-lines{font-size:13px}
+@media(min-width:768px){.marketplace-fields{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .summary-main-number{font-variant-numeric:tabular-nums;letter-spacing:-.04em}
 .dashboard-charts{display:grid;grid-template-columns:minmax(0,1fr);gap:24px}
 .dashboard-charts section{min-width:0;margin:0;padding:24px}

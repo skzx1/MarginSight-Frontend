@@ -1,0 +1,42 @@
+'use client';
+import {useLanguage} from '../language';
+import {Field,Select,ErrorNotice} from './forms';
+import {initialMarketplaceDraft,type MarketplaceDraft,type MarketplaceOptions,type MarketplacePlatform} from '../../lib/marketplace-context';
+
+export function MarketplaceControls({draft:d,change,options,error,loading,reload}:{draft:MarketplaceDraft;change:(d:MarketplaceDraft)=>void;options?:MarketplaceOptions;error?:unknown;loading:boolean;reload:()=>void}){
+ const {locale}=useLanguage(),th=locale==='th';
+ const p=options?.platforms.find(p=>p.id===d.platform);
+ const update=(patch:Partial<MarketplaceDraft>)=>change({...d,...patch,confirmed:false});
+ return <div className="marketplace-context">
+  <Select label={th?'แพลตฟอร์มที่ต้องการคำนวณ':'Platform to calculate'} value={d.platform} onChange={e=>change({...initialMarketplaceDraft,platform:e.target.value as MarketplacePlatform})}>
+   <option value="recorded">{th?'ใช้ข้อมูลและค่าธรรมเนียมที่บันทึกไว้':'Use recorded store data and fees'}</option>
+   {['shopee','lazada','tiktok'].map(id=><option key={id} value={id} disabled={!options?.platforms.some(p=>p.id===id)}>{id==='shopee'?'Shopee':id==='lazada'?'Lazada':'TikTok Shop'}</option>)}
+  </Select>
+  {loading&&<p className="caption">{th?'กำลังโหลดรายการแพลตฟอร์ม…':'Loading platform options…'}</p>}
+  <ErrorNotice error={error}/>{!!error&&<button type="button" className="secondary" onClick={reload}>{th?'โหลดตัวเลือกอีกครั้ง':'Reload options'}</button>}
+  {p&&<>
+   <p className="notice marketplace-scope">{th?'ลองขายสินค้าที่เลือกบนแพลตฟอร์มนี้ ใช้ราคาและต้นทุนจากออเดอร์ล่าสุดในเดือนที่เลือก เป็นประมาณการ ไม่เปลี่ยนออเดอร์เดิมหรือสมัครโปรแกรมให้ร้าน':'Hypothetical sale using the latest single-SKU order in the selected month. This does not change orders or enroll your shop.'}</p>
+   <div className="marketplace-fields"><Select label={th?'หมวดสินค้า / กลุ่มอัตรา':'Product category / rate group'} value={d.category} onChange={e=>update({category:e.target.value})}>{p.categories.map(c=><option key={c.id} value={c.id}>{c.name}</option>)}</Select>
+    <Select label={th?'ประเภทร้าน':'Seller type'} value={d.sellerType} onChange={e=>update({sellerType:e.target.value as MarketplaceDraft['sellerType'],growthTier:'STANDARD'})}><option value="NON_MALL">Non-Mall / Marketplace</option><option value="MALL">Mall</option></Select></div>
+   <fieldset className="marketplace-campaigns"><legend>{th?'แคมเปญ / โปรแกรมที่ต้องการลอง':'Campaigns / programs to simulate'}</legend><p className="caption">{th?'ไม่เลือก = ไม่รวมค่าบริการแคมเปญที่ระบุด้านล่าง; ค่าธรรมเนียมปกติยังคงมี':'None selected excludes these optional campaigns; normal fees still apply.'}</p>
+    {p.campaigns.map(c=><div key={c.id} className="marketplace-campaign"><label className="check-field"><input type="checkbox" checked={d.campaigns.includes(c.id)} onChange={e=>update({campaigns:e.target.checked?[...d.campaigns.filter(id=>!c.id.startsWith('tiktok-')||!id.startsWith('tiktok-')),c.id]:d.campaigns.filter(id=>id!==c.id)})}/><strong>{c.name}</strong></label><p className="caption">{c.note} · <a href={c.sourceUrl} target="_blank" rel="noreferrer">{th?'ที่มา / เงื่อนไข':'Source / terms'}</a></p></div>)}
+   </fieldset>
+   {d.campaigns.includes('shopee-prime')&&d.category==='electronics'&&<Select label={th?'อัตรา PRIME หมวดอิเล็กทรอนิกส์ของร้าน (ก่อน VAT)':'Confirmed PRIME electronics rate (before VAT)'} value={d.primeElectronics} onChange={e=>update({primeElectronics:e.target.value})}><option value="">{th?'ยังไม่ทราบ':'Unknown'}</option><option value="7">7%</option><option value="8">8%</option></Select>}
+   {d.campaigns.includes('shopee-live')&&<Select label={th?'อัตรา LiveXtra ตามสิทธิ์ร้าน (ก่อน VAT)':'LiveXtra rate for your eligibility (before VAT)'} value={d.liveRate} onChange={e=>update({liveRate:e.target.value})}><option value="">{th?'ยังไม่ทราบ':'Unknown'}</option><option value="2">{th?'2% — FSS/CCB อัตราปกติตามเงื่อนไข':'2% — normal FSS/CCB eligibility'}</option><option value="3">{th?'3% — ไม่ร่วม FSS/CCB หรืออัตราพิเศษ':'3% — no FSS/CCB or special rate'}</option></Select>}
+   <p className="caption">{th?'ต้องมีออเดอร์ของ SKU นี้ในเดือนที่เลือก ใช้สมมติฐานการขายปกติ ไม่รวมพรีออเดอร์ Affiliate หรือค่าร่วมจ่ายที่ไม่ได้บันทึก':'Requires a single-SKU order in the selected month. Standard sale assumptions exclude unrecorded pre-order, affiliate and co-funded charges.'}</p>
+   <details className="marketplace-assumptions" open><summary>{th?'ค่าธรรมเนียมพื้นฐานและสมมติฐานของร้าน':'Base fees and merchant assumptions'}</summary>
+    <p className="caption">{th?'ค่าคอมมิชชั่นขึ้นกับหมวดและสิทธิ์ร้าน จึงไม่เดาให้ เว้นว่างหรือเลือก VAT ไม่ทราบ = ยังแสดงกำไรไม่ได้':'Commission depends on category and eligibility. Unknown commission or VAT leaves profit incomplete.'}</p>
+    <div className="marketplace-fields"><Field label={th?'ค่าคอมมิชชั่น (%)':'Commission (%)'} inputMode="decimal" value={d.commission} onChange={e=>update({commission:e.target.value})} placeholder={th?'ยังไม่ทราบ':'Unknown'}/>
+     <Select label={th?'VAT ของค่าคอมมิชชั่น':'Commission VAT'} value={d.commissionVat} onChange={e=>update({commissionVat:e.target.value as MarketplaceDraft['commissionVat']})}><option value="UNKNOWN">{th?'ยังไม่ทราบ':'Unknown'}</option><option value="INCLUDED">{th?'อัตรารวม VAT แล้ว':'Rate includes VAT'}</option><option value="EXCLUDED">{th?'อัตรายังไม่รวม VAT (+7%)':'Rate excludes VAT (+7%)'}</option></Select>
+     <Field label={th?'ค่าชำระเงิน (% รวม VAT)':'Payment fee (% including VAT)'} inputMode="decimal" value={d.payment} onChange={e=>update({payment:e.target.value})} hint={th?'3.21% เป็นค่าเริ่มต้นให้ตรวจ อัตราผ่อน/สิทธิ์พิเศษอาจต่างกัน':'Review the 3.21% starting assumption; installment and special rates can differ.'}/>
+     <Select label={th?'ฐานค่าชำระเงินที่ร้านยืนยัน':'Confirmed payment-fee basis'} value={d.paymentBase} onChange={e=>update({paymentBase:e.target.value as MarketplaceDraft['paymentBase']})}><option value="BUYER_PLUS_PLATFORM_PLUS_SHIPPING">{th?'ผู้ซื้อจ่ายค่าสินค้า + ส่วนลดแพลตฟอร์ม + ค่าส่งผู้ซื้อ':'Buyer item payment + platform discount + buyer shipping'}</option><option value="BUYER_PLUS_PLATFORM">{th?'ผู้ซื้อจ่ายค่าสินค้า + ส่วนลดแพลตฟอร์ม':'Buyer item payment + platform discount'}</option><option value="REVENUE">{th?'รายรับสินค้าหลังส่วนลดร้าน':'Seller item revenue after seller discount'}</option></Select>
+     <Field label={th?'สมมติค่าส่งที่ผู้ซื้อจ่ายต่อออเดอร์ (บาท)':'Assumed buyer shipping per order (THB)'} inputMode="decimal" value={d.buyerShipping} onChange={e=>update({buyerShipping:e.target.value})}/>
+    </div>
+    {d.platform!=='lazada'&&<label className="check-field"><input type="checkbox" checked={d.fixedFeeExempt} onChange={e=>update({fixedFeeExempt:e.target.checked})}/>{th?'ร้านได้รับยกเว้นค่าธรรมเนียมคงที่ 1.07 บาทต่อออเดอร์ — ยืนยันสิทธิ์แล้ว':'Confirmed exemption from the THB 1.07 per-order fee'}</label>}
+    {d.platform==='tiktok'&&<><Select label={th?'Commerce Growth Fee — เป็นค่าปกติ ไม่ใช่แคมเปญ':'Commerce Growth Fee — normal fee, not an optional campaign'} value={d.growthTier} onChange={e=>update({growthTier:e.target.value as MarketplaceDraft['growthTier']})}><option value="STANDARD">{th?'อัตราปกติ: 6.96% / 8.03% รวม VAT':'Standard: 6.96% / 8.03% including VAT'}</option>{d.sellerType==='NON_MALL'&&<option value="SMALL">{th?'Non-Mall GMV 30 วันต่ำกว่า 10,000: 6.42% / 7.49%':'Non-Mall 30-day GMV below THB 10,000: 6.42% / 7.49%'}</option>}<option value="WAIVED">{th?'ยืนยันได้รับยกเว้นแล้ว (ต้องตรวจโควตาคงเหลือ)':'Confirmed waiver (check remaining allowance)'}</option></Select><p className="caption">{th?'เพดาน Growth Fee 199 บาทต่อชิ้น ไม่ได้ยกเว้นเพียงเพราะไม่เลือกแคมเปญ':'Growth fee is capped at THB 199 per item; selecting no campaign does not waive it.'} <a href="https://seller-th.tiktok.com/university/essay?knowledge_id=4831419884979969&lang=en" target="_blank" rel="noreferrer">{th?'เงื่อนไข':'Terms'}</a></p></>}
+   </details>
+   <label className="check-field marketplace-confirm"><input type="checkbox" checked={d.confirmed} onChange={e=>change({...d,confirmed:e.target.checked})}/>{th?'ตรวจอัตรา ฐาน VAT สิทธิ์ยกเว้น และวันที่ของแคมเปญแล้ว ใช้ตัวเลือกนี้เป็นสมมติฐานในการลองคำนวณ':'I reviewed rates, bases, VAT, exemptions and campaign dates; use these as hypothetical assumptions.'}</label>
+   <p className="caption">{th?'รายการอ้างอิงตรวจ 18 ต.ค. 2569 ผลจริงให้ใช้ยอดหักในรายงาน ไม่หักค่าประมาณซ้ำ':'References reviewed 18 Oct 2026. Actual settlement lines replace estimates, never stack with them.'}</p>
+  </>}
+ </div>;
+}

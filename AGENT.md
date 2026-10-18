@@ -23,3 +23,7 @@
 - รักษา output/ และ tmp/ ถ้ามี ไม่ลบข้อมูลร้าน/ทรัพยากรถาวรหรือ seed ข้อมูลจำลองในร้านจริง.
 - plan.md เป็น full-system contract จาก monorepo ใช้ร่วมกับอีก repo ตาม ownership ด้านบน งานของอีก repo ไม่ใช่เหตุให้ลด scope ทั้งระบบหรือกล่าวอ้างว่าทำครบแล้ว.
 - สถานะโครงการยัง PARTIAL_WITH_EXTERNAL_BLOCKERS จนผ่าน gates ตาม plan. จบงานอิสระให้ครบและระบุ blocker ที่ต้องใช้ LINE/ข้อมูลแพลตฟอร์ม/real receipt/บัญชีทดสอบจริง.
+
+## Local references
+
+ภาพใน `docs/design/` และบันทึก UI/release บางฉบับเป็น local-only ตาม `docs/reference-policy.md` และ `.gitignore`. อ่านประกอบได้เมื่อไฟล์มีอยู่ แต่ห้ามใช้เป็น dependency ของ build/test/deploy หรือถือว่า clone ใหม่ต้องมีไฟล์เหล่านี้. ใช้ source และคู่มือที่ยัง tracked เป็นหลัก.

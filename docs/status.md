@@ -1,8 +1,12 @@
+## จัด repository — 18 ตุลาคม 2026
+
+นำภาพและบันทึกอ้างอิง19ไฟล์ออกจาก tracked tree ตาม [reference policy](reference-policy.md); ต้นฉบับและสำเนาสำรอง SHA-256 ยังอยู่ในเครื่อง. Clean snapshot ที่ไม่มีไฟล์เหล่านี้ผ่าน `npm ci` / `npm run verify` (50tests, typecheck, static export, packaging). Runtime/สูตร/assetsของแอป/CIไม่เปลี่ยน และไม่มี AWS deployment รอบนี้. สถานะโครงการยัง PARTIAL_WITH_EXTERNAL_BLOCKERS.
+
 ## อัปเดต 18 ตุลาคม 2026 — รุ่นเว็บล่าสุด
 
 **PARTIAL_WITH_EXTERNAL_BLOCKERS**. Pull upstream `69947ed`, คงผู้ช่วยใหม่และแยกแพลตฟอร์ม/แคมเปญไป Playground. แก้ CSV partial cost save/retry/ข้อมูลที่ยังไม่บันทึก, แจ้งเตือนเมื่อรายละเอียดออเดอร์ไม่ครบ และปรับหน้าข้อมูลร้านให้ใช้ shared shell/สีเดียวกับเว็บไซต์.
 
-Frontend sourceล่าสุด **2a358db** ขึ้น AWS เดิมแล้ว13:33UTC; sidebarหน้าภาพรวมใช้แบบเดียวกับสินค้า/ข้อมูลร้าน ย้ายเลือกเปลี่ยนร้านมาในpage headerข้างช่วงเวลา. Invalidation Completed, public releaseตรงcommit, 50tests/buildผ่านlocal/CloudShell; MOCK browserตรวจdesktop/mobile/tabletและช่วงเวลา. ก่อนหน้านี้ตรวจCSVต้นทุน123.45หลังreload, assistant profit9, Playground Lazada profit7.46, finance expense100/CSVexport. [หลักฐานแยกรอบและข้อจำกัด](release-2026-10-18.md).
+Frontend sourceล่าสุด **2a358db** ขึ้น AWS เดิมแล้ว13:33UTC; sidebarหน้าภาพรวมใช้แบบเดียวกับสินค้า/ข้อมูลร้าน ย้ายเลือกเปลี่ยนร้านมาในpage headerข้างช่วงเวลา. Invalidation Completed, public releaseตรงcommit, 50tests/buildผ่านlocal/CloudShell; MOCK browserตรวจdesktop/mobile/tabletและช่วงเวลา. ก่อนหน้านี้ตรวจCSVต้นทุน123.45หลังreload, assistant profit9, Playground Lazada profit7.46, finance expense100/CSVexport. หลักฐานแยกรอบและข้อจำกัด (ไฟล์อ้างอิงเฉพาะเครื่อง: `docs/release-2026-10-18.md`).
 
 > บันทึกด้านล่างก่อนหัวข้อ Repository split เป็นประวัติจาก monorepo; ignored evidence อยู่เครื่องต้นทางและไม่ได้เผยแพร่ตามไฟล์ลิงก์เหล่านั้น ดู AWS-HANDOFF.md สำหรับคำสั่งปัจจุบัน.
 
@@ -81,7 +85,7 @@ VERIFIED_LOCAL: ดีไซน์ใหม่หน้าเริ่มต้�
 
 VERIFIED_AWS_BROWSER: เผยแพร่staticจากad7bb9fบนS3/CloudFrontเดิมและhealthผ่าน; เข้าguestMOCK, เปิด10เมนู, dashboard9บาท, simulation15%=-14.10บาท. นำเข้าorders.xlsxผ่านbrowserจริงสำเร็จรับ1/ซ้ำ0/ผิด0/conflict0. Cognitoclassicbrandingจาก26ad3e6อ่านกลับCSSตรง/มีlogo, ตรวจหน้าsignup/signinจริงโดยไม่submitcredentialsหรือสร้างบัญชีใหม่. ไม่อ้างว่าได้ทดสอบทุกmutation, liveOCR, LINEหรือสองบัญชีCognitoครบflowในรอบนี้.
 
-ดู[การออกแบบและขอบเขตผลตรวจ](ui-design.md), [ภาพAWS MOCK](design/marginsight-desktop.jpg). การเปลี่ยนรอบนี้เป็นwebstaticและCognitoappearance ไม่มีIAMroles/บริการใหม่/การเปลี่ยนสูตร. คงPARTIAL_WITH_EXTERNAL_BLOCKERSตามรายการข้อมูลและintegrationเดิม.
+ดูการออกแบบและขอบเขตผลตรวจ (ไฟล์อ้างอิงเฉพาะเครื่อง: `docs/ui-design.md`), ภาพAWS MOCK (ไฟล์อ้างอิงเฉพาะเครื่อง: `docs/design/marginsight-desktop.jpg`). การเปลี่ยนรอบนี้เป็นwebstaticและCognitoappearance ไม่มีIAMroles/บริการใหม่/การเปลี่ยนสูตร. คงPARTIAL_WITH_EXTERNAL_BLOCKERSตามรายการข้อมูลและintegrationเดิม.
 
 
 ## Repository split — 15 October 2026

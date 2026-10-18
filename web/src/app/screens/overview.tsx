@@ -19,7 +19,7 @@ export default function Overview({ base, origin, period, navigate, onMissingCost
 }) {
   const { t, locale } = useLanguage();
   const today = bangkokDate();
-  const { data, error, loading, reload } = useOverviewDashboard(base, period, today, origin);
+  const { data, coverage, error, loading, reload } = useOverviewDashboard(base, period, today, origin);
   const [selected, setSelected] = useState<OverviewOrder>();
   const [search, setSearch] = useState(''), [channel, setChannel] = useState('all'), [visibleCount, setVisibleCount] = useState(5);
   useEffect(() => { setSelected(undefined); setVisibleCount(5); }, [period.type, period.start, period.end]);
@@ -58,6 +58,7 @@ export default function Overview({ base, origin, period, navigate, onMissingCost
   return <div className="overview-page" aria-busy={loading}>
     <ErrorNotice error={error} />{Boolean(error) && <button className="secondary" onClick={() => void reload()}>{t('retry')}</button>}
     {!bounds && <p className="notice" role="alert">{t('invalidRange')}</p>}
+    {!loading && coverage?.partial && <p className="notice" role="alert">{locale==='th'?`API ส่งรายละเอียดมา ${coverage.loaded} จาก ${coverage.total} ออเดอร์ในเดือนที่เลือก ตัวเลขและกราฟด้านล่างรวมเฉพาะรายการที่โหลดได้ ไม่ใช่ยอดรวมทั้งร้าน`:`The API returned ${coverage.loaded} of ${coverage.total} orders in the selected months. Figures and charts cover loaded entries only, not the whole store.`}</p>}
     {data && !loading && <>
       <div className="row overview-status-bar"><DataStatus value={data.dataOrigin} /><span className="caption" data-testid="overview-coverage">{t('coverage')}: {stats.completeOrders}/{stats.totalOrders}</span></div>
       {stats.missingCostOrders > 0 && <button className="overview-cost-warning" onClick={onMissingCosts}><span>{t('missingCostPrefix')} {stats.missingCostOrders} {t('missingCostSuffix')}</span><Icon name="arrow" /></button>}

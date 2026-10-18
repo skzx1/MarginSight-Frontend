@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import { request } from './auth';
 import { periodMonths, type OverviewPeriod } from './overview-data';
 import type { Dashboard } from './types';
+import {dashboardCoverage,type DashboardCoverage} from './dashboard-coverage';
 
 // The API owns calculations and exposes monthly snapshots. Read every month
 // touched by the page's date range; never borrow the month from another screen.
@@ -11,7 +12,7 @@ export function useOverviewDashboard(base: string, period: OverviewPeriod, today
   const key = `${base}|${months}|${today}|${origin}`;
   const cache = useRef(new Map<string, Promise<Dashboard>>());
   const [attempt, setAttempt] = useState(0);
-  const [state, setState] = useState<{ key: string; data?: Dashboard; error?: unknown; loading: boolean }>({ key, loading: true });
+  const [state, setState] = useState<{ key: string; data?: Pick<Dashboard,'results'|'dataOrigin'>; coverage?:DashboardCoverage; error?: unknown; loading: boolean }>({ key, loading: true });
   useEffect(() => {
     let active = true;
     setState({ key, loading: true });
@@ -30,17 +31,18 @@ export function useOverviewDashboard(base: string, period: OverviewPeriod, today
         if (!active) return;
         const selected = months ? months.split(',') : [];
         const results: Dashboard['results'] = [];
+        const snapshots:Dashboard[]=[];
         // Bound concurrency and stop scheduling more work after the range changes.
         for (let index = 0; index < selected.length; index += 3) {
           if (!active) return;
           const batch = await Promise.all(selected.slice(index, index + 3).map(read));
-          for (const snapshot of batch) results.push(...snapshot.results);
+          for (const snapshot of batch) {results.push(...snapshot.results);snapshots.push(snapshot);}
         }
-        if (active) setState({ key, data: { ...anchor, results }, loading: false });
+        if (active) setState({ key, data: { dataOrigin:anchor.dataOrigin, results },coverage:dashboardCoverage(snapshots), loading: false });
       } catch (error) { if (active) setState({ key, error, loading: false }); }
     })();
     return () => { active = false; };
   }, [key, base, months, today, origin, attempt]);
   const reload = () => { cache.current.clear(); setAttempt(value => value + 1); };
-  return { ...(state.key === key ? state : { loading: true, data: undefined, error: undefined }), reload };
+  return { ...(state.key === key ? state : { loading: true, data: undefined, coverage:undefined, error: undefined }), reload };
 }

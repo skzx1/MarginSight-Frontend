@@ -18,6 +18,7 @@ import Products, { Simulation } from '../screens/products';
 import AddProductPage from '../screens/add-product';
 import { Orders, Settlement } from '../screens/orders';
 import Assistant from '../screens/assistant';
+import Playground from '../screens/playground';
 import { AssistantProvider } from '../components/assistant-provider';
 import { AssistantDrawerNav } from '../components/assistant-history';
 import Imports from '../screens/imports';
@@ -40,6 +41,8 @@ function StoreWorkspace({ stores, store, changeStore, create }: { stores: Store[
   const [selectedSku, setSelectedSku] = useState(''), [draftRequest, setDraftRequest] = useState(0);
   const [assistantDraftStore, setAssistantDraftStore] = useState('');
   const [assistantOpened, setAssistantOpened] = useState(false);
+  const [playgroundOpened, setPlaygroundOpened] = useState(false);
+  useEffect(() => { if (screen === 'playground') setPlaygroundOpened(true); }, [screen]);
   useEffect(() => { if (screen === 'assistant') setAssistantOpened(true); }, [screen]);
   const version = useRef(0);
   const base = '/stores/' + encodeURIComponent(store.id);
@@ -88,6 +91,7 @@ function StoreWorkspace({ stores, store, changeStore, create }: { stores: Store[
         {screen === 'line' && <LineConnection {...props} />}
         {screen === 'store' && <StoreHub base={base} guest={guest} storeName={store.name ?? store.id} onNameSaved={setLocalStoreName} registerGuard={registerGuard} canLeave={canLeave} navigate={navigate} canCreate={!guest && !stores.some(item => item.personal)} create={create} />}
       </div>
+      <div key={'playground|'+key} hidden={screen !== 'playground'}>{(playgroundOpened || screen === 'playground') && <Playground {...props} products={products} visible={screen === 'playground'} />}</div>
       <div className={assistantStyles.host} hidden={screen !== 'assistant'}>{(assistantOpened || screen === 'assistant') && <Assistant key={base} {...props} products={products} initialSku={assistantDraftStore === store.id ? selectedSku : ''} draftRequest={draftRequest} onDraftHandled={() => setAssistantDraftStore('')} defaultContext={{ ...assistantPeriod, sku: null }} visible={screen === 'assistant'} more={more} loadMore={() => void loadMore()} catalogError={catalogError} catalogLoading={loading} retryCatalog={() => void refresh()} />}</div>
     </AppShell>
   </AssistantProvider>;

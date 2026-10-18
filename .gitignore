@@ -49,3 +49,16 @@ Thumbs.db
 /scripts/operator-runtime.mjs
 /contracts/.staging/
 .impeccable
+
+# Local reference notes and UI/release screenshots; retained on the owner's machine
+/docs/design/
+/docs/assistant-composer-ui.md
+/docs/assistant-history-ui.md
+/docs/assistant-ui.md
+/docs/design-theme.md
+/docs/finance-ui.md
+/docs/products-ui.md
+/docs/store-settings-ui.md
+/docs/ui-design.md
+/docs/welcome.md
+/docs/release-2026-10-18.md

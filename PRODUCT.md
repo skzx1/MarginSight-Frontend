@@ -41,13 +41,13 @@ web
 
 ## Brand Commitments
 
-ชื่อ MarginSight ใช้ภาษาสงบ ตรงไปตรงมา น่าเชื่อถือ และคำที่เจ้าของร้านเข้าใจ หลีกเลี่ยงศัพท์บัญชีหรือการตลาดที่ไม่จำเป็น ผู้ช่วยเป็นพื้นที่หลักของผลิตภัณฑ์ รักษาระบบดีไซน์เดิมในการปรับเฉพาะจุด รายละเอียดระบบภาพอยู่ใน docs/ui-design.md
+ชื่อ MarginSight ใช้ภาษาสงบ ตรงไปตรงมา น่าเชื่อถือ และคำที่เจ้าของร้านเข้าใจ หลีกเลี่ยงศัพท์บัญชีหรือการตลาดที่ไม่จำเป็น ผู้ช่วยเป็นพื้นที่หลักของผลิตภัณฑ์ รักษาระบบดีไซน์เดิมในการปรับเฉพาะจุด รายละเอียดสีและ UI ปัจจุบันอยู่ใน web/src/app/globals.css, earth-theme.css และ components/
 
 ## Evidence on Hand
 
 - docs/usage.md: ขั้นตอนใช้งานและข้อจำกัดการทำงาน
 - docs/data-contracts.md และ docs/calculation-policy.md: รูปแบบข้อมูลและขอบเขตการคำนวณ
-- docs/ui-design.md: ระบบดีไซน์ปัจจุบันและประวัติการเปลี่ยนแปลง
+- web/src/app/globals.css และ earth-theme.css: สีและรูปแบบส่วนกลางปัจจุบัน; บันทึกดีไซน์ย้อนหลังเป็นไฟล์อ้างอิงเฉพาะเครื่องตาม docs/reference-policy.md
 - docs/status.md และ docs/verification.md: สถานะและหลักฐาน แยกผล local/AWS และผลเก่า/ล่าสุด
 - web/public/templates/ และ web/public/fixtures/: แบบฟอร์มและตัวอย่าง; web/src/lib/overview-data.ts: synthetic Overview fixture ไม่ใช่ข้อมูลร้านจริงหรืออัตราทางการ
 - ยังไม่รับรองผล LINE live, native marketplace mappings, OCR จากบิลจริงครบเกณฑ์ หรือ flow ครบด้วยสองบัญชี Cognito จนมีหลักฐานตาม gates ของโครงการ

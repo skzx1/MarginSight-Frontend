@@ -4,6 +4,7 @@ import type { FeatureProps, Screen } from '../../lib/types';
 import { bangkokDate, money, parseBaht } from '../../lib/format';
 import { periodBounds, type OverviewPeriod } from '../../lib/overview-data';
 import { useOverviewDashboard } from '../../lib/use-overview-dashboard';
+import type {DashboardCoverage} from '../../lib/dashboard-coverage';
 import { settingsStorageKey } from '../../lib/store-settings';
 import { FINANCE_CHANNELS, expenseCategories, financeCsv, financeDays, financeTotals, fromCalculation, previousPeriod, readExpenses, selectFinance, type Expense, type ExpenseCategory, type FinanceOrder } from '../../lib/finance-data';
 import { LanguageSwitch, useLanguage } from '../language';
@@ -14,7 +15,7 @@ import { Icon } from '../ui';
 import s from '../components/finance.module.css';
 
 type Props = FeatureProps & { period: OverviewPeriod; onPeriodChange: (period: OverviewPeriod) => void; navigate: (screen: Screen) => void; onMissingCosts: () => void };
-type Resource = { orders: FinanceOrder[]; loading: boolean; error?: unknown; retry: () => void };
+type Resource = { orders: FinanceOrder[]; coverage?:DashboardCoverage; loading: boolean; error?: unknown; retry: () => void };
 export default function Finance(props: Props) {
   return props.origin === 'MOCK' ? <MockFinance {...props} /> : <LiveFinance {...props} />;
 }
@@ -32,7 +33,7 @@ function LiveFinance(props: Props) {
   const requested = previous && bounds ? { type: 'custom' as const, start: previous.start, end: bounds.end } : props.period;
   const resource = useOverviewDashboard(props.base, requested, today, props.origin);
   const orders = useMemo(() => (resource.data?.results ?? []).map(fromCalculation), [resource.data]);
-  return <FinanceView {...props} resource={{ orders, loading: resource.loading, error: resource.error, retry: resource.reload }} />;
+  return <FinanceView {...props} resource={{ orders, coverage:resource.coverage, loading: resource.loading, error: resource.error, retry: resource.reload }} />;
 }
 
 function Sparkline({ values, label }: { values: (number | null)[]; label: string }) {
@@ -76,7 +77,7 @@ function FinanceView({ resource, base, origin, period, onPeriodChange, navigate,
   useEffect(() => { if (!saved) return; const timer = setTimeout(() => setSaved(false), 4000); return () => clearTimeout(timer); }, [saved]);
   const bounds = periodBounds(period, today), previous = previousPeriod(period, today);
   const sampleStart = new Date(Date.parse(today) - 61 * 86400000).toISOString().slice(0, 10);
-  const previousCovered = !mock || !!previous && previous.start >= sampleStart && previous.end <= today;
+  const previousCovered = !mock ? !resource.coverage?.partial : !!previous && previous.start >= sampleStart && previous.end <= today;
   const current = selectFinance(resource.orders, expenses, period, today, channel);
   const prior = previous ? selectFinance(resource.orders, expenses, previous, today, channel) : { orders: [], expenses: [] };
   const totals = financeTotals(current.orders, current.expenses), old = financeTotals(prior.orders, prior.expenses), days = financeDays(current.orders, current.expenses);
@@ -109,6 +110,7 @@ function FinanceView({ resource, base, origin, period, onPeriodChange, navigate,
   };
   const exportReport = () => {
     const rows: (string | number | null)[][] = [['MarginSight', text('รายงานการเงิน', 'Finance report'), origin], ['Period', bounds?.start ?? '', bounds?.end ?? ''], ['Channel', channel === 'all' ? text('ทุกช่องทาง', 'All channels') : channelName(channel)], ['Currency', 'THB'], ['Scope', text('เฉพาะรายการที่บันทึก ค่าใช้จ่ายเพิ่มเติมอยู่ในเบราว์เซอร์', 'Recorded entries only; added expenses are local')], [], ['Metric', 'Value (THB, percent, or count)']];
+    if(resource.coverage?.partial)rows.splice(5,0,['INCOMPLETE_API_COVERAGE',resource.coverage.loaded,resource.coverage.total,'Loaded orders only; monthly counts include the requested comparison months. Not whole-store totals.']);
     kpis.forEach(k => rows.push([k.label, totals[k.key] == null ? null : ['totalOrders', 'marginPct'].includes(k.key) ? totals[k.key] : totals[k.key]! / 100]));
     rows.push([], ['Profit & loss', 'THB']); pnl.forEach(([label, value]) => rows.push([label, value == null ? null : value / 100]));
     rows.push([], ['Channel', 'Net sales THB', 'Orders', 'Fees THB', 'Net profit THB', 'Margin %']); channels.forEach(c => rows.push([channelName(c.platform), c.revenueSatang / 100, c.totalOrders, c.categories.fees == null ? null : c.categories.fees / 100, c.profitSatang == null ? null : c.profitSatang / 100, c.marginPct]));
@@ -132,15 +134,16 @@ function FinanceView({ resource, base, origin, period, onPeriodChange, navigate,
   };
   const busy = resource.loading || !storageReady;
   return <div className={s.page} aria-busy={busy}>
+    {!busy && resource.coverage?.partial && <p className="notice" role="alert">{text(`API ส่งรายละเอียดมา ${resource.coverage.loaded} จาก ${resource.coverage.total} ออเดอร์ในเดือนที่ขอ รวมเดือนที่ใช้เปรียบเทียบ ตัวเลขและไฟล์ส่งออกครอบคลุมเฉพาะรายการที่โหลดได้ ไม่ใช่ยอดรวมทั้งร้าน ปิดการเทียบช่วงก่อนหน้าจนข้อมูลครบ`,`The API returned ${resource.coverage.loaded} of ${resource.coverage.total} orders across requested months, including comparison months. Figures and exports cover loaded entries only, not the whole store. Previous-period comparison is unavailable until coverage is complete.`)}</p>}
     <header className={s.header}><div><div className={s.heading}><h1 id="screen-title" tabIndex={-1}>{t('finance')}</h1>{mock && <span className={s.badge}>{text('ข้อมูลจำลอง', 'Sample data')}</span>}</div><p>{text('ดูว่าเงินไปไหน และช่องทางไหนทำกำไรให้ร้าน', 'See where the money goes, and which channels earn it.')}</p></div><div className={s.heading}><LanguageSwitch /><button className="secondary" disabled={busy || !!resource.error || !bounds} onClick={exportReport}><Icon name="receipt" />{text('ส่งออกรายงาน', 'Export report')}</button></div></header>
-    <div className={s.controls}><OverviewPeriodControl value={period} onChange={onPeriodChange} /><label>{text('ช่องทางขาย', 'Sales channel')}<select aria-label={text('ช่องทางขาย', 'Sales channel')} value={channel} onChange={e => setChannel(e.target.value)}><option value="all">{text('ทุกช่องทาง', 'All channels')}</option>{[...new Set([...FINANCE_CHANNELS, ...resource.orders.map(o => o.platform)])].map(c => <option key={c} value={c}>{channelName(c)}</option>)}</select></label><label className={s.compare}><input type="checkbox" checked={compare} onChange={e => setCompare(e.target.checked)} />{text('เทียบกับช่วงก่อนหน้า', 'Compare previous period')}</label></div>
-    <p className={s.scope}><span>{bounds ? `${bounds.start} — ${bounds.end}` : t('invalidRange')}{compare && previous ? ` · ${text('เทียบ', 'vs')} ${previous.start} — ${previous.end}` : ''}</span><span>{mock ? text(`ตัวอย่าง ${sampleStart} — ${today} · แยกจากออเดอร์นำเข้า`, `Sample ${sampleStart} — ${today} · Separate from imported orders`) : text('เฉพาะข้อมูลที่บันทึก · ไม่รวมภาษีเงินได้ที่ยังไม่บันทึก', 'Recorded entries only · Excludes unrecorded income tax')}</span></p>
+    <div className={s.controls}><OverviewPeriodControl value={period} onChange={onPeriodChange} /><label>{text('ช่องทางขาย', 'Sales channel')}<select aria-label={text('ช่องทางขาย', 'Sales channel')} value={channel} onChange={e => setChannel(e.target.value)}><option value="all">{text('ทุกช่องทาง', 'All channels')}</option>{[...new Set([...FINANCE_CHANNELS, ...resource.orders.map(o => o.platform)])].map(c => <option key={c} value={c}>{channelName(c)}</option>)}</select></label><label className={s.compare}><input type="checkbox" checked={compare && previousCovered} disabled={!previousCovered} onChange={e => setCompare(e.target.checked)} />{text('เทียบกับช่วงก่อนหน้า', 'Compare previous period')}</label></div>
+    <p className={s.scope}><span>{bounds ? `${bounds.start} — ${bounds.end}` : t('invalidRange')}{compare && previousCovered && previous ? ` · ${text('เทียบ', 'vs')} ${previous.start} — ${previous.end}` : ''}</span><span>{mock ? text(`ตัวอย่าง ${sampleStart} — ${today} · แยกจากออเดอร์นำเข้า`, `Sample ${sampleStart} — ${today} · Separate from imported orders`) : text('เฉพาะข้อมูลที่บันทึก · ไม่รวมภาษีเงินได้ที่ยังไม่บันทึก', 'Recorded entries only · Excludes unrecorded income tax')}</span></p>
     {!bounds && <p className="notice" role="alert">{t('invalidRange')}</p>}
     <ErrorNotice error={resource.error} />{!!resource.error && <button className="secondary" onClick={resource.retry}>{t('retry')}</button>}
     {busy ? <div className={s.loading} role="status"><span>{t('loading')}</span><div className={s.kpis}>{Array.from({ length: 6 }, (_, i) => <div key={i} className={s.skeleton} />)}</div><div className={s.skeleton} /></div> : !resource.error && bounds && <>
       {totals.missingCostOrders > 0 && <div className={s.warning}><span>{text(`มี ${totals.missingCostOrders} ออเดอร์ที่ยังไม่ระบุต้นทุน — ตัวเลขกำไรอาจไม่ครบ`, `${totals.missingCostOrders} orders are missing costs — profit may be incomplete`)}</span><button className="ghost" onClick={onMissingCosts}>{text('เพิ่มต้นทุนสินค้า', 'Add product costs')}<Icon name="arrow" /></button></div>}
       {estimated && !totals.missingCostOrders && <p className={s.muted}>{text('ข้อมูลเงินหักยังไม่ครบ กำไรจะแสดงเมื่อมีข้อมูลครบ', 'Some deductions are missing. Profit is available when records are complete.')}</p>}
-      <section className={s.kpis} aria-label={text('สรุปการเงิน', 'Finance summary')}>{kpis.map(k => <article className={s.kpi + (k.key === 'profitSatang' ? ' ' + s.kpiProfit : '')} key={k.key}><h2 title={k.key === 'averageSatang' ? text('ยอดขายสุทธิหารด้วยจำนวนออเดอร์ทุกสถานะ', 'Net sales divided by orders of all statuses') : undefined}>{k.label}{estimated && ['profitSatang', 'marginPct', 'totalCostsSatang'].includes(k.key) ? ' · ' + text('ประมาณการ', 'Incomplete estimate') : ''}</h2><strong className={totals[k.key] != null && totals[k.key]! < 0 ? s.negative : ''}>{k.key === 'profitSatang' ? <ProfitValue value={totals[k.key]} locale={locale} /> : k.key === 'marginPct' ? pct(totals[k.key]) : k.key === 'totalOrders' ? totals[k.key].toLocaleString(locale) : cash(totals[k.key])}</strong>{compare && <span className={s.delta}>{delta(k.key)}</span>}<Sparkline values={days.map(d => d[k.key])} label={text('แนวโน้มรายวัน · ดูตัวเลขในกราฟด้านล่าง', 'Daily trend · Exact values in chart below')} /></article>)}</section>
+      <section className={s.kpis} aria-label={text('สรุปการเงิน', 'Finance summary')}>{kpis.map(k => <article className={s.kpi + (k.key === 'profitSatang' ? ' ' + s.kpiProfit : '')} key={k.key}><h2 title={k.key === 'averageSatang' ? text('ยอดขายสุทธิหารด้วยจำนวนออเดอร์ทุกสถานะ', 'Net sales divided by orders of all statuses') : undefined}>{k.label}{estimated && ['profitSatang', 'marginPct', 'totalCostsSatang'].includes(k.key) ? ' · ' + text('ประมาณการ', 'Incomplete estimate') : ''}</h2><strong className={totals[k.key] != null && totals[k.key]! < 0 ? s.negative : ''}>{k.key === 'profitSatang' ? <ProfitValue value={totals[k.key]} locale={locale} /> : k.key === 'marginPct' ? pct(totals[k.key]) : k.key === 'totalOrders' ? totals[k.key].toLocaleString(locale) : cash(totals[k.key])}</strong>{compare && previousCovered && <span className={s.delta}>{delta(k.key)}</span>}<Sparkline values={days.map(d => d[k.key])} label={text('แนวโน้มรายวัน · ดูตัวเลขในกราฟด้านล่าง', 'Daily trend · Exact values in chart below')} /></article>)}</section>
       {!current.orders.length && !current.expenses.length && <Empty title={t('noOrdersInPeriod')} action={<button className="secondary" onClick={() => { setChannel('all'); onPeriodChange({ ...period, type: 'month' }); }}>{text('ดูทุกช่องทางในเดือนนี้', 'View all channels this month')}</button>} />}
       <nav className={s.jumpLinks} aria-label={text('ส่วนต่าง ๆ ของการเงิน', 'Finance sections')}>{[['finance-summary', text('สรุป / กำไรขาดทุน', 'Summary / Profit & loss')], ['finance-channels', text('ช่องทางขาย', 'Channels')], ['finance-orders', text('ออเดอร์', 'Orders')], ['finance-products', text('สินค้า', 'Products')], ['finance-expenses', text('ค่าใช้จ่าย', 'Expenses')]].map(([id, label]) => <a key={id} href={'#' + id} onClick={e => { e.preventDefault(); const section = document.getElementById(id); section?.scrollIntoView({ behavior: 'instant', block: 'start' }); section?.focus({ preventScroll: true }); }}>{label}</a>)}</nav>
       <div id="finance-summary" tabIndex={-1} className={s.summaryGrid}>

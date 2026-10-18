@@ -1,4 +1,5 @@
 export const copy = {
+  playground: ['Playground', 'Playground'],
   finance: ['การเงิน', 'Finance'],
   overviewPeriod: ['ช่วงเวลา', 'Period'], invalidRange: ['เลือกวันที่เริ่มต้นและสิ้นสุดให้ถูกต้อง', 'Choose a valid start and end date.'],
   netMargin: ['อัตรากำไรสุทธิ', 'Net margin'], totalCostsFees: ['ต้นทุนและค่าธรรมเนียมรวม', 'Total costs & fees'], platformFees: ['ค่าธรรมเนียมแพลตฟอร์ม', 'Platform fees'], overviewShipping: ['ค่าจัดส่ง', 'Shipping'], otherCosts: ['ค่าแพ็กและค่าโฆษณา', 'Packaging & advertising'], salesAllocation: ['ยอดขายเหลือเป็นอะไรบ้าง', 'Where sales went'], channelInsight: ['กำไรแยกตามช่องทาง', 'Profit by channel'],

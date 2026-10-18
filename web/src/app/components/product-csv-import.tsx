@@ -6,6 +6,7 @@ import { Icon } from '../ui';
 import { ErrorNotice } from './forms';
 import { money, bangkokDate, dateAt } from '../../lib/format';
 import { request } from '../../lib/auth';
+import {importProductRows,type ImportCheckpoint} from '../../lib/product-import-service';
 import type { CatalogProduct, FeatureProps } from '../../lib/types';
 import {
   parseCsvText,
@@ -38,6 +39,7 @@ export default function ProductCsvImport({
   const { t, locale } = useLanguage();
   const fileInputId = useId();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const checkpoints = useRef(new Map<number,ImportCheckpoint>());
 
   // Flow states
   const [file, setFile] = useState<File | null>(null);
@@ -76,6 +78,7 @@ export default function ProductCsvImport({
       return;
     }
 
+    checkpoints.current.clear();
     setFile(selectedFile);
 
     try {
@@ -220,98 +223,22 @@ export default function ProductCsvImport({
       return;
     }
 
-    const createdList: CatalogProduct[] = [];
-    let skipped = 0;
-
     setImportProgress({ current: 0, total: importableRows.length });
-
     try {
-      for (let i = 0; i < importableRows.length; i++) {
-        const row = importableRows[i];
-        setImportProgress({ current: i + 1, total: importableRows.length });
-
-        // Check if shop duplicate and policy is 'skip'
-        if (row.isShopDuplicate && duplicatePolicy === 'skip') {
-          skipped++;
-          continue;
-        }
-
-        // Check if in-file duplicate and policy is 'skip'
-        if (row.isInFileDuplicate && duplicatePolicy === 'skip') {
-          skipped++;
-          continue;
-        }
-
-        const effectiveFrom = dateAt(bangkokDate());
-        const cleanSku = row.sku || 'SKU-' + crypto.randomUUID().slice(0, 8).toUpperCase();
-
-        let baseProduct: CatalogProduct;
-
-        // If duplicate policy is 'update' and product already exists in shop
-        const existingMatch = existingProducts.find(
-          p => p.name.trim().toLowerCase() === row.name.trim().toLowerCase()
-        );
-
-        if (existingMatch && duplicatePolicy === 'update') {
-          baseProduct = existingMatch;
-        } else {
-          // Create product in catalog
-          baseProduct = await request<CatalogProduct>(base + '/products', {
-            sku: cleanSku,
-            name: row.name,
-            unit: row.unit || 'ชิ้น'
-          });
-        }
-
-        // Save cost version if cost was provided
-        let savedCost = baseProduct.cost ?? null;
-        if (row.costSatang !== null) {
-          try {
-            savedCost = await request(
-              base + '/products/' + encodeURIComponent(baseProduct.sku) + '/cost-versions',
-              {
-                sku: baseProduct.sku,
-                unitCostSatang: row.costSatang,
-                effectiveFrom,
-                sourceRef: 'merchant-csv-import:' + bangkokDate(),
-                dataOrigin: origin,
-                method: 'MERCHANT_CONFIRMED_UNIT_COST'
-              }
-            );
-          } catch {
-            // If cost saving fails, product is still created
-          }
-        }
-
-        // Attach frontend attributes for instant presentation
-        const fullProduct: CatalogProduct = {
-          ...baseProduct,
-          cost: savedCost,
-          sellingPriceSatang: row.sellingPriceSatang,
-          quantity: row.quantity ?? 1,
-          profitSatang:
-            row.sellingPriceSatang != null && savedCost?.unitCostSatang != null
-              ? row.sellingPriceSatang - savedCost.unitCostSatang
-              : null,
-          dateAdded: bangkokDate()
-        };
-
-        createdList.push(fullProduct);
-      }
-
-      setImportSuccessCount(createdList.length);
-      setImportSkippedCount(skipped);
-      onImportComplete(createdList);
-    } catch (e) {
-      setImportError(e instanceof Error ? e.message : 'เกิดข้อผิดพลาดระหว่างนำเข้าสินค้า');
-    } finally {
-      setIsImporting(false);
-      setImportProgress(null);
-    }
+      const result=await importProductRows(request,base,importableRows,existingProducts,duplicatePolicy,origin,dateAt(bangkokDate()),checkpoints.current,current=>setImportProgress({current,total:importableRows.length}));
+      if(result.products.length)onImportComplete(result.products);
+      setImportSkippedCount(result.skipped);
+      if(result.failures.length){
+        const details=result.failures.slice(0,10).map(f=>locale==='th'?'แถว '+f.index+': '+f.code+(f.productSaved?' (บันทึกสินค้าแล้ว แต่ต้นทุนยังไม่สำเร็จ)':''):'Row '+f.index+': '+f.code+(f.productSaved?' (product saved; cost incomplete)':'')).join(' · ')+(result.failures.length>10?' · …':'');
+        setImportError((locale==='th'?'บันทึกครบ '+result.completed+' รายการ มี '+result.failures.length+' แถวที่ต้องแก้หรือลองใหม่ กดนำเข้าอีกครั้งเพื่อลองเฉพาะรายการที่ยังไม่สำเร็จ: ':'Saved '+result.completed+' rows; retry incomplete rows: ')+details);
+      }else setImportSuccessCount(result.completed);
+    }catch(error){setImportError(error instanceof Error?error.message:'IMPORT_FAILED');}
+    finally{setIsImporting(false);setImportProgress(null);}
   };
 
   // Reset to import another file
   const handleReset = () => {
+    checkpoints.current.clear();
     setFile(null);
     setParseResult(null);
     setImportSuccessCount(null);
@@ -356,6 +283,7 @@ export default function ProductCsvImport({
           </div>
         </div>
 
+        <p className="notice">{locale==='th'?'บันทึก SKU ชื่อสินค้า หน่วยขาย และต้นทุนเท่านั้น ราคาขายและจำนวนในไฟล์ใช้ตรวจร่าง ยังไม่ถูกบันทึกเป็นราคาขายหรือสต็อก และไม่ใช่กำไรสุทธิ':'Saves SKU, name, selling unit and cost only. CSV prices and quantities are draft checks, not saved sale prices, inventory or net profit.'}</p>
         <div className="csv-success-actions">
           <button type="button" onClick={onNavigateToProducts} className="primary-btn">
             <Icon name="products" />
@@ -372,6 +300,7 @@ export default function ProductCsvImport({
 
   return (
     <div className="csv-import-flow" role="region" aria-label={t('addCsvTab')}>
+      <p className="notice">{locale==='th'?'บันทึก SKU ชื่อสินค้า หน่วยขาย และต้นทุนเท่านั้น ราคาขายและจำนวนในไฟล์ใช้ตรวจร่าง ยังไม่ถูกบันทึกเป็นราคาขายหรือสต็อก และไม่ใช่กำไรสุทธิ':'Saves SKU, name, selling unit and cost only. CSV prices and quantities are draft checks, not saved sale prices, inventory or net profit.'}</p>
       {/* 3-Step Merchant Hint */}
       <ol className="steps" aria-label="ขั้นตอนการนำเข้าสินค้าจาก CSV">
         <li className={!file ? 'current' : ''}>

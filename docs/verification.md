@@ -1,3 +1,13 @@
+## Repository cleanup — 18 October 2026
+
+VERIFIED_LOCAL: staged tracked-only snapshot exported with `git checkout-index`; ไม่มี19ไฟล์อ้างอิงที่นำออก. `npm ci` และ `npm run verify` ผ่าน50tests, TypeScript, preview hash/policy, Next static exportและdeploy packaging. ตรวจ34ลิงก์เอกสารหลักรวมสองrepoผ่าน; ลิงก์ไปไฟล์local-onlyแปลงเป็นข้อความกำกับ ไม่ให้เป็นลิงก์เสีย. ต้นฉบับและbackup22ไฟล์รวมสองrepo hashตรงmanifest. ไม่มีruntime/source/fixtures/IaCเปลี่ยนและไม่ได้ทดสอบหรือdeployAWSใหม่. ดู [reference policy](reference-policy.md).
+
+## 18 October 2026 — fresh frontend verification
+
+เพิ่มเติม13:33UTC source2a358db: shared sidebarภาพรวมตรงกับหน้าอื่น, store/period selectorใช้งานได้, responsive390/900/1440px, full50tests/buildผ่านและAWSreadback/invalidationCompleted. หลักฐานอยู่หัวข้อเพิ่มเติมของ release report ด้านล่าง.
+
+ดู release-2026-10-18.md (ไฟล์อ้างอิงเฉพาะเครื่อง: `docs/release-2026-10-18.md`) สำหรับ exact commit, 50 tests, CloudShell build, 4 file hashes matched, invalidation/readback และ AWS browser checks ของผู้ช่วย/Playground/CSV/finance/store desktop/mobile. ทดสอบ guest MOCK เท่านั้น; ไม่ใช่หลักฐานใหม่ของ REAL merchant/OCR/LINE/Cognito สองผู้ใช้.
+
 > บันทึกด้านล่างก่อนหัวข้อ Repository split เป็นประวัติจาก monorepo; ignored evidence อยู่เครื่องต้นทางและไม่ได้เผยแพร่ตามไฟล์ลิงก์เหล่านั้น ดู AWS-HANDOFF.md สำหรับคำสั่งปัจจุบัน.
 
 # Verification — 14–15 October 2026
@@ -129,7 +139,7 @@ VERIFIED_LOCAL: ดีไซน์ใหม่หน้าเริ่มต้�
 
 VERIFIED_AWS_BROWSER: เผยแพร่staticจากad7bb9fบนS3/CloudFrontเดิมและhealthผ่าน; เข้าguestMOCK, เปิด10เมนู, dashboard9บาท, simulation15%=-14.10บาท. นำเข้าorders.xlsxผ่านbrowserจริงสำเร็จรับ1/ซ้ำ0/ผิด0/conflict0. Cognitoclassicbrandingจาก26ad3e6อ่านกลับCSSตรง/มีlogo, ตรวจหน้าsignup/signinจริงโดยไม่submitcredentialsหรือสร้างบัญชีใหม่. ไม่อ้างว่าได้ทดสอบทุกmutation, liveOCR, LINEหรือสองบัญชีCognitoครบflowในรอบนี้.
 
-ดู[การออกแบบและขอบเขตผลตรวจ](ui-design.md), [ภาพAWS MOCK](design/marginsight-desktop.jpg). การเปลี่ยนรอบนี้เป็นwebstaticและCognitoappearance ไม่มีIAMroles/บริการใหม่/การเปลี่ยนสูตร. คงPARTIAL_WITH_EXTERNAL_BLOCKERSตามรายการข้อมูลและintegrationเดิม.
+ดูการออกแบบและขอบเขตผลตรวจ (ไฟล์อ้างอิงเฉพาะเครื่อง: `docs/ui-design.md`), ภาพAWS MOCK (ไฟล์อ้างอิงเฉพาะเครื่อง: `docs/design/marginsight-desktop.jpg`). การเปลี่ยนรอบนี้เป็นwebstaticและCognitoappearance ไม่มีIAMroles/บริการใหม่/การเปลี่ยนสูตร. คงPARTIAL_WITH_EXTERNAL_BLOCKERSตามรายการข้อมูลและintegrationเดิม.
 
 
 ## Repository split — 15 October 2026
@@ -189,7 +199,7 @@ Published web/out to the existing private web bucket; SHA-256 read-back matched 
 
 AWS read-back11:20:14Z: health200/protectedNoToken401/privateWebBucket403/web200/login200. Cognito root callback, authorization-code flow and marginsight/api scope preserved; stackUPDATE_COMPLETE. No Backend/IaC update or new resources.
 
-AGENT-OBSERVED AWS_BROWSER: new bilingual landing -> /login/ -> create one isolated MOCK demo session. Overview uses the actual API fixture (profit9THB/margin4.5/revenue200), does not substitute display-only marketplace orders. Simulation15% returns-14.10THB and break-even188.31. Added RELEASE-CHECK-20261017 product plus154.50THB confirmed cost; after reload product and cost remain, unsaved price/quantity/profit stay unknown. Opened all12screens, including assistant/OCR/rules/LINE, without claiming every mutation was tested. Overview390px/1440px and simulation390px have no horizontal overflow. Settings draft fields are explicitly disabled/unconnected. Screenshot: [AWS MOCK UI](design/frontend-aws-2026-10-17.jpg). Local evidence .local/aws-ui-release-20261017/ is excluded from Git.
+AGENT-OBSERVED AWS_BROWSER: new bilingual landing -> /login/ -> create one isolated MOCK demo session. Overview uses the actual API fixture (profit9THB/margin4.5/revenue200), does not substitute display-only marketplace orders. Simulation15% returns-14.10THB and break-even188.31. Added RELEASE-CHECK-20261017 product plus154.50THB confirmed cost; after reload product and cost remain, unsaved price/quantity/profit stay unknown. Opened all12screens, including assistant/OCR/rules/LINE, without claiming every mutation was tested. Overview390px/1440px and simulation390px have no horizontal overflow. Settings draft fields are explicitly disabled/unconnected. Screenshot: AWS MOCK UI (ไฟล์อ้างอิงเฉพาะเครื่อง: `docs/design/frontend-aws-2026-10-17.jpg`). Local evidence .local/aws-ui-release-20261017/ is excluded from Git.
 
 No AI/model/OCR call, live LINE, real merchant data, fresh Cognito login/signup roundtrip or native marketplace integration test in this release. Opening a screen is not proof of its external integration. Local browser attempt could not reach localhost, so no new local-browser pass is claimed; browser evidence above is the actual AWS site. Overall PARTIAL_WITH_EXTERNAL_BLOCKERS remains. Source/docs/publish-marker maintenance after cb11f7f does not change the recorded deployed UI commit.
 

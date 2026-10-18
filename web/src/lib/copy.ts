@@ -1,4 +1,5 @@
 export const copy = {
+  finance: ['การเงิน', 'Finance'],
   overviewPeriod: ['ช่วงเวลา', 'Period'], invalidRange: ['เลือกวันที่เริ่มต้นและสิ้นสุดให้ถูกต้อง', 'Choose a valid start and end date.'],
   netMargin: ['อัตรากำไรสุทธิ', 'Net margin'], totalCostsFees: ['ต้นทุนและค่าธรรมเนียมรวม', 'Total costs & fees'], platformFees: ['ค่าธรรมเนียมแพลตฟอร์ม', 'Platform fees'], overviewShipping: ['ค่าจัดส่ง', 'Shipping'], otherCosts: ['ค่าแพ็กและค่าโฆษณา', 'Packaging & advertising'], salesAllocation: ['ยอดขายเหลือเป็นอะไรบ้าง', 'Where sales went'], channelInsight: ['กำไรแยกตามช่องทาง', 'Profit by channel'],
   overviewSearch: ['ค้นหาเลขออเดอร์หรือชื่อสินค้า', 'Search order ID or product'], overviewSummary: ['สรุปกำไรและยอดขาย', 'Profit and sales summary'], quickActions: ['ทำต่อได้เลย', 'Quick actions'], overviewAddHelper: ['อัปเดตต้นทุนเพื่อคำนวณกำไรแม่นยำ', 'Update costs for a more accurate profit figure'], overviewImportHelper: ['นำเข้า Excel/CSV ตามแบบ MarginSight', 'Import Excel/CSV using the MarginSight template'], overviewImportNote: ['จัดคอลัมน์ตามแบบฟอร์ม MarginSight ก่อนนำเข้า', 'Arrange columns using the MarginSight template before importing.'],

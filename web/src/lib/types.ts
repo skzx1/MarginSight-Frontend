@@ -21,4 +21,4 @@ export type Conflict = { id: string; orderId?: string; key: string; existing: Re
 export type Reconciliation = { key: string; orderId: string; estimatedFeeSatang: number | null; actualFeeSatang: number | null; varianceSatang: number | null; payoutReconciled: boolean | null };
 export type RulesData = { rules: Rule[]; enrollments: Enrollment[] };
 export type FeatureProps = { base: string; month: string; guest: boolean; realStore: boolean; origin: 'MOCK' | 'REAL' };
-export type Screen = 'overview' | 'products' | 'addProduct' | 'assistant' | 'store' | 'orders' | 'reconciliation' | 'imports' | 'receipts' | 'rules' | 'line' | 'simulation';
+export type Screen = 'finance' | 'overview' | 'products' | 'addProduct' | 'assistant' | 'store' | 'orders' | 'reconciliation' | 'imports' | 'receipts' | 'rules' | 'line' | 'simulation';

@@ -3,13 +3,13 @@ import {useLanguage} from '../language';
 import {Field,Select,ErrorNotice} from './forms';
 import {initialMarketplaceDraft,type MarketplaceDraft,type MarketplaceOptions,type MarketplacePlatform} from '../../lib/marketplace-context';
 
-export function MarketplaceControls({draft:d,change,options,error,loading,reload}:{draft:MarketplaceDraft;change:(d:MarketplaceDraft)=>void;options?:MarketplaceOptions;error?:unknown;loading:boolean;reload:()=>void}){
+export function MarketplaceControls({draft:d,change,options,error,loading,reload,allowRecorded=true}:{draft:MarketplaceDraft;change:(d:MarketplaceDraft)=>void;options?:MarketplaceOptions;error?:unknown;loading:boolean;reload:()=>void;allowRecorded?:boolean}){
  const {locale}=useLanguage(),th=locale==='th';
  const p=options?.platforms.find(p=>p.id===d.platform);
  const update=(patch:Partial<MarketplaceDraft>)=>change({...d,...patch,confirmed:false});
  return <div className="marketplace-context">
   <Select label={th?'แพลตฟอร์มที่ต้องการคำนวณ':'Platform to calculate'} value={d.platform} onChange={e=>change({...initialMarketplaceDraft,platform:e.target.value as MarketplacePlatform})}>
-   <option value="recorded">{th?'ใช้ข้อมูลและค่าธรรมเนียมที่บันทึกไว้':'Use recorded store data and fees'}</option>
+   {allowRecorded&&<option value="recorded">{th?'ใช้ข้อมูลและค่าธรรมเนียมที่บันทึกไว้':'Use recorded store data and fees'}</option>}
    {['shopee','lazada','tiktok'].map(id=><option key={id} value={id} disabled={!options?.platforms.some(p=>p.id===id)}>{id==='shopee'?'Shopee':id==='lazada'?'Lazada':'TikTok Shop'}</option>)}
   </Select>
   {loading&&<p className="caption">{th?'กำลังโหลดรายการแพลตฟอร์ม…':'Loading platform options…'}</p>}

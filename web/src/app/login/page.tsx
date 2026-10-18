@@ -78,7 +78,7 @@ function StoreWorkspace({ stores, store, changeStore, create }: { stores: Store[
         {screen === 'overview' && <Overview {...props} navigate={navigate} period={overviewPeriod} onMissingCosts={() => { setMissingCostsOnly(true); navigate('products'); }} />}
         {screen === 'finance' && <Finance key={base} {...props} period={overviewPeriod} onPeriodChange={setOverviewPeriod} navigate={navigate} onMissingCosts={() => { setMissingCostsOnly(true); navigate('products'); }} />}
         {screen === 'products' && <Products {...props} loading={loading} products={products} more={more} loadMore={() => void loadMore()} refresh={refresh} ask={ask} simulate={simulate} onAddProduct={() => navigate('addProduct')} initialMissingCostsOnly={missingCostsOnly} />}
-        {screen === 'addProduct' && <AddProductPage {...props} onCancel={() => navigate('products')} onSaved={newProd => { setProducts(old => [newProd, ...old.filter(p => p.sku !== newProd.sku)]); navigate('products'); }} />}
+        {screen === 'addProduct' && <AddProductPage {...props} existingProducts={products} onCancel={() => navigate('products')} onSaved={newProd => { setProducts(old => [newProd, ...old.filter(p => p.sku !== newProd.sku)]); navigate('products'); }} onBatchSaved={batch => { const skus = new Set(batch.map(b => b.sku)); setProducts(old => [...batch, ...old.filter(p => !skus.has(p.sku))]); }} />}
         {screen === 'simulation' && <Simulation {...props} products={products} initialSku={selectedSku} />}
         {screen === 'orders' && <Orders {...props} />}
         {screen === 'reconciliation' && <Settlement {...props} />}

@@ -366,6 +366,79 @@ dd{margin:0;text-align:right;overflow-wrap:anywhere;min-width:0;max-width:65%}
 .success-icon{display:grid;place-items:center;width:40px;height:40px;border-radius:50%;background:#414833;color:white;flex-shrink:0}
 
 /* ========================================================
+   3.1 CSV IMPORT (นำเข้าสินค้าจาก CSV)
+   ======================================================== */
+.add-product-tabs{max-width:380px;margin:0 0 24px}
+.csv-import-flow{width:100%}
+.csv-template-bar{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;padding:16px 20px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:20px}
+.csv-template-bar span.caption{font-size:14px;color:var(--muted);font-weight:500}
+.csv-template-buttons{display:flex;gap:10px;flex-wrap:wrap}
+.csv-template-buttons button{font-size:13px;min-height:44px;padding:8px 16px}
+.csv-dropzone{display:grid;place-items:center;border:2px dashed var(--field-border);border-radius:var(--radius);background:var(--surface);padding:48px 24px;text-align:center;cursor:pointer;transition:border-color 150ms ease,background 150ms ease;margin:20px 0;min-height:220px}
+.csv-dropzone:hover,.csv-dropzone.drag-over{border-color:var(--green);background:var(--sage)}
+.csv-dropzone:focus-visible{outline:3px solid var(--green);outline-offset:2px}
+.dropzone-content{display:flex;flex-direction:column;align-items:center}
+.dropzone-icon{display:grid;place-items:center;width:56px;height:56px;border-radius:14px;background:var(--sage);color:var(--green);margin-bottom:16px}
+.dropzone-title{font-size:16px;font-weight:600;color:var(--ink);margin-bottom:6px}
+.dropzone-mobile-btn{display:none}
+.dropzone-hint{font-size:13px;color:var(--muted);margin-top:4px}
+.csv-preview-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin:20px 0}
+.csv-preview-header{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--border)}
+.csv-preview-header h2{font-size:19px;margin:0 0 8px}
+.csv-summary-badges{display:flex;gap:8px;flex-wrap:wrap}
+.duplicate-policy-box{display:flex;flex-direction:column;gap:6px;min-width:220px}
+.duplicate-policy-box label{font-size:13px;color:var(--ink)}
+.duplicate-select{min-height:44px;font-size:14px;padding:8px 12px;border:1px solid var(--field-border);border-radius:8px;background:var(--surface);color:var(--ink)}
+.csv-table-scroll-container{overflow-x:auto;-webkit-overflow-scrolling:touch;max-width:100%;margin:16px 0;border:1px solid var(--border);border-radius:8px}
+.csv-preview-table{width:100%;border-collapse:collapse;font-size:14px;text-align:left;min-width:680px}
+.csv-preview-table th,.csv-preview-table td{padding:12px 14px;border-bottom:1px solid var(--border);vertical-align:top}
+.csv-preview-table th{background:#faf9f5;color:var(--muted);font-weight:600;font-size:13px}
+.csv-preview-table tbody tr:hover{background:#faf9f5}
+.csv-preview-table tr.row-status-warning{background:#fffdf5}
+.csv-preview-table tr.row-status-error{background:#fff8f6}
+.csv-preview-table tr.editing-row{background:var(--sage)}
+.row-num{color:var(--muted);font-size:12px;font-weight:600}
+.product-table-name{display:block;font-size:14px;font-weight:600;color:var(--ink)}
+.row-msg-warning{display:block;font-size:11px;color:#8c6000;margin-top:4px;line-height:1.4}
+.row-msg-error{display:block;font-size:11px;color:var(--loss);margin-top:4px;font-weight:500;line-height:1.4}
+.calm-warning-inline{display:inline-block;background:#fef7e6;color:#8c6000;border:1px solid #fae4b8;border-radius:4px;padding:2px 6px;font-size:11px;font-weight:500}
+.inline-input{padding:6px 8px;min-height:38px;font-size:13px;border:1px solid var(--field-border);border-radius:6px;background:var(--surface);color:var(--ink)}
+.inline-action-btns{display:flex;gap:4px;justify-content:center}
+.inline-btn{min-height:36px;padding:6px 10px;font-size:12px;border-radius:6px;cursor:pointer;font-weight:600}
+.inline-btn.save-btn{background:var(--green);color:white;border:1px solid var(--green)}
+.inline-btn.cancel-btn{background:transparent;color:var(--muted);border:1px solid var(--border)}
+.edit-row-btn{min-height:38px;padding:6px 12px;font-size:13px}
+.csv-bottom-actions{display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin-top:24px;padding-top:18px;border-top:1px solid var(--border)}
+.primary-btn{display:inline-flex;justify-content:center;align-items:center;gap:8px;min-height:48px;padding:11px 22px;border:1px solid var(--green);border-radius:8px;background:var(--green);color:white;font-weight:600;cursor:pointer;transition:background 150ms ease;text-decoration:none}
+.primary-btn:hover{background:var(--green-dark)}
+.primary-btn:disabled{opacity:.55;cursor:not-allowed}
+.csv-success-container{padding:32px 24px;margin:24px 0}
+.csv-success-actions{display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin-top:24px}
+.csv-mobile-card-list{display:none}
+
+@media(max-width:768px){
+  .dropzone-title{display:none}
+  .dropzone-mobile-btn{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:10px 18px;background:var(--green);color:white;border-radius:8px;font-weight:600;margin:6px 0}
+  .csv-template-bar{flex-direction:column;align-items:stretch;gap:12px}
+  .csv-template-buttons{flex-direction:column}
+  .csv-template-buttons button{width:100%}
+  .csv-table-scroll-container{display:none}
+  .csv-mobile-card-list{display:flex;flex-direction:column;gap:12px;margin:16px 0}
+  .csv-mobile-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px}
+  .csv-mobile-card.card-warning{border-color:#fae4b8;background:#fffdf5}
+  .csv-mobile-card.card-error{border-color:#fecdca;background:#fff8f6}
+  .card-top-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+  .card-index{font-size:12px;font-weight:600;color:var(--muted)}
+  .card-product-name{font-size:15px;font-weight:600;color:var(--ink);margin:0 0 2px}
+  .card-details-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0 8px;padding:10px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);font-size:13px}
+  .card-details-grid dt{color:var(--muted);font-size:11px;margin-bottom:2px}
+  .card-details-grid dd{font-weight:600;margin:0;color:var(--ink)}
+  .edit-card-btn{width:100%;min-height:44px;margin-top:10px}
+  .csv-bottom-actions button{width:100%}
+  .csv-success-actions button{width:100%}
+}
+
+/* ========================================================
    4. CHAT (ถามผู้ช่วย) PAGE
    ======================================================== */
 .modern-chat-container{display:flex;flex-direction:column;width:100%;min-height:calc(100vh - 180px)}

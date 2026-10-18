@@ -8,17 +8,25 @@ import { useLanguage } from '../language';
 import { ErrorNotice, Submit } from '../components/forms';
 import { Icon } from '../ui';
 import { productDraftPreview, saveProductAndCost } from '../../lib/catalog-actions';
+import ProductCsvImport from '../components/product-csv-import';
 
 type AddProductProps = FeatureProps & {
+  existingProducts?: CatalogProduct[];
   onCancel: () => void;
   onSaved: (product: CatalogProduct) => void;
+  onBatchSaved?: (products: CatalogProduct[]) => void;
 };
 
 export default function AddProductPage({
   base,
+  month,
+  guest,
+  realStore,
   origin,
+  existingProducts = [],
   onCancel,
-  onSaved
+  onSaved,
+  onBatchSaved
 }: AddProductProps) {
   const { t, locale } = useLanguage();
   const nameId = useId();
@@ -34,6 +42,7 @@ export default function AddProductPage({
   const [cost, setCost] = useState('');
   const [quantity, setQuantity] = useState('1');
   const [unit, setUnit] = useState('ชิ้น');
+  const [mode, setMode] = useState<'manual' | 'csv'>('manual');
 
   const [validationError, setValidationError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
@@ -82,7 +91,45 @@ export default function AddProductPage({
     <div className="add-product-full-page" role="region" aria-label={t('addProductTitle')}>
       <p className="screen-note">{t('addProductSubtitle')}</p>
 
-      {success ? (
+      {/* Mode Switcher Tabs */}
+      <div className="segmented add-product-tabs" role="tablist" aria-label={t('addProductTitle')}>
+        <button
+          type="button"
+          role="tab"
+          aria-selected={mode === 'manual'}
+          aria-pressed={mode === 'manual'}
+          className="secondary"
+          onClick={() => setMode('manual')}
+        >
+          {t('addManualTab')}
+        </button>
+        <button
+          type="button"
+          role="tab"
+          aria-selected={mode === 'csv'}
+          aria-pressed={mode === 'csv'}
+          className="secondary"
+          onClick={() => setMode('csv')}
+        >
+          {t('addCsvTab')}
+        </button>
+      </div>
+
+      {mode === 'csv' ? (
+        <ProductCsvImport
+          base={base}
+          month={month}
+          guest={guest}
+          realStore={realStore}
+          origin={origin}
+          existingProducts={existingProducts}
+          onImportComplete={imported => {
+            if (onBatchSaved) onBatchSaved(imported);
+            else imported.forEach(onSaved);
+          }}
+          onNavigateToProducts={onCancel}
+        />
+      ) : success ? (
         <div className="success-banner" role="status">
           <span className="success-icon" aria-hidden="true"><Icon name="check" /></span>
           <div>

@@ -13,6 +13,7 @@ import { ErrorNotice, Loading } from '../components/forms';
 import Onboarding from '../onboarding';
 import Preview from '../preview';
 import Overview from '../screens/overview';
+import Finance from '../screens/finance';
 import Products, { Simulation } from '../screens/products';
 import AddProductPage from '../screens/add-product';
 import { Orders, Settlement } from '../screens/orders';
@@ -75,6 +76,7 @@ function StoreWorkspace({ stores, store, changeStore, create }: { stores: Store[
       {['products','addProduct','simulation','receipts'].includes(screen) && <><ErrorNotice error={catalogError} />{catalogError && <button className="secondary" onClick={() => void refresh()}>{t('retry')}</button>}{loading && screen !== 'products' && <Loading />}{more && screen !== 'products' && screen !== 'addProduct' && <button className="secondary" disabled={loading} onClick={() => void loadMore()}>{t('next')} · {t('products')}</button>}</>}
       <div key={key} className={'screen-content screen-' + screen}>
         {screen === 'overview' && <Overview {...props} navigate={navigate} period={overviewPeriod} onMissingCosts={() => { setMissingCostsOnly(true); navigate('products'); }} />}
+        {screen === 'finance' && <Finance key={base} {...props} period={overviewPeriod} onPeriodChange={setOverviewPeriod} navigate={navigate} onMissingCosts={() => { setMissingCostsOnly(true); navigate('products'); }} />}
         {screen === 'products' && <Products {...props} loading={loading} products={products} more={more} loadMore={() => void loadMore()} refresh={refresh} ask={ask} simulate={simulate} onAddProduct={() => navigate('addProduct')} initialMissingCostsOnly={missingCostsOnly} />}
         {screen === 'addProduct' && <AddProductPage {...props} onCancel={() => navigate('products')} onSaved={newProd => { setProducts(old => [newProd, ...old.filter(p => p.sku !== newProd.sku)]); navigate('products'); }} />}
         {screen === 'simulation' && <Simulation {...props} products={products} initialSku={selectedSku} />}

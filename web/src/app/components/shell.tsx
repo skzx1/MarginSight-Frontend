@@ -1,5 +1,5 @@
 'use client';
-import { Fragment, useEffect, useRef, useState, type ReactNode } from 'react';
+import { Fragment, useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 import type { Screen, Store } from '../../lib/types';
 import { useLanguage } from '../language';
 import { Brand, Icon, type IconName } from '../ui';
@@ -12,16 +12,30 @@ const screens: Screen[] = ['overview','products','addProduct','assistant','store
 export function parentScreen(screen: Screen): Screen { if (['orders','reconciliation'].includes(screen)) return 'overview'; if (['simulation','addProduct'].includes(screen)) return 'products'; if (['imports','receipts','rules','line'].includes(screen)) return 'store'; return screen; }
 export function useNavigation() {
   const [screen, setScreen] = useState<Screen>('overview');
-  useEffect(() => { const read = () => { const candidate = location.hash.slice(1) as Screen; setScreen(screens.includes(candidate) ? candidate : 'overview'); }; read(); window.addEventListener('hashchange', read); return () => window.removeEventListener('hashchange', read); }, []);
-  const navigate = (next: Screen) => { if (location.hash !== '#' + next) location.hash = next; setScreen(next); };
-  return { screen, navigate };
+  const current = useRef<Screen>('overview'), guard = useRef<(() => boolean) | null>(null);
+  const registerGuard = useCallback((check: () => boolean) => { guard.current = check; return () => { if (guard.current === check) guard.current = null; }; }, []);
+  const canLeave = useCallback(() => guard.current?.() ?? true, []);
+  useEffect(() => {
+    const read = () => {
+      const candidate = location.hash.slice(1) as Screen, next = screens.includes(candidate) ? candidate : 'overview';
+      if (next !== current.current && !canLeave()) { history.replaceState(history.state, '', location.pathname + location.search + '#' + current.current); return; }
+      current.current = next; setScreen(next);
+    };
+    read(); window.addEventListener('hashchange', read); return () => window.removeEventListener('hashchange', read);
+  }, [canLeave]);
+  const navigate = useCallback((next: Screen) => {
+    if (next === current.current || !canLeave()) return;
+    current.current = next; if (location.hash !== '#' + next) location.hash = next; setScreen(next);
+  }, [canLeave]);
+  return { screen, navigate, registerGuard, canLeave };
 }
 export function AppShell({ screen, navigate, stores, store, changeStore, month, changeMonth, guest, children, overviewControls, assistantNav }: { screen: Screen; navigate: (screen: Screen) => void; stores: Store[]; store: Store; changeStore: (id: string) => void; month: string; changeMonth: (value: string) => void; guest: boolean; children: ReactNode; overviewControls?: ReactNode; assistantNav?: ReactNode }) {
-  const { t } = useLanguage();
+  const { t, locale } = useLanguage();
   const parent = parentScreen(screen);
   const [drawerExpanded, setDrawerExpanded] = useState(false);
   const drawerToggle = useRef<HTMLButtonElement>(null);
-  useEffect(() => { document.title = t(screen) + ' · MarginSight'; document.getElementById('screen-title')?.focus({ preventScroll: true }); window.scrollTo(0, 0); }, [screen, t]);
+  const lastScreen = useRef<Screen | null>(null);
+  useEffect(() => { document.title = t(screen) + ' · MarginSight'; if (screen === 'store' && lastScreen.current === screen) return; lastScreen.current = screen; document.getElementById('screen-title')?.focus({ preventScroll: true }); window.scrollTo(0, 0); }, [screen, t]);
   return <div className={'app-shell' + (drawerExpanded ? ' drawer-expanded' : '') + (screen === 'overview' ? ' overview-shell' : '') + (screen === 'assistant' ? ' ' + assistantStyles.shell : '') + (screen === 'store' ? ' ' + storeStyles.shell : '')}>
     <a href="#main-content" className="skip-link" onClick={e => { e.preventDefault(); document.getElementById('main-content')?.focus(); }}>{t('skip')}</a>
     <div className="topbar" onKeyDown={e => {
@@ -31,7 +45,10 @@ export function AppShell({ screen, navigate, stores, store, changeStore, month, 
     }}>
       <Brand />
       <div className="desktop-store" title={store.name ?? store.id}>
-        {screen === 'overview' || screen === 'store' ? <>
+        {screen === 'store' ? <>
+          <button className={storeStyles.storeRail + ' overview-store-rail secondary'} type="button" aria-label={locale === 'th' ? 'ขยายข้อมูลร้าน' : 'Expand store information'} title={store.name ?? store.id} onClick={() => { setDrawerExpanded(true); window.requestAnimationFrame(() => document.getElementById('settings-current-store')?.focus()); }}><Icon name="settings" /></button>
+          <div className={storeStyles.storeBlock}>{stores.length > 1 ? <label htmlFor="settings-current-store"><span>{locale === 'th' ? 'ร้านของคุณ' : 'Your store'}</span><select id="settings-current-store" value={store.id} onChange={e => changeStore(e.target.value)}>{stores.map(item => <option key={item.id} value={item.id}>{item.id === store.id ? store.name ?? store.id : item.name ?? item.id}</option>)}</select></label> : <div id="settings-current-store" tabIndex={-1} className={storeStyles.storeIdentity}><small>{locale === 'th' ? 'ร้านของคุณ' : 'Your store'}</small><strong>{store.name ?? store.id}</strong></div>}</div>
+        </> : screen === 'overview' ? <>
           <button className="overview-store-rail secondary" type="button" aria-label={t('store')} title={store.name ?? store.id} onClick={() => { setDrawerExpanded(true); window.requestAnimationFrame(() => document.getElementById('overview-store-switch')?.focus()); }}><Icon name="settings" /></button>
           <div className="overview-store-choice"><small>{t('store')}</small><details>
             <summary id="overview-store-switch">{store.name ?? store.id}</summary>

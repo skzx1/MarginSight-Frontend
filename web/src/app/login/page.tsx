@@ -27,7 +27,8 @@ import s from './login.module.css';
 import assistantStyles from '../components/assistant.module.css';
 
 function StoreWorkspace({ stores, store, changeStore, create }: { stores: Store[]; store: Store; changeStore: (id: string) => void; create: () => void }) {
-  const { screen, navigate } = useNavigation();
+  const { screen, navigate, registerGuard, canLeave } = useNavigation();
+  const [localStoreName, setLocalStoreName] = useState<string>();
   const { t } = useLanguage();
   const [month, setMonth] = useState(bangkokDate().slice(0, 7));
   const [overviewPeriod, setOverviewPeriod] = useState<OverviewPeriod>({ type: 'month', start: bangkokDate().slice(0, 7) + '-01', end: bangkokDate() });
@@ -70,7 +71,7 @@ function StoreWorkspace({ stores, store, changeStore, create }: { stores: Store[
   const key = store.id + '|' + month;
   const assistantPeriod = periodBounds(overviewPeriod, bangkokDate()) ?? { start: bangkokDate().slice(0, 7) + '-01', end: bangkokDate() };
   return <AssistantProvider key={base} base={base} defaultContext={{ ...assistantPeriod, sku: null }}>
-    <AppShell screen={screen} navigate={navigate} stores={stores} store={store} changeStore={changeStore} month={month} changeMonth={setMonth} guest={guest} overviewControls={<OverviewPeriodControl value={overviewPeriod} onChange={setOverviewPeriod} />} assistantNav={<AssistantDrawerNav />}>
+    <AppShell screen={screen} navigate={navigate} stores={stores} store={screen === 'store' && localStoreName ? { ...store, name: localStoreName } : store} changeStore={id => { if (id !== store.id && canLeave()) changeStore(id); }} month={month} changeMonth={setMonth} guest={guest} overviewControls={<OverviewPeriodControl value={overviewPeriod} onChange={setOverviewPeriod} />} assistantNav={<AssistantDrawerNav />}>
       {['products','addProduct','simulation','receipts'].includes(screen) && <><ErrorNotice error={catalogError} />{catalogError && <button className="secondary" onClick={() => void refresh()}>{t('retry')}</button>}{loading && screen !== 'products' && <Loading />}{more && screen !== 'products' && screen !== 'addProduct' && <button className="secondary" disabled={loading} onClick={() => void loadMore()}>{t('next')} · {t('products')}</button>}</>}
       <div key={key} className={'screen-content screen-' + screen}>
         {screen === 'overview' && <Overview {...props} navigate={navigate} period={overviewPeriod} onMissingCosts={() => { setMissingCostsOnly(true); navigate('products'); }} />}
@@ -83,7 +84,7 @@ function StoreWorkspace({ stores, store, changeStore, create }: { stores: Store[
         {screen === 'receipts' && <Receipts {...props} products={products} refreshProducts={refresh} />}
         {screen === 'rules' && <Rules {...props} />}
         {screen === 'line' && <LineConnection {...props} />}
-        {screen === 'store' && <StoreHub guest={guest} storeName={store.name ?? store.id} navigate={navigate} canCreate={!guest && !stores.some(item => item.personal)} create={create} />}
+        {screen === 'store' && <StoreHub base={base} guest={guest} storeName={store.name ?? store.id} onNameSaved={setLocalStoreName} registerGuard={registerGuard} canLeave={canLeave} navigate={navigate} canCreate={!guest && !stores.some(item => item.personal)} create={create} />}
       </div>
       <div className={assistantStyles.host} hidden={screen !== 'assistant'}>{(assistantOpened || screen === 'assistant') && <Assistant key={base} {...props} products={products} initialSku={assistantDraftStore === store.id ? selectedSku : ''} draftRequest={draftRequest} onDraftHandled={() => setAssistantDraftStore('')} defaultContext={{ ...assistantPeriod, sku: null }} visible={screen === 'assistant'} more={more} loadMore={() => void loadMore()} catalogError={catalogError} catalogLoading={loading} retryCatalog={() => void refresh()} />}</div>
     </AppShell>

@@ -8,7 +8,7 @@ import { LanguageSwitch, useLanguage } from '../language';
 import { Brand, Icon } from '../ui';
 import { AppShell, useNavigation } from '../components/shell';
 import OverviewPeriodControl from '../components/overview-period';
-import type { OverviewPeriod } from '../../lib/overview-data';
+import { periodBounds, type OverviewPeriod } from '../../lib/overview-data';
 import { ErrorNotice, Loading } from '../components/forms';
 import Onboarding from '../onboarding';
 import Preview from '../preview';
@@ -17,11 +17,14 @@ import Products, { Simulation } from '../screens/products';
 import AddProductPage from '../screens/add-product';
 import { Orders, Settlement } from '../screens/orders';
 import Assistant from '../screens/assistant';
+import { AssistantProvider } from '../components/assistant-provider';
+import { AssistantDrawerNav } from '../components/assistant-history';
 import Imports from '../screens/imports';
 import Receipts from '../screens/receipts';
 import Rules from '../screens/rules';
 import StoreHub, { LineConnection } from '../screens/store';
 import s from './login.module.css';
+import assistantStyles from '../components/assistant.module.css';
 
 function StoreWorkspace({ stores, store, changeStore, create }: { stores: Store[]; store: Store; changeStore: (id: string) => void; create: () => void }) {
   const { screen, navigate } = useNavigation();
@@ -33,6 +36,9 @@ function StoreWorkspace({ stores, store, changeStore, create }: { stores: Store[
   const [products, setProducts] = useState<CatalogProduct[]>([]), [more, setMore] = useState<string>();
   const [loading, setLoading] = useState(true), [catalogError, setCatalogError] = useState<unknown>();
   const [selectedSku, setSelectedSku] = useState(''), [draftRequest, setDraftRequest] = useState(0);
+  const [assistantDraftStore, setAssistantDraftStore] = useState('');
+  const [assistantOpened, setAssistantOpened] = useState(false);
+  useEffect(() => { if (screen === 'assistant') setAssistantOpened(true); }, [screen]);
   const version = useRef(0);
   const base = '/stores/' + encodeURIComponent(store.id);
   const guest = fullDemoMode();
@@ -59,26 +65,29 @@ function StoreWorkspace({ stores, store, changeStore, create }: { stores: Store[
     catch (e) { if (id === version.current) setCatalogError(e); }
     finally { if (id === version.current) setLoading(false); }
   };
-  const ask = (sku: string) => { setSelectedSku(sku); setDraftRequest(n => n + 1); navigate('assistant'); };
+  const ask = (sku: string) => { setSelectedSku(sku); setAssistantDraftStore(store.id); setDraftRequest(n => n + 1); navigate('assistant'); };
   const simulate = (sku: string) => { setSelectedSku(sku); navigate('simulation'); };
   const key = store.id + '|' + month;
-  return <AppShell screen={screen} navigate={navigate} stores={stores} store={store} changeStore={changeStore} month={month} changeMonth={setMonth} guest={guest} overviewControls={<OverviewPeriodControl value={overviewPeriod} onChange={setOverviewPeriod} />}>
-    {['products','addProduct','simulation','assistant','receipts'].includes(screen) && <><ErrorNotice error={catalogError} />{catalogError && <button className="secondary" onClick={() => void refresh()}>{t('retry')}</button>}{loading && <Loading />}{more && screen !== 'products' && screen !== 'addProduct' && <button className="secondary" disabled={loading} onClick={() => void loadMore()}>{t('next')} · {t('products')}</button>}</>}
-    <div key={key} className={'screen-content screen-' + screen}>
-      {screen === 'overview' && <Overview {...props} navigate={navigate} period={overviewPeriod} onMissingCosts={() => { setMissingCostsOnly(true); navigate('products'); }} />}
-      {screen === 'products' && <Products {...props} products={products} more={more} loadMore={() => void loadMore()} refresh={refresh} ask={ask} simulate={simulate} onAddProduct={() => navigate('addProduct')} initialMissingCostsOnly={missingCostsOnly} />}
-      {screen === 'addProduct' && <AddProductPage {...props} onCancel={() => navigate('products')} onSaved={newProd => { setProducts(old => [newProd, ...old.filter(p => p.sku !== newProd.sku)]); navigate('products'); }} />}
-      {screen === 'simulation' && <Simulation {...props} products={products} initialSku={selectedSku} />}
-      {screen === 'orders' && <Orders {...props} />}
-      {screen === 'reconciliation' && <Settlement {...props} />}
-      {screen === 'imports' && <Imports {...props} />}
-      {screen === 'receipts' && <Receipts {...props} products={products} refreshProducts={refresh} />}
-      {screen === 'rules' && <Rules {...props} />}
-      {screen === 'line' && <LineConnection {...props} />}
-      {screen === 'store' && <StoreHub storeName={store.name ?? store.id} navigate={navigate} canCreate={!guest && !stores.some(item => item.personal)} create={create} />}
-    </div>
-    <div hidden={screen !== 'assistant'}><Assistant {...props} products={products} initialSku={selectedSku} draftRequest={draftRequest} /></div>
-  </AppShell>;
+  const assistantPeriod = periodBounds(overviewPeriod, bangkokDate()) ?? { start: bangkokDate().slice(0, 7) + '-01', end: bangkokDate() };
+  return <AssistantProvider key={base} base={base} defaultContext={{ ...assistantPeriod, sku: null }}>
+    <AppShell screen={screen} navigate={navigate} stores={stores} store={store} changeStore={changeStore} month={month} changeMonth={setMonth} guest={guest} overviewControls={<OverviewPeriodControl value={overviewPeriod} onChange={setOverviewPeriod} />} assistantNav={<AssistantDrawerNav />}>
+      {['products','addProduct','simulation','receipts'].includes(screen) && <><ErrorNotice error={catalogError} />{catalogError && <button className="secondary" onClick={() => void refresh()}>{t('retry')}</button>}{loading && screen !== 'products' && <Loading />}{more && screen !== 'products' && screen !== 'addProduct' && <button className="secondary" disabled={loading} onClick={() => void loadMore()}>{t('next')} · {t('products')}</button>}</>}
+      <div key={key} className={'screen-content screen-' + screen}>
+        {screen === 'overview' && <Overview {...props} navigate={navigate} period={overviewPeriod} onMissingCosts={() => { setMissingCostsOnly(true); navigate('products'); }} />}
+        {screen === 'products' && <Products {...props} loading={loading} products={products} more={more} loadMore={() => void loadMore()} refresh={refresh} ask={ask} simulate={simulate} onAddProduct={() => navigate('addProduct')} initialMissingCostsOnly={missingCostsOnly} />}
+        {screen === 'addProduct' && <AddProductPage {...props} onCancel={() => navigate('products')} onSaved={newProd => { setProducts(old => [newProd, ...old.filter(p => p.sku !== newProd.sku)]); navigate('products'); }} />}
+        {screen === 'simulation' && <Simulation {...props} products={products} initialSku={selectedSku} />}
+        {screen === 'orders' && <Orders {...props} />}
+        {screen === 'reconciliation' && <Settlement {...props} />}
+        {screen === 'imports' && <Imports {...props} />}
+        {screen === 'receipts' && <Receipts {...props} products={products} refreshProducts={refresh} />}
+        {screen === 'rules' && <Rules {...props} />}
+        {screen === 'line' && <LineConnection {...props} />}
+        {screen === 'store' && <StoreHub guest={guest} storeName={store.name ?? store.id} navigate={navigate} canCreate={!guest && !stores.some(item => item.personal)} create={create} />}
+      </div>
+      <div className={assistantStyles.host} hidden={screen !== 'assistant'}>{(assistantOpened || screen === 'assistant') && <Assistant key={base} {...props} products={products} initialSku={assistantDraftStore === store.id ? selectedSku : ''} draftRequest={draftRequest} onDraftHandled={() => setAssistantDraftStore('')} defaultContext={{ ...assistantPeriod, sku: null }} visible={screen === 'assistant'} more={more} loadMore={() => void loadMore()} catalogError={catalogError} catalogLoading={loading} retryCatalog={() => void refresh()} />}</div>
+    </AppShell>
+  </AssistantProvider>;
 }
 
 export default function Page() {

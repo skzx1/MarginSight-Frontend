@@ -1,281 +1,269 @@
 'use client';
-import { useEffect, useRef, useState } from 'react';
-import { request } from '../../lib/auth';
-import type { AssistantAnswer, CatalogProduct, ChatMessage, FeatureProps } from '../../lib/types';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
+import type { CatalogProduct, FeatureProps } from '../../lib/types';
+import { bangkokDate, money } from '../../lib/format';
+import { contextLabel, contextPreset, resolveChatContext } from '../../lib/assistant-context';
+import { answerQuestion } from '../../lib/assistant-service';
+import { createChat, sessionTitle, validContext, type ChatContext, type ChatTurn } from '../../lib/assistant-sessions';
 import { useLanguage } from '../language';
-import { ProductSelect } from '../components/forms';
-import { EvidencePanel } from '../components/ledger';
 import { Icon } from '../ui';
+import { EvidencePanel, Money } from '../components/ledger';
+import { assistantCopy, type AssistantCopyKey } from '../components/assistant-copy';
+import { ChatIcon, useAssistantContext, type AssistantPanel } from '../components/assistant-provider';
+import s from '../components/assistant.module.css';
+import { AssistantHistory } from '../components/assistant-history';
+import { useAssistantViewport } from '../components/use-assistant-viewport';
 
-export default function Assistant({
-  base,
-  month,
-  products: rawProducts,
-  initialSku,
-  draftRequest
-}: FeatureProps & {
-  products: CatalogProduct[];
-  initialSku: string;
-  draftRequest: number;
+function Dialog({ title, kind, close, children }: { title: string; kind: AssistantPanel; close: () => void; children: ReactNode }) {
+  const ref = useRef<HTMLDialogElement>(null), returnTo = useRef<HTMLElement | null>(null);
+  const drag = useRef<number | null>(null);
+  useEffect(() => {
+    returnTo.current = document.activeElement as HTMLElement;
+    const dialog = ref.current; dialog?.showModal();
+    return () => { dialog?.close(); if (returnTo.current?.isConnected) returnTo.current.focus({ preventScroll: true }); };
+  }, [kind]);
+  return <dialog ref={ref} className={s.dialog + (kind === 'sheet' || kind === 'allHistory' ? ' ' + s.sheetDialog : '')} aria-labelledby="assistant-dialog-title" onCancel={e => { e.preventDefault(); close(); }} onClick={e => { if (e.target === e.currentTarget) { const r = e.currentTarget.getBoundingClientRect(); if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) close(); } }} onKeyDown={e => {
+    if (e.key === 'Escape') { e.preventDefault(); close(); return; }
+    if (e.key !== 'Tab') return;
+    const nodes = [...e.currentTarget.querySelectorAll<HTMLElement>('button:not(:disabled),input:not(:disabled),textarea,select,a[href]')].filter(n => n.checkVisibility());
+    const first = nodes[0], last = nodes.at(-1);
+    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last?.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first?.focus(); }
+  }}><div className={s.dialogHeader}>{(kind === 'sheet' || kind === 'allHistory') && <span className={s.dragHandle} aria-hidden="true" onPointerDown={e => { if (window.innerWidth >= 768) return; drag.current = e.clientY; e.currentTarget.setPointerCapture(e.pointerId); }} onPointerMove={e => { if (drag.current !== null && ref.current) ref.current.style.transform = `translateY(${Math.max(0, e.clientY - drag.current)}px)`; }} onPointerUp={e => { const distance = drag.current === null ? 0 : e.clientY - drag.current; drag.current = null; ref.current?.style.removeProperty('transform'); if (distance > 90) close(); }} onPointerCancel={() => { drag.current = null; ref.current?.style.removeProperty('transform'); }} />}<h2 id="assistant-dialog-title">{title}</h2><button type="button" className={s.iconButton} aria-label={title + ' · ' + (document.documentElement.lang === 'en' ? 'Close' : 'ปิด')} onClick={close}><Icon name="close" /></button></div>{children}</dialog>;
+}
+
+function AnswerText({ text }: { text: string }) {
+  return <div className={s.answerText}>{text.split('\n').map((line, i) => {
+    const parts = line.replace(/^#{1,4}\s*/, '').split(/(\*\*[^*]+\*\*)/g).map((part, j) => part.startsWith('**') ? <strong key={j}>{part.slice(2, -2)}</strong> : part);
+    return line.trim() ? <p key={i}>{parts}</p> : null;
+  })}</div>;
+}
+
+export default function Assistant({ base, guest, origin, products, initialSku, draftRequest, defaultContext, visible, more, loadMore, catalogError, catalogLoading, retryCatalog, onDraftHandled }: FeatureProps & {
+  products: CatalogProduct[]; initialSku: string; draftRequest: number; defaultContext: ChatContext; visible: boolean;
+  more?: string; loadMore: () => void; catalogError?: unknown; catalogLoading: boolean; retryCatalog: () => void; onDraftHandled: () => void;
 }) {
-  const { t, locale } = useLanguage();
-  const products = rawProducts;
+  const { locale } = useLanguage();
+  const t = (key: AssistantCopyKey) => assistantCopy[key][locale === 'th' ? 0 : 1];
+  const {
+    archive, setArchive, updateSession, ready, active, storageError, retrySave, canRetrySave,
+    deleteChat, renameChat, panel, setPanel, targetChat,
+    openRenameModal, openDeleteModal, openSheet, closePanel, textareaRef
+  } = useAssistantContext();
 
-  const [sku, setSku] = useState(initialSku || products[0]?.sku || '');
-  const [text, setText] = useState('');
-  const [history, setHistory] = useState<Record<string, ChatMessage[]>>({});
-  const [pending, setPending] = useState<Record<string, boolean>>({});
+  const [editingTitle, setEditingTitle] = useState(false);
+  const [inlineTitleDraft, setInlineTitleDraft] = useState('');
+  const inlineTitleInput = useRef<HTMLInputElement>(null);
 
-  const locks = useRef(new Set<string>());
-  const inputRef = useRef<HTMLTextAreaElement>(null);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [renameDraft, setRenameDraft] = useState('');
+  useEffect(() => { if (panel === 'rename') setRenameDraft(targetChat?.title || active?.title || ''); }, [panel, targetChat?.id, targetChat?.title, active?.title]);
+  const [productSearch, setProductSearch] = useState('');
+  const [periodDraft, setPeriodDraft] = useState<ChatContext>(defaultContext);
+  const [notice, setNotice] = useState<AssistantCopyKey | null>(null);
+  const [atBottom, setAtBottom] = useState(true);
+  const [copied, setCopied] = useState('');
 
-  const messages = history[month] ?? [];
-  const isPending = !!pending[month];
+  const root = useRef<HTMLDivElement>(null);
+  const composerWrap = useRef<HTMLDivElement>(null);
+  useAssistantViewport(visible, root);
+  const scroll = useRef<HTMLDivElement>(null);
+  const nearBottom = useRef(true), forceBottom = useRef(false), draftHandled = useRef(0);
+  const pending = useRef(new Map<string, { turnId: string; controller: AbortController }>());
+  const activePending = active?.turns.some(turn => turn.state === 'pending') ?? false;
 
-  // Auto-scroll on new message or when pending status changes
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages.length, isPending]);
+    const composer = composerWrap.current, host = root.current;
+    if (!visible || !composer || !host) return;
+    const observer = new ResizeObserver(() => host.style.setProperty('--composer-height', `${composer.getBoundingClientRect().height}px`));
+    observer.observe(composer);
+    return () => { observer.disconnect(); host.style.removeProperty('--composer-height'); };
+  }, [visible]);
 
-  // Initial draft prompt from other screens (e.g., clicking Ask from Products)
+  useEffect(() => () => { for (const job of pending.current.values()) job.controller.abort(); }, []);
+  useEffect(() => { if (!visible) closePanel(); }, [visible, closePanel]);
+
   useEffect(() => {
-    if (initialSku) {
-      setSku(initialSku);
-      setText(t('askProfit'));
-      inputRef.current?.focus();
+    if (!ready || !visible || !initialSku || !draftRequest || draftHandled.current === draftRequest) return;
+    draftHandled.current = draftRequest;
+    const chat = createChat({ ...defaultContext, sku: initialSku });
+    chat.draft = locale === 'th' ? 'สินค้านี้เหลือกำไรเท่าไร?' : 'How much profit does this product make?';
+    setArchive(old => old.sessions.length >= 100 ? old : { ...old, activeId: chat.id, sessions: [chat, ...old.sessions] });
+    onDraftHandled();
+    textareaRef.current?.focus({ preventScroll: true });
+  }, [ready, visible, draftRequest, initialSku, defaultContext, locale, setArchive, onDraftHandled, textareaRef]);
+
+  useEffect(() => {
+    const node = textareaRef.current;
+    if (node && visible) { node.style.height = '0px'; node.style.height = Math.min(160, Math.max(48, node.scrollHeight)) + 'px'; }
+  }, [active?.draft, active?.id, visible, textareaRef]);
+
+  useEffect(() => {
+    const node = textareaRef.current;
+    if (!node || !visible) return;
+    let width = -1;
+    const observer = new ResizeObserver(entries => {
+      if (entries[0].contentRect.width === width) return;
+      width = entries[0].contentRect.width;
+      node.style.height = '0px'; node.style.height = Math.min(160, Math.max(48, node.scrollHeight)) + 'px';
+    });
+    observer.observe(node.parentElement!); return () => observer.disconnect();
+  }, [visible, textareaRef]);
+
+  useEffect(() => { nearBottom.current = true; setAtBottom(true); forceBottom.current = true; }, [active?.id, visible]);
+  const lastTurn = active?.turns.at(-1);
+  useEffect(() => {
+    if (!visible || !scroll.current) return;
+    if (nearBottom.current || forceBottom.current) { scroll.current.scrollTop = scroll.current.scrollHeight; forceBottom.current = false; }
+  }, [active?.id, active?.turns.length, lastTurn?.state, visible]);
+
+  useEffect(() => {
+    if (editingTitle) {
+      inlineTitleInput.current?.focus();
+      inlineTitleInput.current?.select();
     }
-  }, [initialSku, draftRequest, t]);
+  }, [editingTitle]);
 
-  const send = async (explicitText?: string) => {
-    const questionText = (explicitText !== undefined ? explicitText : text).trim();
-    if (!questionText || locks.current.has(month)) return;
+  const changeContext = (context: ChatContext) => {
+    if (active) updateSession(active.id, chat => ({ ...chat, context }));
+    closePanel();
+    textareaRef.current?.focus({ preventScroll: true });
+  };
 
-    const activeSku = sku || products[0]?.sku || 'GENERAL';
-    const context = month;
-    const id = crypto.randomUUID();
-
-    locks.current.add(context);
-    setPending(old => ({ ...old, [context]: true }));
-    setHistory(old => ({
-      ...old,
-      [context]: [...(old[context] ?? []), { id, question: questionText, sku: activeSku }]
-    }));
-
-    if (explicitText === undefined) {
-      setText('');
-    }
-
+  const run = async (sessionId: string, turn: ChatTurn) => {
+    const controller = new AbortController();
+    pending.current.set(sessionId, { turnId: turn.id, controller });
     try {
-      const answer = await request<AssistantAnswer>(base + '/assistant', {
-          message: questionText,
-          sku: activeSku,
-          month: context
-        });
-
-      setHistory(old => ({
-        ...old,
-        [context]: (old[context] ?? []).map(m => (m.id === id ? { ...m, answer } : m))
-      }));
-    } catch (error) {
-      setHistory(old => ({
-        ...old,
-        [context]: (old[context] ?? []).map(m => (m.id === id ? { ...m, error } : m))
-      }));
-    } finally {
-      locks.current.delete(context);
-      setPending(old => ({ ...old, [context]: false }));
-      setTimeout(() => inputRef.current?.focus(), 50);
-    }
+      const reply = await answerQuestion({ base, question: turn.requestQuestion ?? turn.question, context: turn.context, products, locale, signal: controller.signal });
+      if (!controller.signal.aborted) updateSession(sessionId, chat => ({ ...chat, updatedAt: new Date().toISOString(), turns: chat.turns.map(item => item.id === turn.id ? { ...item, reply, state: 'complete' } : item) }));
+    } catch {
+      if (!controller.signal.aborted) updateSession(sessionId, chat => ({ ...chat, turns: chat.turns.map(item => item.id === turn.id ? { ...item, state: 'failed' } : item) }));
+    } finally { if (pending.current.get(sessionId)?.controller === controller) pending.current.delete(sessionId); }
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      void send();
-    }
+  const send = (explicit?: string) => {
+    if (!active || pending.current.has(active.id)) return;
+    const question = (explicit ?? active.draft).trim();
+    if (!question) return;
+    if (active.turns.length >= 200) { setNotice('turnLimit'); return; }
+    const context = resolveChatContext(question, active.context, products, bangkokDate());
+    const previous = active.turns.at(-1);
+    const productOnly = products.some(p => [p.sku, p.name].some(v => v.toLocaleLowerCase() === question.toLocaleLowerCase()));
+    const requestQuestion = productOnly && previous?.reply?.source === 'notice' && !previous.context.sku && /ลด|discount|คุ้มทุน|break.even/i.test(previous.question) ? previous.question + '\n' + question : undefined;
+    const turn: ChatTurn = { id: crypto.randomUUID(), question, requestQuestion, createdAt: new Date().toISOString(), context, state: 'pending' };
+    forceBottom.current = true; setNotice(null);
+    updateSession(active.id, chat => ({ ...chat, context, draft: '', title: chat.title || sessionTitle(question), updatedAt: turn.createdAt, turns: [...chat.turns, turn] }));
+    void run(active.id, turn);
   };
 
-  const promptChips = [
-    t('promptProfitWeek'),
-    t('promptTopProduct'),
-    t('promptDiscountCheck'),
-    t('promptBreakEven')
-  ];
+  const regenerate = (turn: ChatTurn) => {
+    if (!active || pending.current.has(active.id)) return;
+    updateSession(active.id, chat => ({ ...chat, turns: chat.turns.map(item => item.id === turn.id ? { ...item, state: 'pending', reply: undefined } : item) }));
+    void run(active.id, { ...turn, state: 'pending' });
+  };
 
-  return (
-    <div className="modern-chat-container">
-      {/* Centered Readable Column Container */}
-      <div className="modern-chat-column">
-        {/* Chat Context Header */}
-        <header className="chat-top-context">
-          <div className="chat-context-controls">
-            <div className="chat-sku-select">
-              <ProductSelect products={products} value={sku} onChange={setSku} />
-            </div>
-            <span className="chat-month-tag">
-              <Icon name="overview" />
-              <span>{month}</span>
-            </span>
-          </div>
-          <p className="caption chat-context-caption">{t('chatNote')}</p>
-        </header>
+  const stop = () => {
+    if (!active) return;
+    const job = pending.current.get(active.id); job?.controller.abort(); pending.current.delete(active.id);
+    updateSession(active.id, chat => ({ ...chat, turns: chat.turns.map(turn => turn.id === job?.turnId ? { ...turn, state: 'stopped' } : turn) }));
+  };
 
-        {/* Message Thread */}
-        <div className="chat-messages-scroll" role="log" aria-live="polite" aria-label={t('assistant')}>
-          {messages.length === 0 ? (
-            <div className="modern-chat-empty">
-              <div className="assistant-avatar-large" aria-hidden="true">
-                <Icon name="assistant" />
-              </div>
-              <h2 className="chat-welcome-headline">{t('chatGreeting')}</h2>
-              <p className="chat-welcome-desc">{t('welcomeBody')}</p>
+  const productLabel = (sku: string | null) => sku ? products.find(p => p.sku === sku)?.name ?? sku : t('all');
+  const copy = async (turn: ChatTurn) => {
+    if (!turn.reply) return;
+    const reply = turn.reply, result = reply.result;
+    const text = [reply.text, result && `${result.label}: ${result.profitSatang == null ? t('missing') : '฿' + money(result.profitSatang, locale)}`, t('basedOn') + ': ' + contextLabel(reply.context, locale) + ' · ' + productLabel(reply.context.sku), reply.note].filter(Boolean).join('\n');
+    try { await navigator.clipboard.writeText(text); setCopied(turn.id); setTimeout(() => setCopied(''), 1800); } catch { setNotice('copyFailed'); }
+  };
+  const dateLabel = (context: ChatContext) => context.start === bangkokDate().slice(0, 7) + '-01' && context.end === bangkokDate() ? t('thisMonth') : contextLabel(context, locale);
 
-              {/* 3-4 Suggested Prompts as Tappable Chips */}
-              <div className="suggested-chips-container" role="region" aria-label={t('suggestedQuestions')}>
-                <span className="chips-title">{t('suggestedQuestions')}:</span>
-                <div className="chips-grid">
-                  {promptChips.map((prompt, idx) => (
-                    <button
-                      key={idx}
-                      type="button"
-                      className="suggested-prompt-chip"
-                      onClick={() => void send(prompt)}
-                    >
-                      <Icon name="sparkles" />
-                      <span>{prompt}</span>
-                      <span className="chip-arrow" aria-hidden="true">↗</span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
-          ) : (
-            <div className="chat-bubbles-list">
-              {messages.map(msg => (
-                <div key={msg.id} className="chat-exchange">
-                  {/* User Bubble */}
-                  <div className="chat-bubble-user-row">
-                    <div className="chat-bubble-user">
-                      <div className="bubble-header-user">
-                        <span>{t('you')}</span>
-                        <small>{msg.sku} · {month}</small>
-                      </div>
-                      <p className="user-message-text">{msg.question}</p>
-                    </div>
-                  </div>
+  const saveInlineTitle = () => {
+    if (active && inlineTitleDraft.trim() && inlineTitleDraft.trim() !== active.title) {
+      renameChat(active.id, inlineTitleDraft.trim());
+    }
+    setEditingTitle(false);
+  };
 
-                  {/* Assistant Bubble */}
-                  <div className="chat-bubble-assistant-row">
-                    <div className="assistant-avatar-mini" aria-hidden="true">
-                      <Icon name="assistant" />
-                    </div>
-                    <div className="chat-bubble-assistant">
-                      <div className="bubble-header-assistant">
-                        <strong>MarginSight Assistant</strong>
-                        <span className="badge mock">
-                          {t(msg.answer?.provider === 'deterministic-fallback' ? 'fallback' : 'aiAnswer')}
-                        </span>
-                      </div>
-
-                      {msg.answer ? (
-                        <div className="assistant-answer-content">
-                          <div className="formatted-answer-text">
-                            {msg.answer.answer.split('\n').map((line, lineIdx) => {
-                              if (!line.trim()) return <br key={lineIdx} />;
-                              if (line.startsWith('### ') || line.startsWith('## ')) {
-                                return <h4 key={lineIdx} className="answer-heading-text">{line.replace(/^#+\s*/, '')}</h4>;
-                              }
-                              if (line.startsWith('- ')) {
-                                return (
-                                  <p key={lineIdx} className="answer-bullet-line">
-                                    <span className="bullet-dot">•</span>
-                                    <span>{line.replace(/^- /, '')}</span>
-                                  </p>
-                                );
-                              }
-                              return <p key={lineIdx} className="answer-paragraph">{line}</p>;
-                            })}
-                          </div>
-
-                          {msg.answer.result?.profitSatang !== undefined && (
-                            <details className="assistant-evidence-accordion">
-                              <summary>{t('result')} / {t('evidence')}</summary>
-                              <EvidencePanel result={msg.answer.result} />
-                            </details>
-                          )}
-                        </div>
-                      ) : msg.error ? (
-                        <div className="notice error-notice">
-                          <strong>{t('errorTitle')}</strong>
-                          <p>{t('errorGeneric')}</p>
-                        </div>
-                      ) : null}
-                    </div>
-                  </div>
-                </div>
-              ))}
-
-              {/* Typing Indicator */}
-              {isPending && (
-                <div className="chat-bubble-assistant-row typing-row" role="status" aria-label={t('typing')}>
-                  <div className="assistant-avatar-mini" aria-hidden="true">
-                    <Icon name="assistant" />
-                  </div>
-                  <div className="chat-bubble-assistant typing-bubble">
-                    <div className="typing-dots" aria-hidden="true">
-                      <span className="dot" />
-                      <span className="dot" />
-                      <span className="dot" />
-                    </div>
-                    <span className="caption">{t('waiting')}</span>
-                  </div>
-                </div>
-              )}
-
-              <div ref={messagesEndRef} />
-            </div>
-          )}
+  const renderAnswer = (turn: ChatTurn) => {
+    const reply = turn.reply;
+    return <div className={s.assistantRow}><div className={s.assistantBody}>
+      <div className={s.answerByline}>
+        <span className={s.avatar} aria-hidden="true"><Icon name="assistant" /></span>
+        <strong>{t('assistant')}</strong>
+        {reply && reply.source !== 'recorded' && <small className={s.sourceTag}>{t(reply.source === 'assistant' ? 'ai' : reply.source === 'fallback' ? 'fallback' : 'notice')}</small>}
+      </div>
+      {turn.state === 'pending' ? <div className={s.typing} role="status"><span aria-hidden="true"><i /><i /><i /></span>{t('typing')}</div> : reply ? <>
+        <AnswerText text={reply.text} />
+        {reply.result && <div className={s.resultCard}><div className={s.resultMain}><span>{reply.result.label}</span><strong className={reply.result.profitSatang == null ? s.missing : reply.result.profitSatang < 0 ? s.loss : ''}>{reply.result.profitSatang == null ? t('missing') : <Money value={reply.result.profitSatang} />}</strong></div>
+          <dl>{reply.result.revenueSatang !== undefined && <div><dt>{t('revenue')}</dt><dd><Money value={reply.result.revenueSatang} /></dd></div>}{reply.result.marginPct !== undefined && <div><dt>{t('margin')}</dt><dd>{reply.result.marginPct == null ? '—' : new Intl.NumberFormat(locale, { maximumFractionDigits: 1 }).format(reply.result.marginPct) + '%'}</dd></div>}{reply.result.count !== undefined && <div><dt>{locale === 'th' ? 'จากออเดอร์' : 'Recorded orders'}</dt><dd>{reply.result.count} {t('orders')}</dd></div>}{reply.result.beforeSatang !== undefined && <><div><dt>{t('before')}</dt><dd><Money value={reply.result.beforeSatang} /></dd></div><div><dt>{t('after')}</dt><dd><Money value={reply.result.afterSatang} /></dd></div></>}</dl>
+        </div>}
+        <div className={s.answerFootnote}>
+          <ChatIcon name="calendar" />
+          <div><span>{t('basedOn')}: {contextLabel(reply.context, locale)} · {productLabel(reply.context.sku)}</span>
+          {reply.note && <span className={s.footnoteNote}> · {reply.note}</span>}</div>
         </div>
+        {reply.calculation && <details className={s.evidence}><summary>{t('evidence')}</summary><EvidencePanel result={reply.calculation} /></details>}
+        <div className={s.messageActions}>
+          <button type="button" className={s.quietAction} onClick={() => void copy(turn)} aria-label={t(copied === turn.id ? 'copied' : 'copy')} title={t(copied === turn.id ? 'copied' : 'copy')}>
+            <ChatIcon name={copied === turn.id ? 'check' : 'copy'} /><span>{t(copied === turn.id ? 'copied' : 'copy')}</span>
+          </button>
+          {turn.id === lastTurn?.id && <button type="button" className={s.quietAction} onClick={() => regenerate(turn)} disabled={activePending} aria-label={t('regenerate')} title={t('regenerate')}>
+            <Icon name="refresh" /><span>{t('regenerate')}</span>
+          </button>}
+        </div>
+      </> : <div className={s.responseNotice} role={turn.state === 'failed' ? 'alert' : undefined}><p>{t(turn.state === 'stopped' ? 'stopped' : 'failed')}</p>{turn.state === 'stopped' && <small>{t('stopNote')}</small>}<button type="button" className={s.secondary} onClick={() => regenerate(turn)} disabled={activePending}><Icon name="refresh" />{t('retry')}</button></div>}
+    </div></div>;
+  };
 
-        {/* Pinned Bottom Composer */}
-        <div className="chat-pinned-composer">
-          <form
-            className="composer-form"
-            onSubmit={e => {
-              e.preventDefault();
-              void send();
-            }}
-          >
-            <label htmlFor="chat-user-input" className="sr-only">
-              {t('message')}
-            </label>
-            <textarea
-              ref={inputRef}
-              id="chat-user-input"
-              value={text}
-              onChange={e => setText(e.target.value)}
-              onKeyDown={handleKeyDown}
-              placeholder={t('message') + '...'}
-              rows={2}
-              maxLength={2000}
-              className="chat-textarea"
-            />
-            <button
-              type="submit"
-              disabled={!text.trim() || isPending}
-              className="chat-send-button"
-              aria-label={t('send')}
-            >
-              <Icon name="arrow" />
-              <span>{t('send')}</span>
+  return <div className={s.root} ref={root}>
+    <h1 id="screen-title" tabIndex={-1} className="sr-only">{t('assistant')}</h1>
+    <div className={s.conversation}>
+      <header className={s.chatHeader}>
+        <div className={s.headerLeft}>
+          {editingTitle ? (
+            <form className={s.inlineTitleForm} onSubmit={e => { e.preventDefault(); saveInlineTitle(); }}>
+              <input ref={inlineTitleInput} type="text" className={s.inlineTitleInput} value={inlineTitleDraft} onChange={e => setInlineTitleDraft(e.target.value)} onKeyDown={e => { if (e.key === 'Escape') setEditingTitle(false); }} onBlur={saveInlineTitle} maxLength={120} aria-label={t('name')} />
+              <button type="submit" className={s.inlineTitleCheck} aria-label={t('save')} title={t('save')}><ChatIcon name="check" /></button>
+            </form>
+          ) : (
+            <button type="button" className={s.headerTitleBtn} onClick={() => { setInlineTitleDraft(active?.title || t('untitled')); setEditingTitle(true); }} title={t('tapToRename')} aria-label={`${active?.title || t('untitled')} · ${t('tapToRename')}`}>
+              <span className={s.headerTitleText}>{active?.title || t('untitled')}</span>
+              <span className={s.editHintIcon} aria-hidden="true"><ChatIcon name="edit" /></span>
             </button>
-          </form>
-          <div className="composer-footer-hint">
-            <small>{t('enterToSend')}</small>
-          </div>
+          )}
+          {(guest || origin === 'MOCK') && <span className={s.mockBadge} title={locale === 'th' ? 'ร้านจำลอง · นำเข้าได้ 3 ไฟล์ · ผู้ช่วยและอ่านบิลรวม 3 ครั้งต่อรอบ' : 'Demo store · 3 imports · 3 assistant/receipt requests per session'} tabIndex={0} role="note" aria-label={t('mock')}>{t('mock')}</span>}
+        </div>
+        <div className={s.headerRight}>
+          <button type="button" className={s.historyHeaderButton} onClick={openSheet} aria-label={t('history')} aria-expanded={panel === 'sheet'} aria-haspopup="dialog"><ChatIcon name="history" /><span>{t('historyShort')}</span></button>
+        </div>
+      </header>
+      {storageError && <div className={s.warning} role="status">{t('storageError')}{canRetrySave && <button type="button" onClick={retrySave}>{t('storageRetry')}</button>}</div>}
+      {notice && <div className={s.warning} role="status">{t(notice)}</div>}
+      <div className={s.messageScroll} ref={scroll} tabIndex={0} aria-label={t('assistant')} onScroll={e => { const el = e.currentTarget; const near = el.scrollHeight - el.scrollTop - el.clientHeight < 90; nearBottom.current = near; setAtBottom(near); }}>
+        <div className={s.messageColumn}>
+          {!active?.turns.length ? <div className={s.welcome}><span className={s.welcomeMark} aria-hidden="true"><Icon name="assistant" /></span><h2>{t('greeting')}</h2><p>{t('intro')}</p><div className={s.prompts} aria-label={t('prompts')}>{(['profitPrompt','rankingPrompt','discountPrompt','weekPrompt'] as const).map((key, i) => <button type="button" key={key} onClick={() => send(t(key))} disabled={!ready}><Icon name={(['overview','products','simulation','orders'] as const)[i]} /><span>{t(key)}</span><Icon name="chevronRight" /></button>)}</div></div> : <div className={s.turns}>{active.turns.map(turn => <article className={s.turn} key={turn.id}><div className={s.userRow}><div className={s.userBubble}><span className="sr-only">{t('you')}: </span>{turn.question}</div></div>{renderAnswer(turn)}</article>)}</div>}
         </div>
       </div>
+      {!atBottom && !!active?.turns.length && <button type="button" className={s.jump} onClick={() => { if (scroll.current) scroll.current.scrollTo({ top: scroll.current.scrollHeight, behavior: matchMedia('(prefers-reduced-motion:reduce)').matches ? 'instant' : 'smooth' }); }}><ChatIcon name="down" />{t('latest')}</button>}
+      <div className={s.composerWrap} ref={composerWrap}><div className={s.composerColumn}>
+        <form className={s.composer} onSubmit={e => { e.preventDefault(); send(); }}>
+          <label htmlFor="assistant-input" className="sr-only">{t('input')}</label>
+          <textarea ref={textareaRef} id="assistant-input" rows={1} maxLength={1500} value={active?.draft ?? ''} placeholder={t('placeholder')} title={t('hint')} disabled={!ready} onChange={e => { const draft = e.target.value; if (active) updateSession(active.id, chat => ({ ...chat, draft })); }} onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing) { e.preventDefault(); if (!activePending) send(); } }} aria-describedby="assistant-context" />
+          <div className={s.composerToolbar}>
+            <div id="assistant-context" className={s.context} role="group" aria-label={t('using')}>
+              <button type="button" disabled={!ready} aria-label={t('editPeriod')} aria-haspopup="dialog" aria-expanded={panel === 'period'} onClick={() => { setPeriodDraft(active?.context ?? defaultContext); setPanel('period'); }}><ChatIcon name="calendar" /><span>{dateLabel(active?.context ?? defaultContext)}</span><span className={s.contextChevron} aria-hidden="true"><Icon name="chevronRight" /></span></button>
+              <button type="button" disabled={!ready} aria-label={t('editProduct')} aria-haspopup="dialog" aria-expanded={panel === 'products'} onClick={() => { setProductSearch(''); setPanel('products'); }}><Icon name="products" /><span>{productLabel(active?.context.sku ?? null)}</span><span className={s.contextChevron} aria-hidden="true"><Icon name="chevronRight" /></span></button>
+            </div>
+            {activePending ? <button type="button" className={s.send} onClick={stop} aria-label={t('stop')} title={t('stop')}><ChatIcon name="stop" /></button> : <button type="submit" className={s.send} disabled={!ready || !active?.draft.trim()} aria-label={t('send')} title={t('send')}><Icon name="arrow" /></button>}
+          </div>
+        </form>
+      </div></div>
     </div>
-  );
+    <div className="sr-only" aria-live="polite" aria-atomic="true">{lastTurn?.state === 'complete' ? lastTurn.reply?.text : ''}{copied ? t('copied') : ''}</div>
+    {panel && <Dialog kind={panel} title={t(panel === 'sheet' ? 'history' : panel === 'allHistory' ? 'allHistoryTitle' : panel === 'period' ? 'period' : panel === 'products' ? 'product' : panel === 'rename' ? 'renameTitle' : 'deleteTitle')} close={closePanel}>
+      {panel === 'sheet' || panel === 'allHistory' ? <AssistantHistory /> : panel === 'period' ? <form className={s.dialogBody} onSubmit={e => { e.preventDefault(); if (validContext(periodDraft) && Date.parse(periodDraft.end) - Date.parse(periodDraft.start) <= 366 * 86400000) changeContext(periodDraft); }}><p className={s.dialogNote}>{t('optional')}</p><div className={s.presets}>{(['today','week','lastWeek','month','lastMonth'] as const).map(preset => <button type="button" key={preset} className={s.secondary} onClick={() => setPeriodDraft({ ...contextPreset(preset, bangkokDate()), sku: active?.context.sku ?? null })}>{t(preset === 'month' ? 'thisMonth' : preset === 'week' ? 'thisWeek' : preset)}</button>)}</div><div className={s.dateFields}><label>{t('from')}<input type="date" required value={periodDraft.start} onChange={e => setPeriodDraft(v => ({ ...v, start: e.target.value }))} /></label><label>{t('to')}<input type="date" required value={periodDraft.end} onChange={e => setPeriodDraft(v => ({ ...v, end: e.target.value }))} /></label></div>{(!validContext(periodDraft) || Date.parse(periodDraft.end) - Date.parse(periodDraft.start) > 366 * 86400000) && <p className={s.missing} role="status">{t('invalidRange')}</p>}<button type="submit" disabled={!validContext(periodDraft) || Date.parse(periodDraft.end) - Date.parse(periodDraft.start) > 366 * 86400000}>{t('apply')}</button></form>
+        : panel === 'products' ? <div className={s.dialogBody}><p className={s.dialogNote}>{t('optional')}</p><label className="sr-only" htmlFor="assistant-product-search">{t('searchProducts')}</label><input id="assistant-product-search" type="search" placeholder={t('searchProducts')} value={productSearch} onChange={e => setProductSearch(e.target.value)} /><div className={s.productChoices}><button type="button" aria-pressed={!active?.context.sku} onClick={() => changeContext({ ...(active?.context ?? defaultContext), sku: null })}><Icon name="products" />{t('all')}</button>{products.filter(p => `${p.name} ${p.sku}`.toLocaleLowerCase().includes(productSearch.toLocaleLowerCase())).map(p => <button type="button" key={p.sku} aria-pressed={active?.context.sku === p.sku} onClick={() => changeContext({ ...(active?.context ?? defaultContext), sku: p.sku })}><span>{p.name}<small>{p.sku}</small></span><Icon name="chevronRight" /></button>)}{!products.some(p => `${p.name} ${p.sku}`.toLocaleLowerCase().includes(productSearch.toLocaleLowerCase())) && <p>{t('noProducts')}</p>}{catalogLoading && <p role="status">{t('typing')}</p>}{Boolean(catalogError) && <div role="alert"><p>{t('catalogError')}</p><button type="button" className={s.secondary} onClick={retryCatalog}>{t('retry')}</button></div>}{more && <button type="button" className={s.secondary} disabled={catalogLoading} onClick={loadMore}>{t('loadMore')}</button>}</div></div>
+        : panel === 'rename' ? <form className={s.dialogBody} onSubmit={e => { e.preventDefault(); const target = targetChat || active; const title = renameDraft.trim(); if (target && title) renameChat(target.id, title); }}><label htmlFor="assistant-chat-name">{t('name')}</label><input id="assistant-chat-name" value={renameDraft} onChange={e => setRenameDraft(e.target.value)} maxLength={120} required autoFocus /><div className={s.dialogActions}><button type="button" className={s.secondary} onClick={closePanel}>{t('cancel')}</button><button type="submit">{t('save')}</button></div></form>
+        : <div className={s.dialogBody}><p>{t('deleteBody')}</p><strong className={s.deleteName}>{targetChat?.title || active?.title || t('untitled')}</strong><div className={s.dialogActions}><button type="button" className={s.secondary} autoFocus onClick={closePanel}>{t('cancel')}</button><button type="button" className={s.deleteConfirmBtn} onClick={() => { const target = targetChat || active; if (target) deleteChat(target.id); }}>{t('delete')}</button></div></div>}
+    </Dialog>}
+  </div>;
 }

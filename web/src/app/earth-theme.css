@@ -25,6 +25,7 @@ body{font-optical-sizing:auto}
 .marketplace-calculate{display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin-top:16px}
 .marketplace-calculate small{max-width:420px;font-size:12px}
 .marketplace-context .check-field input{flex-shrink:0}
+@media(max-width:479px){.primary-nav button[aria-label="Playground"] span{font-size:10px;letter-spacing:-.03em;white-space:nowrap;overflow-wrap:normal;max-width:100%;overflow:hidden;text-overflow:ellipsis}}
 .scenario-fee-lines{font-size:13px}
 @media(min-width:768px){.marketplace-fields{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .summary-main-number{font-variant-numeric:tabular-nums;letter-spacing:-.04em}

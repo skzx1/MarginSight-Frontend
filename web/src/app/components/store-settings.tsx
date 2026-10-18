@@ -5,7 +5,6 @@ import type { Screen } from '../../lib/types';
 import { categories, currencies, reportingCycles, validateSettings, type SettingsDraft } from '../../lib/store-settings';
 import { LanguageSwitch, useLanguage } from '../language';
 import { Icon, type IconName } from '../ui';
-import { DataStatus } from './ledger';
 import { useStoreSettings } from './use-store-settings';
 import s from './store-settings.module.css';
 
@@ -62,7 +61,7 @@ export default function StoreSettings({ base, navigate, canCreate, create, store
     food: text('อาหารและเครื่องดื่ม', 'Food & drinks'), home: text('ของใช้ในบ้าน', 'Home & living'), other: text('อื่น ๆ', 'Other'),
   };
   const cycleLabels = { monthly: text('รายเดือน', 'Monthly'), weekly: text('รายสัปดาห์', 'Weekly'), daily: text('รายวัน', 'Daily') };
-  const header = <header className={s.pageHeader}><div><h1 id="screen-title" tabIndex={-1}>{t('store')}</h1><p>{t('settingsSubtitle')}</p></div>{guest && <div className={s.badgeWrap}><button type="button" className={s.mockBadge} aria-describedby="store-demo-detail"><DataStatus value="MOCK" /></button><span id="store-demo-detail" role="tooltip" className={s.tooltip}>{text('ข้อมูลร้านสาธิตสำหรับลองใช้งาน ไม่ใช่ข้อมูลร้านจริง', 'Demo store records for trying the app, not real merchant data.')}</span></div>}</header>;
+  const header = <p className="screen-note">{t('settingsSubtitle')}</p>;
 
   if (!ready) return <div className={s.root}>{header}<div className={s.skeleton} role="status" aria-busy="true"><span className="sr-only">{text('กำลังโหลดการตั้งค่า', 'Loading settings')}</span><div /><div /><div /></div></div>;
   const cancel = () => { state.cancel(); setAttempted(false); setTouched({}); };

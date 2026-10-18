@@ -6,7 +6,6 @@ import { Brand, Icon, type IconName } from '../ui';
 import { DataStatus } from './ledger';
 import { Field, Select } from './forms';
 import assistantStyles from './assistant.module.css';
-import storeStyles from './store-settings.module.css';
 import financeStyles from './finance.module.css';
 export const primary: { screen: Screen; icon: IconName }[] = [{ screen: 'overview', icon: 'overview' }, { screen: 'products', icon: 'products' }, { screen: 'finance', icon: 'calculator' }, { screen: 'assistant', icon: 'assistant' }, { screen: 'playground', icon: 'simulation' }, { screen: 'store', icon: 'settings' }];
 const screens: Screen[] = ['playground','finance','overview','products','addProduct','assistant','store','orders','reconciliation','imports','receipts','rules','line','simulation'];
@@ -31,13 +30,13 @@ export function useNavigation() {
   return { screen, navigate, registerGuard, canLeave };
 }
 export function AppShell({ screen, navigate, stores, store, changeStore, month, changeMonth, guest, children, overviewControls, assistantNav }: { screen: Screen; navigate: (screen: Screen) => void; stores: Store[]; store: Store; changeStore: (id: string) => void; month: string; changeMonth: (value: string) => void; guest: boolean; children: ReactNode; overviewControls?: ReactNode; assistantNav?: ReactNode }) {
-  const { t, locale } = useLanguage();
+  const { t } = useLanguage();
   const parent = parentScreen(screen);
   const [drawerExpanded, setDrawerExpanded] = useState(false);
   const drawerToggle = useRef<HTMLButtonElement>(null);
   const lastScreen = useRef<Screen | null>(null);
   useEffect(() => { document.title = t(screen) + ' · MarginSight'; if (screen === 'store' && lastScreen.current === screen) return; lastScreen.current = screen; document.getElementById('screen-title')?.focus({ preventScroll: true }); window.scrollTo(0, 0); }, [screen, t]);
-  return <div className={'app-shell' + (drawerExpanded ? ' drawer-expanded' : '') + (screen === 'overview' ? ' overview-shell' : '') + (screen === 'assistant' ? ' ' + assistantStyles.shell : '') + (screen === 'store' ? ' ' + storeStyles.shell : '') + (screen === 'finance' ? ' ' + financeStyles.shell : '')}>
+  return <div className={'app-shell' + (drawerExpanded ? ' drawer-expanded' : '') + (screen === 'overview' ? ' overview-shell' : '') + (screen === 'assistant' ? ' ' + assistantStyles.shell : '') + (screen === 'finance' ? ' ' + financeStyles.shell : '')}>
     <a href="#main-content" className="skip-link" onClick={e => { e.preventDefault(); document.getElementById('main-content')?.focus(); }}>{t('skip')}</a>
     <div className="topbar" onKeyDown={e => {
       if (e.key === 'Escape' && drawerExpanded && window.matchMedia('(min-width:768px) and (max-width:1023px)').matches) {
@@ -46,10 +45,7 @@ export function AppShell({ screen, navigate, stores, store, changeStore, month, 
     }}>
       <Brand />
       <div className="desktop-store" title={store.name ?? store.id}>
-        {screen === 'store' ? <>
-          <button className={storeStyles.storeRail + ' overview-store-rail secondary'} type="button" aria-label={locale === 'th' ? 'ขยายข้อมูลร้าน' : 'Expand store information'} title={store.name ?? store.id} onClick={() => { setDrawerExpanded(true); window.requestAnimationFrame(() => document.getElementById('settings-current-store')?.focus()); }}><Icon name="settings" /></button>
-          <div className={storeStyles.storeBlock}>{stores.length > 1 ? <label htmlFor="settings-current-store"><span>{locale === 'th' ? 'ร้านของคุณ' : 'Your store'}</span><select id="settings-current-store" value={store.id} onChange={e => changeStore(e.target.value)}>{stores.map(item => <option key={item.id} value={item.id}>{item.id === store.id ? store.name ?? store.id : item.name ?? item.id}</option>)}</select></label> : <div id="settings-current-store" tabIndex={-1} className={storeStyles.storeIdentity}><small>{locale === 'th' ? 'ร้านของคุณ' : 'Your store'}</small><strong>{store.name ?? store.id}</strong></div>}</div>
-        </> : screen === 'overview' ? <>
+        {screen === 'overview' ? <>
           <button className="overview-store-rail secondary" type="button" aria-label={t('store')} title={store.name ?? store.id} onClick={() => { setDrawerExpanded(true); window.requestAnimationFrame(() => document.getElementById('overview-store-switch')?.focus()); }}><Icon name="settings" /></button>
           <div className="overview-store-choice"><small>{t('store')}</small><details>
             <summary id="overview-store-switch">{store.name ?? store.id}</summary>
@@ -71,8 +67,8 @@ export function AppShell({ screen, navigate, stores, store, changeStore, month, 
       </nav>
     </div>
     <main id="main-content" tabIndex={-1} className={'workspace ' + (screen === 'assistant' ? 'assistant-workspace' : '')}>
-      {guest && !['assistant','store','finance'].includes(screen) && <div className="demo-banner"><DataStatus value="MOCK" /><span>{t('demoBanner')}</span></div>}
-      {!['assistant','store','finance'].includes(screen) && <header className="screen-header"><div>{parent !== screen && <button className="ghost back-link" onClick={() => navigate(parent)}>← {t(parent)}</button>}<span className="eyebrow">{store.name ?? store.id}</span><h1 id="screen-title" tabIndex={-1}>{t(screen)}</h1></div>{screen === 'overview' ? overviewControls : <div className="context-controls"><Select label={t('store')} value={store.id} onChange={e => changeStore(e.target.value)}>{stores.map(item => <option key={item.id} value={item.id}>{item.name ?? item.id}</option>)}</Select>{['orders','reconciliation','simulation','playground'].includes(screen) && <Field label={t('month')} type="month" value={month} onChange={e => { if (e.target.value) changeMonth(e.target.value); }} />}</div>}</header>}
+      {guest && !['assistant','finance'].includes(screen) && <div className="demo-banner"><DataStatus value="MOCK" /><span>{t('demoBanner')}</span></div>}
+      {!['assistant','finance'].includes(screen) && <header className="screen-header"><div>{parent !== screen && <button className="ghost back-link" onClick={() => navigate(parent)}>← {t(parent)}</button>}<span className="eyebrow">{store.name ?? store.id}</span><h1 id="screen-title" tabIndex={-1}>{t(screen)}</h1></div>{screen === 'overview' ? overviewControls : <div className="context-controls"><Select label={t('store')} value={store.id} onChange={e => changeStore(e.target.value)}>{stores.map(item => <option key={item.id} value={item.id}>{item.name ?? item.id}</option>)}</Select>{['orders','reconciliation','simulation','playground'].includes(screen) && <Field label={t('month')} type="month" value={month} onChange={e => { if (e.target.value) changeMonth(e.target.value); }} />}</div>}</header>}
       {children}
       {screen !== 'assistant' && <footer className="app-footer">MarginSight · {t('trustNote')}</footer>}</main>
   </div>;

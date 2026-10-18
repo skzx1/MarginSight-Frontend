@@ -1,7 +1,4 @@
-.shell{--canvas:#f9f8f6;--forest:#1e2d1b;background:var(--canvas);color:var(--ink)}
-.shell :global(.workspace){max-width:1920px;width:100%;margin-inline:auto;padding:32px 24px calc(var(--nav-height) + env(safe-area-inset-bottom) + 32px)}
-.shell :global(.app-footer){margin-top:32px}
-.root{--ink:#1e2d1b;--muted:#69665e;--green:#253521;--green-dark:#1a2617;--border:#e6e2d8;display:flex;flex-direction:column;gap:24px;width:100%;color:var(--ink);caret-color:var(--green);scrollbar-color:#969b8d #f9f8f6}
+.root{display:flex;flex-direction:column;gap:24px;width:100%;color:var(--ink);caret-color:var(--green);scrollbar-color:var(--olive) var(--canvas)}
 .root *{min-width:0}
 .root ::selection{background:#e5ece2;color:var(--ink)}
 .root :focus-visible{outline:3px solid var(--green);outline-offset:3px}
@@ -17,13 +14,13 @@
 .mockBadge :global(.badge){background:#e5e9dc;color:#34422c;font-size:13px}
 .tooltip{display:none;position:absolute;right:0;top:100%;z-index:5;width:min(280px,calc(100vw - 48px));padding:12px;border:1px solid var(--border);border-radius:10px;background:#fff;color:var(--ink);font-size:13px;line-height:1.85;box-shadow:0 3px 12px rgb(30 45 27 / .08)}
 .badgeWrap:hover .tooltip,.badgeWrap:focus-within .tooltip{display:block}
-.card{padding:24px;margin:0;border:1px solid var(--border);border-radius:16px;background:#fff;color:var(--ink);width:100%}
+.card{padding:24px;margin:0;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);color:var(--ink);width:100%}
 .cardHeading{margin-bottom:20px}
 .cardHeading h2{font-size:20px;line-height:1.65;font-weight:600;margin:0;color:var(--ink)}
 .cardHeading p{font-size:14px;line-height:1.85;color:var(--muted);margin:6px 0 0}
 .toolGrid,.formGrid,.formsLayout,.additionalLayout{display:grid;grid-template-columns:minmax(0,1fr);gap:24px}
 .toolGrid{gap:16px}
-.root .tool{display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-start;gap:8px;width:100%;padding:20px;text-align:left;background:#fcfbf9;color:var(--ink);border:1px solid var(--border);border-radius:12px;transition:background 150ms ease,border-color 150ms ease,box-shadow 150ms ease}
+.root .tool{display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-start;gap:8px;width:100%;padding:20px;text-align:left;background:var(--canvas);color:var(--ink);border:1px solid var(--border);border-radius:12px;transition:background 150ms ease,border-color 150ms ease,box-shadow 150ms ease}
 .root .tool:hover{background:#fff;color:var(--ink);border-color:rgb(37 53 33 / .4);box-shadow:0 2px 5px rgb(30 45 27 / .05)}
 .toolIcon{display:grid;place-items:center;flex-shrink:0;width:36px;height:36px;border-radius:10px;background:#efeee7;color:var(--green);margin-bottom:4px}
 .tool strong{font-size:16px;font-weight:600;line-height:1.8}
@@ -36,7 +33,7 @@
 .formGrid{gap:20px 24px}
 .field{display:flex;flex-direction:column;align-items:stretch;gap:8px}
 .field>label,.fieldLabel,.reports legend{font-size:14px;font-weight:500;line-height:1.8;color:var(--ink)}
-.root .field input,.root .field select{height:44px;min-height:44px;line-height:1.6;margin:0;padding:0 14px;border:1px solid #d5d0c5;border-radius:12px;background:#fff;color:var(--ink);font-size:15px;opacity:1}
+.root .field input,.root .field select{height:48px;min-height:48px;line-height:1.5;margin:0;padding:0 12px;border:1px solid var(--field-border);border-radius:8px;background:var(--surface);color:var(--ink);font-size:16px;opacity:1}
 .root .field select{padding-inline-end:28px}
 .root .field input:focus,.root .field select:focus{border-color:var(--green);outline:2px solid var(--green);outline-offset:1px}
 .root .field input::placeholder{color:var(--muted);opacity:1}

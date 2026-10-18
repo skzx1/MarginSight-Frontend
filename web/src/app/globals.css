@@ -561,6 +561,9 @@ dd{margin:0;text-align:right;overflow-wrap:anywhere;min-width:0;max-width:65%}
 .overview-shell .screen-header>div:first-child{min-width:0}
 .overview-shell .screen-header .eyebrow{white-space:normal;overflow-wrap:anywhere}
 .overview-period-control{display:grid;gap:12px;width:100%;max-width:420px}
+.overview-shell .context-controls{width:100%;max-width:440px;flex-wrap:wrap}
+.overview-shell .context-controls>.field{flex:1 1 160px}
+.overview-shell .context-controls>.overview-period-control{flex:1 1 240px;min-width:0}
 .overview-period-control .field{margin-bottom:0}
 .overview-date-range{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
 .overview-page .summary-cards-container{grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr))}

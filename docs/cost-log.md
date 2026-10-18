@@ -1,5 +1,7 @@
 ## 18 October 2026 — frontend/Playground bug-fix release
 
+- เพิ่มเติม13:33:48Z: sidebarภาพรวม source2a358db, เพิ่ม2staticpublishesบนbucket/distributionเดิม (รวมรอบวันนี้6publishes), invalidation7pathsต่อครั้ง. Budgetอ่านก่อน/หลัง: limit350USD actual0.023USD LastUpdated10:38:21.973Zยังล่าช้า. ไม่มีmodel/APIwrites/Backend/IAMchangesในรอบappearanceนี้; MOCK UI readsเท่านั้น.
+
 - Account109991964227 / ap-southeast-1; อ่าน Budget `Hackathon-Team10` ก่อน publish และหลัง publish เวลา13:21:50Z. Limit **350USD**, reported actual **0.023USD**; AWS LastUpdated **2026-10-18T10:38:21.973Z** จึงเป็นข้อมูลล่าช้า ไม่ใช่ค่าใช้จ่ายเรียลไทม์หรือค่าใช้จ่ายรอบนี้.
 - ใช้ CloudShell, private S3/CloudFront เดิม; 4 static publishes ระหว่างตรวจมือถือ/แก้ CSV/ปรับหน้าข้อมูลร้าน แต่ละครั้ง invalidation7paths. ไม่สร้าง service/IAM/model/Marketplace subscription ใหม่. บันทึกรุ่นล่าสุดและ readback อยู่ [release evidence](release-2026-10-18.md).
 - UI tests ใช้ guest MOCK sessions แยก, product+cost1row, deterministic scenario calculations, API reads, browser-local expense และ static asset requests. คำถาม recorded profit อ่าน API; ไม่เรียก Bedrock/OCR/training ในรอบนี้. ไม่มีการเปลี่ยนเพดานทีม350USDหรือยกเลิก trial target25USD.

@@ -2,7 +2,7 @@
 
 **PARTIAL_WITH_EXTERNAL_BLOCKERS**. Pull upstream `69947ed`, คงผู้ช่วยใหม่และแยกแพลตฟอร์ม/แคมเปญไป Playground. แก้ CSV partial cost save/retry/ข้อมูลที่ยังไม่บันทึก, แจ้งเตือนเมื่อรายละเอียดออเดอร์ไม่ครบ และปรับหน้าข้อมูลร้านให้ใช้ shared shell/สีเดียวกับเว็บไซต์.
 
-Frontend source `c6e4031` ขึ้น AWS เดิมแล้ว; CloudFront invalidation Completed, public release ตรง commit, 50 tests/build ผ่านทั้ง local/CloudShell. ทดสอบ cloud MOCK browser: CSV 1 แถวต้นทุน 123.45 ยังอยู่หลัง reload, assistant profit9, Playground Lazada profit7.46, finance expense100 และ CSV export ตรงยอด; desktop/mobile ไม่มี overflow ในหน้าที่ตรวจ. [หลักฐานและข้อจำกัด](release-2026-10-18.md).
+Frontend sourceล่าสุด **2a358db** ขึ้น AWS เดิมแล้ว13:33UTC; sidebarหน้าภาพรวมใช้แบบเดียวกับสินค้า/ข้อมูลร้าน ย้ายเลือกเปลี่ยนร้านมาในpage headerข้างช่วงเวลา. Invalidation Completed, public releaseตรงcommit, 50tests/buildผ่านlocal/CloudShell; MOCK browserตรวจdesktop/mobile/tabletและช่วงเวลา. ก่อนหน้านี้ตรวจCSVต้นทุน123.45หลังreload, assistant profit9, Playground Lazada profit7.46, finance expense100/CSVexport. [หลักฐานแยกรอบและข้อจำกัด](release-2026-10-18.md).
 
 > บันทึกด้านล่างก่อนหัวข้อ Repository split เป็นประวัติจาก monorepo; ignored evidence อยู่เครื่องต้นทางและไม่ได้เผยแพร่ตามไฟล์ลิงก์เหล่านั้น ดู AWS-HANDOFF.md สำหรับคำสั่งปัจจุบัน.
 

@@ -1,5 +1,7 @@
 ## 18 October 2026 — fresh frontend verification
 
+เพิ่มเติม13:33UTC source2a358db: shared sidebarภาพรวมตรงกับหน้าอื่น, store/period selectorใช้งานได้, responsive390/900/1440px, full50tests/buildผ่านและAWSreadback/invalidationCompleted. หลักฐานอยู่หัวข้อเพิ่มเติมของ release report ด้านล่าง.
+
 ดู [release-2026-10-18.md](release-2026-10-18.md) สำหรับ exact commit, 50 tests, CloudShell build, 4 file hashes matched, invalidation/readback และ AWS browser checks ของผู้ช่วย/Playground/CSV/finance/store desktop/mobile. ทดสอบ guest MOCK เท่านั้น; ไม่ใช่หลักฐานใหม่ของ REAL merchant/OCR/LINE/Cognito สองผู้ใช้.
 
 > บันทึกด้านล่างก่อนหัวข้อ Repository split เป็นประวัติจาก monorepo; ignored evidence อยู่เครื่องต้นทางและไม่ได้เผยแพร่ตามไฟล์ลิงก์เหล่านั้น ดู AWS-HANDOFF.md สำหรับคำสั่งปัจจุบัน.

@@ -1,24 +1,13 @@
 'use client';
-import { useId, useState } from 'react';
+import { useState } from 'react';
 import { request } from '../../lib/auth';
 import { useAction } from '../../lib/use-resource';
-import { bangkokDate, dateAt, money, parseBaht } from '../../lib/format';
+import { bangkokDate, dateAt, parseBaht } from '../../lib/format';
 import type { CatalogProduct, FeatureProps, Scenario } from '../../lib/types';
 import { useLanguage } from '../language';
-import { Empty, ErrorNotice, Field, ProductSelect, Select, Submit } from '../components/forms';
+import { ErrorNotice, Field, ProductSelect, Select, Submit } from '../components/forms';
 import { EvidencePanel, Money } from '../components/ledger';
-import { Icon } from '../ui';
-import { recordedProducts } from '../../lib/catalog-actions';
-
-type SortOption =
-  | 'dateDesc'
-  | 'dateAsc'
-  | 'priceAsc'
-  | 'priceDesc'
-  | 'qtyDesc'
-  | 'qtyAsc'
-  | 'profitDesc'
-  | 'profitAsc';
+import ProductCatalog, { useProductCatalog } from '../components/product-catalog';
 
 type CatalogProps = {
   products: CatalogProduct[];
@@ -29,6 +18,7 @@ type CatalogProps = {
   simulate: (sku: string) => void;
   onAddProduct?: () => void;
   initialMissingCostsOnly?: boolean;
+  loading?: boolean;
 };
 
 export default function Products({
@@ -41,17 +31,10 @@ export default function Products({
   ask,
   simulate,
   onAddProduct,
-  initialMissingCostsOnly = false
+  initialMissingCostsOnly = false,
+  loading = false
 }: FeatureProps & CatalogProps) {
   const { t, locale } = useLanguage();
-  const searchId = useId();
-  const sortId = useId();
-  const filterId = useId();
-
-  const [search, setSearch] = useState('');
-  const [missingCostsOnly, setMissingCostsOnly] = useState(initialMissingCostsOnly);
-  const [priceFilter, setPriceFilter] = useState<'all' | 'listed' | 'unlisted'>('all');
-  const [sort, setSort] = useState<SortOption>('dateDesc');
   const [selectedSku, setSelectedSku] = useState('');
 
   // Cost modal/form state
@@ -61,84 +44,9 @@ export default function Products({
   const [source, setSource] = useState('');
   const action = useAction();
 
-  // Ensure products have all required fields
-  const products = recordedProducts(rawProducts);
+  const catalog = useProductCatalog(rawProducts, initialMissingCostsOnly, locale);
+  const products = catalog.products;
   const product = products.find(p => p.sku === selectedSku);
-
-  // Filter products
-  const filtered = products.filter(p => {
-    const matchesSearch =
-      !search.trim() ||
-      (p.name + ' ' + p.sku).toLowerCase().includes(search.toLowerCase().trim());
-
-    const hasPrice = p.sellingPriceSatang != null && p.sellingPriceSatang > 0;
-    const matchesPriceFilter =
-      priceFilter === 'all' ||
-      (priceFilter === 'listed' ? hasPrice : !hasPrice);
-
-    return matchesSearch && matchesPriceFilter && (!missingCostsOnly || p.cost?.unitCostSatang == null);
-  });
-
-  // Sort products (one active at a time)
-  const sorted = [...filtered].sort((a, b) => {
-    switch (sort) {
-      case 'priceAsc': {
-        const pa = a.sellingPriceSatang ?? Infinity;
-        const pb = b.sellingPriceSatang ?? Infinity;
-        return pa - pb;
-      }
-      case 'priceDesc': {
-        const pa = a.sellingPriceSatang ?? -Infinity;
-        const pb = b.sellingPriceSatang ?? -Infinity;
-        return pb - pa;
-      }
-      case 'dateDesc': {
-        return (b.dateAdded || '').localeCompare(a.dateAdded || '');
-      }
-      case 'dateAsc': {
-        return (a.dateAdded || '').localeCompare(b.dateAdded || '');
-      }
-      case 'qtyDesc': {
-        return (b.quantity ?? 0) - (a.quantity ?? 0);
-      }
-      case 'qtyAsc': {
-        return (a.quantity ?? 0) - (b.quantity ?? 0);
-      }
-      case 'profitDesc': {
-        const pfa = a.profitSatang ?? -Infinity;
-        const pfb = b.profitSatang ?? -Infinity;
-        return pfb - pfa;
-      }
-      case 'profitAsc': {
-        const pfa = a.profitSatang ?? Infinity;
-        const pfb = b.profitSatang ?? Infinity;
-        return pfa - pfb;
-      }
-      default:
-        return 0;
-    }
-  });
-
-  const clearAllFilters = () => {
-    setMissingCostsOnly(false);
-    setSearch('');
-    setPriceFilter('all');
-  };
-
-  const hasActiveFilters = search.trim().length > 0 || priceFilter !== 'all';
-
-  // Toggle sort from table headers
-  const toggleSort = (column: 'price' | 'date' | 'qty' | 'profit') => {
-    if (column === 'price') {
-      setSort(s => (s === 'priceAsc' ? 'priceDesc' : 'priceAsc'));
-    } else if (column === 'date') {
-      setSort(s => (s === 'dateDesc' ? 'dateAsc' : 'dateDesc'));
-    } else if (column === 'qty') {
-      setSort(s => (s === 'qtyDesc' ? 'qtyAsc' : 'qtyDesc'));
-    } else if (column === 'profit') {
-      setSort(s => (s === 'profitDesc' ? 'profitAsc' : 'profitDesc'));
-    }
-  };
 
   if (costFormOpen && product) {
     return (
@@ -303,331 +211,10 @@ export default function Products({
     );
   }
 
-  return (
-    <div className="products-screen-content">
-      {missingCostsOnly && <div className="active-filter-chips"><span className="filter-chip">{t('missingCost')}<button type="button" onClick={() => setMissingCostsOnly(false)} aria-label={t('clearFilters')}>✕</button></span></div>}
-      {/* Top Action Header */}
-      <div className="section-heading">
-        <div>
-          <span className="eyebrow">{products.length} {t('loaded')}</span>
-        </div>
-        <button
-          type="button"
-          className="button-primary"
-          onClick={() => {
-            if (onAddProduct) onAddProduct();
-            else location.hash = 'addProduct';
-          }}
-        >
-          <Icon name="plus" />
-          <span>{t('addProduct')}</span>
-        </button>
-      </div>
-
-      {/* Search, Filter, Sort Controls */}
-      <div className="products-controls-bar">
-        <div className="search-field-wrapper">
-          <label htmlFor={searchId} className="sr-only">
-            {t('search')}
-          </label>
-          <div className="search-input-group">
-            <Icon name="search" />
-            <input
-              id={searchId}
-              type="search"
-              placeholder={t('search')}
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-              className="search-input"
-            />
-            {search && (
-              <button
-                type="button"
-                className="clear-search-btn"
-                onClick={() => setSearch('')}
-                aria-label={t('close')}
-              >
-                ✕
-              </button>
-            )}
-          </div>
-        </div>
-
-        <div className="filter-sort-group">
-          <label htmlFor={filterId} className="sr-only">
-            {t('priceStatus')}
-          </label>
-          <select
-            id={filterId}
-            value={priceFilter}
-            onChange={e => setPriceFilter(e.target.value as 'all' | 'listed' | 'unlisted')}
-            className="filter-select"
-          >
-            <option value="all">{t('priceStatus')}: {t('all')}</option>
-            <option value="listed">{t('priceStatus')}: {t('priceListed')}</option>
-            <option value="unlisted">{t('priceStatus')}: {t('priceNotListed')}</option>
-          </select>
-
-          <label htmlFor={sortId} className="sr-only">
-            {t('sortBy')}
-          </label>
-          <select
-            id={sortId}
-            value={sort}
-            onChange={e => setSort(e.target.value as SortOption)}
-            className="sort-select"
-          >
-            <option value="dateDesc">{t('sortDateDesc')}</option>
-            <option value="dateAsc">{t('sortDateAsc')}</option>
-            <option value="priceAsc">{t('sortPriceAsc')}</option>
-            <option value="priceDesc">{t('sortPriceDesc')}</option>
-            <option value="profitDesc">{t('sortProfitDesc')}</option>
-            <option value="profitAsc">{t('sortProfitAsc')}</option>
-            <option value="qtyDesc">{t('sortQtyDesc')}</option>
-            <option value="qtyAsc">{t('sortQtyAsc')}</option>
-          </select>
-        </div>
-      </div>
-
-      {/* Active Filter Chips */}
-      {hasActiveFilters && (
-        <div className="active-filter-chips" role="region" aria-label="ตัวกรองที่เลือก">
-          {search.trim() && (
-            <span className="filter-chip">
-              <span>{t('search')}: &quot;{search}&quot;</span>
-              <button
-                type="button"
-                onClick={() => setSearch('')}
-                aria-label={`ล้างการค้นหา ${search}`}
-              >
-                ✕
-              </button>
-            </span>
-          )}
-
-          {priceFilter !== 'all' && (
-            <span className="filter-chip">
-              <span>
-                {t('priceStatus')}: {priceFilter === 'listed' ? t('priceListed') : t('priceNotListed')}
-              </span>
-              <button
-                type="button"
-                onClick={() => setPriceFilter('all')}
-                aria-label="ล้างตัวกรองสถานะราคา"
-              >
-                ✕
-              </button>
-            </span>
-          )}
-
-          <button
-            type="button"
-            className="ghost clear-all-btn"
-            onClick={clearAllFilters}
-          >
-            {t('clearFilters')}
-          </button>
-        </div>
-      )}
-
-      {/* Empty States */}
-      {products.length === 0 ? (
-        <Empty
-          title={t('noProductsYet')}
-          action={
-            <button
-              onClick={() => {
-                if (onAddProduct) onAddProduct();
-                else location.hash = 'addProduct';
-              }}
-            >
-              + {t('addProduct')}
-            </button>
-          }
-        />
-      ) : sorted.length === 0 ? (
-        <Empty
-          title={t('noSearchResults')}
-          action={
-            <button className="secondary" onClick={clearAllFilters}>
-              {t('clearFilters')}
-            </button>
-          }
-        />
-      ) : (
-        <>
-          {/* Desktop Table View */}
-          <div className="products-table-container">
-            <table className="products-table" aria-label={t('products')}>
-              <thead>
-                <tr>
-                  <th scope="col" className="col-name">{t('productName')}</th>
-                  <th
-                    scope="col"
-                    className="col-sortable col-price"
-                    onClick={() => toggleSort('price')}
-                  >
-                    <span>{t('sellingPrice')}</span>
-                    <span className="sort-indicator" aria-hidden="true">
-                      {sort === 'priceAsc' ? '▲' : sort === 'priceDesc' ? '▼' : '⇅'}
-                    </span>
-                  </th>
-                  <th scope="col" className="col-cost">{t('costPrice')}</th>
-                  <th
-                    scope="col"
-                    className="col-sortable col-qty"
-                    onClick={() => toggleSort('qty')}
-                  >
-                    <span>{t('stockQty')}</span>
-                    <span className="sort-indicator" aria-hidden="true">
-                      {sort === 'qtyAsc' ? '▲' : sort === 'qtyDesc' ? '▼' : '⇅'}
-                    </span>
-                  </th>
-                  <th
-                    scope="col"
-                    className="col-sortable col-profit"
-                    onClick={() => toggleSort('profit')}
-                  >
-                    <span>{t('unitProfit')}</span>
-                    <span className="sort-indicator" aria-hidden="true">
-                      {sort === 'profitAsc' ? '▲' : sort === 'profitDesc' ? '▼' : '⇅'}
-                    </span>
-                  </th>
-                  <th
-                    scope="col"
-                    className="col-sortable col-date"
-                    onClick={() => toggleSort('date')}
-                  >
-                    <span>{t('dateAdded')}</span>
-                    <span className="sort-indicator" aria-hidden="true">
-                      {sort === 'dateAsc' ? '▲' : sort === 'dateDesc' ? '▼' : '⇅'}
-                    </span>
-                  </th>
-                  <th scope="col" className="col-action"><span className="sr-only">{t('details')}</span></th>
-                </tr>
-              </thead>
-              <tbody>
-                {sorted.map(p => (
-                  <tr
-                    key={p.sku}
-                    className="product-table-row"
-                    onClick={() => setSelectedSku(p.sku)}
-                    tabIndex={0}
-                    onKeyDown={e => {
-                      if (e.key === 'Enter') setSelectedSku(p.sku);
-                    }}
-                  >
-                    <td className="col-name">
-                      <strong>{p.name}</strong>
-                      <small className="sku-sub">{p.sku} · {p.unit}</small>
-                    </td>
-                    <td className="col-price">
-                      {p.sellingPriceSatang != null ? (
-                        <Money value={p.sellingPriceSatang} />
-                      ) : (
-                        <span className="badge warn calm-warning">
-                          {t('priceNotListed')}
-                        </span>
-                      )}
-                    </td>
-                    <td className="col-cost">
-                      {p.cost?.unitCostSatang != null ? (
-                        <Money value={p.cost.unitCostSatang} />
-                      ) : (
-                        <span className="badge warn">{t('missingCost')}</span>
-                      )}
-                    </td>
-                    <td className="col-qty">
-                      <span className="tabular-num">{p.quantity ?? '—'}</span> {p.unit}
-                    </td>
-                    <td className="col-profit">
-                      {p.profitSatang != null ? (
-                        <span className={(p.profitSatang >= 0 ? 'positive' : 'negative') + ' tabular-num'}>
-                          <Money value={p.profitSatang} />
-                        </span>
-                      ) : (
-                        <span className="muted">—</span>
-                      )}
-                    </td>
-                    <td className="col-date">
-                      <time dateTime={p.dateAdded}>{p.dateAdded}</time>
-                    </td>
-                    <td className="col-action" aria-hidden="true">
-                      <span className="row-arrow">→</span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-
-          {/* Mobile Cards View */}
-          <div className="products-mobile-cards">
-            {sorted.map(p => (
-              <article
-                key={p.sku}
-                className="product-card"
-                onClick={() => setSelectedSku(p.sku)}
-                tabIndex={0}
-                onKeyDown={e => {
-                  if (e.key === 'Enter') setSelectedSku(p.sku);
-                }}
-              >
-                <div className="product-card-top">
-                  <div>
-                    <h3 className="product-card-title">{p.name}</h3>
-                    <p className="caption">{p.sku} · {p.unit}</p>
-                  </div>
-                  <div>
-                    {p.sellingPriceSatang != null ? (
-                      <strong className="product-card-price">
-                        <Money value={p.sellingPriceSatang} />
-                      </strong>
-                    ) : (
-                      <span className="badge warn calm-warning">
-                        {t('priceNotListed')}
-                      </span>
-                    )}
-                  </div>
-                </div>
-
-                <div className="product-card-metrics">
-                  <div className="card-metric">
-                    <span className="metric-label">{t('costPrice')}</span>
-                    <span className="metric-val">
-                      {p.cost ? <Money value={p.cost.unitCostSatang} /> : '—'}
-                    </span>
-                  </div>
-                  <div className="card-metric">
-                    <span className="metric-label">{t('stockQty')}</span>
-                    <span className="metric-val tabular-num">{p.quantity ?? '—'}</span>
-                  </div>
-                  <div className="card-metric">
-                    <span className="metric-label">{t('unitProfit')}</span>
-                    <span className={'metric-val ' + ((p.profitSatang ?? 0) >= 0 ? 'positive' : 'negative')}>
-                      {p.profitSatang != null ? <Money value={p.profitSatang} /> : '—'}
-                    </span>
-                  </div>
-                  <div className="card-metric">
-                    <span className="metric-label">{t('dateAdded')}</span>
-                    <span className="metric-val caption">{p.dateAdded}</span>
-                  </div>
-                </div>
-              </article>
-            ))}
-          </div>
-        </>
-      )}
-
-      {more && (
-        <div className="load-more-row">
-          <button className="secondary" onClick={loadMore}>
-            {t('next')}
-          </button>
-        </div>
-      )}
-    </div>
-  );
+  return <ProductCatalog controls={catalog} loading={loading} more={more} loadMore={loadMore} onSelect={setSelectedSku} onAdd={() => {
+    if (onAddProduct) onAddProduct();
+    else location.hash = 'addProduct';
+  }} />;
 }
 
 export function Simulation({

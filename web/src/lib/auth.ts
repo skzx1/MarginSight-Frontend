@@ -11,10 +11,10 @@ export async function demo(user='demo-a'){if(process.env.NEXT_PUBLIC_AUTH_MODE!=
 export class ApiError extends Error {
  constructor(public code: string, public statusCode: number) { super(code); this.name = 'ApiError'; }
 }
-export async function request<T = unknown>(path:string,body?:unknown):Promise<T> {
+export async function request<T = unknown>(path:string,body?:unknown,signal?:AbortSignal):Promise<T> {
  await loadConfig();
  const guest=fullDemoMode();
- const r=await fetch(api+(guest?'/demo/api':'')+path,{method:body===undefined?'GET':'POST',headers:{authorization:'Bearer '+activeToken(),...(body===undefined?{}:{'content-type':'application/json'})},body:body===undefined?undefined:JSON.stringify(body)});
+ const r=await fetch(api+(guest?'/demo/api':'')+path,{method:body===undefined?'GET':'POST',headers:{authorization:'Bearer '+activeToken(),...(body===undefined?{}:{'content-type':'application/json'})},body:body===undefined?undefined:JSON.stringify(body),signal});
  if(r.status===401){if(guest)clearFullDemo();else sessionStorage.removeItem('token');window.dispatchEvent(new Event('auth-expired'));throw new ApiError('SESSION_EXPIRED',401)}
  const v=await r.json().catch(()=>({error:'INVALID_RESPONSE'}));
  if(!r.ok)throw new ApiError(v.error??'REQUEST_FAILED',r.status);

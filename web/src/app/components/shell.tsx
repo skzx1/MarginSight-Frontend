@@ -45,14 +45,8 @@ export function AppShell({ screen, navigate, stores, store, changeStore, month, 
     }}>
       <Brand />
       <div className="desktop-store" title={store.name ?? store.id}>
-        {screen === 'overview' ? <>
-          <button className="overview-store-rail secondary" type="button" aria-label={t('store')} title={store.name ?? store.id} onClick={() => { setDrawerExpanded(true); window.requestAnimationFrame(() => document.getElementById('overview-store-switch')?.focus()); }}><Icon name="settings" /></button>
-          <div className="overview-store-choice"><small>{t('store')}</small><details>
-            <summary id="overview-store-switch">{store.name ?? store.id}</summary>
-            <div className="overview-store-options">{stores.map(item => <button key={item.id} type="button" className="ghost" aria-pressed={store.id === item.id} onClick={e => { e.currentTarget.closest('details')?.removeAttribute('open'); changeStore(item.id); }}>{item.name ?? item.id}</button>)}</div>
-          </details></div>
-        </> : <><span className="drawer-store-mark" aria-hidden="true">{(store.name ?? store.id).slice(0, 1)}</span>
-          <span className="drawer-store-name"><small>{t('store')}</small><strong>{store.name ?? store.id}</strong></span></>}
+        <span className="drawer-store-mark" aria-hidden="true">{(store.name ?? store.id).slice(0, 1)}</span>
+        <span className="drawer-store-name"><small>{t('store')}</small><strong>{store.name ?? store.id}</strong></span>
       </div>
       <button ref={drawerToggle} className="drawer-toggle secondary" type="button" aria-controls="main-navigation" aria-expanded={drawerExpanded} aria-label={t(drawerExpanded ? 'collapseNavigation' : 'expandNavigation')} title={t(drawerExpanded ? 'collapseNavigation' : 'expandNavigation')} onClick={() => setDrawerExpanded(value => !value)}>
         <Icon name={drawerExpanded ? 'close' : 'menu'} /><span>{t('collapseNavigation')}</span>
@@ -68,7 +62,7 @@ export function AppShell({ screen, navigate, stores, store, changeStore, month, 
     </div>
     <main id="main-content" tabIndex={-1} className={'workspace ' + (screen === 'assistant' ? 'assistant-workspace' : '')}>
       {guest && !['assistant','finance'].includes(screen) && <div className="demo-banner"><DataStatus value="MOCK" /><span>{t('demoBanner')}</span></div>}
-      {!['assistant','finance'].includes(screen) && <header className="screen-header"><div>{parent !== screen && <button className="ghost back-link" onClick={() => navigate(parent)}>← {t(parent)}</button>}<span className="eyebrow">{store.name ?? store.id}</span><h1 id="screen-title" tabIndex={-1}>{t(screen)}</h1></div>{screen === 'overview' ? overviewControls : <div className="context-controls"><Select label={t('store')} value={store.id} onChange={e => changeStore(e.target.value)}>{stores.map(item => <option key={item.id} value={item.id}>{item.name ?? item.id}</option>)}</Select>{['orders','reconciliation','simulation','playground'].includes(screen) && <Field label={t('month')} type="month" value={month} onChange={e => { if (e.target.value) changeMonth(e.target.value); }} />}</div>}</header>}
+      {!['assistant','finance'].includes(screen) && <header className="screen-header"><div>{parent !== screen && <button className="ghost back-link" onClick={() => navigate(parent)}>← {t(parent)}</button>}<span className="eyebrow">{store.name ?? store.id}</span><h1 id="screen-title" tabIndex={-1}>{t(screen)}</h1></div><div className="context-controls"><Select label={t('store')} value={store.id} onChange={e => changeStore(e.target.value)}>{stores.map(item => <option key={item.id} value={item.id}>{item.name ?? item.id}</option>)}</Select>{screen === 'overview' ? overviewControls : ['orders','reconciliation','simulation','playground'].includes(screen) && <Field label={t('month')} type="month" value={month} onChange={e => { if (e.target.value) changeMonth(e.target.value); }} />}</div></header>}
       {children}
       {screen !== 'assistant' && <footer className="app-footer">MarginSight · {t('trustNote')}</footer>}</main>
   </div>;

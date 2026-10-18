@@ -64,15 +64,13 @@ body{font-optical-sizing:auto}
  .topbar{background:var(--forest);color:#f7f6f1;border-right:0}
  .topbar .brand small,.topbar .desktop-store small{color:#c2c5aa}
  .topbar .desktop-store{border-color:var(--olive)}
- .topbar .overview-store-choice summary{color:#f7f6f1}
  .topbar .logo{background:var(--olive-deep)}
  .topbar .primary-nav{background:transparent;box-shadow:none}
  .topbar .primary-nav button,.topbar button.ghost{color:#e4e6d7;background:transparent}
  .topbar .primary-nav button:hover,.topbar button.ghost:hover{background:var(--olive-deep)}
  .topbar .primary-nav button.active{background:var(--olive-deep);border-color:var(--olive);color:#fff}
  .topbar .primary-nav button.active::before{background:var(--olive-light)}
- .topbar .drawer-toggle,.topbar .overview-store-rail{background:var(--olive-deep);border-color:var(--olive);color:#fff}
- .topbar .overview-store-options{background:var(--forest)}
+ .topbar .drawer-toggle{background:var(--olive-deep);border-color:var(--olive);color:#fff}
  .topbar :focus-visible{outline-color:var(--pale)}
 }
 @container workspace (min-width:900px){.dashboard-charts{grid-template-columns:minmax(0,1.9fr) minmax(260px,1fr)}}

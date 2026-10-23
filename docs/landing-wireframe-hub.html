@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MarginSight — Header + Hero wireframe</title>
+<style>
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;background:#fff;color:#222;font-family:Tahoma,Arial,sans-serif}body{height:100svh;display:grid;grid-template-rows:72px minmax(0,1fr)}button{font:inherit;color:inherit}header{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px 48px;border-bottom:1px solid #999}.logo{font-size:24px;font-weight:700}.utilities{display:flex;align-items:center;gap:16px}.utility{min-height:44px;min-width:44px;padding:8px 12px;border:0;background:#fff;font-size:16px}.language{display:inline-flex;align-items:center;gap:10px;font-size:16px;min-height:44px}.language span:last-child{color:#555}button:disabled{opacity:1;cursor:default}.hero{position:relative;min-height:0;overflow:clip;text-align:center}.orbit-field{position:absolute;inset:8px 0 64px}.orbits{position:absolute;inset:0;pointer-events:none}.orbit{position:absolute;left:50%;top:50%;width:56%;height:62%;border:1px solid #999;border-radius:50%;transform:translate(-50%,-50%)}.orbit.two{width:74%;height:77%}.orbit.three{width:90%;height:92%}.copy{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(560px,calc(100% - 300px));display:grid;justify-items:center;gap:20px;z-index:2}h1,p{margin:0}h1{font-size:clamp(30px,3.4vw,48px);line-height:1.4}p{font-size:18px;line-height:1.65}.cta{min-height:48px;padding:10px 24px;border:2px solid #222;background:#eee;font-weight:700;font-size:18px;line-height:1.5}.nodes{position:absolute;inset:0;margin:0;padding:0;list-style:none;pointer-events:none}.node{position:absolute;display:flex;align-items:center;justify-content:center;width:clamp(76px,7vw,100px);aspect-ratio:1;border:1px solid #777;border-radius:50%;background:#fff;transform:translate(-50%,-50%);font-size:clamp(13px,1.2vw,17px);line-height:1.4;padding:4px;font-weight:700}.shopee{left:5%;top:50%}.lazada{left:95%;top:50%}.tiktok{left:23.84%;top:22.78%}.shipping{left:73.78%;top:20.5%}.cost{left:23.84%;top:77.22%}.fees{left:78%;top:50%}.ads{left:76.16%;top:77.22%}.scope{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);width:min(760px,calc(100% - 32px));font-size:16px;line-height:1.5;background:#fff}.scope span{display:block}
+@media(max-width:1000px) and (min-width:801px){.fees{left:89%;top:65%}.lazada{left:94%;top:35%}.copy{width:calc(100% - 280px)}}
+@media(max-width:800px){body{grid-template-rows:64px minmax(0,1fr)}header{padding:10px 16px;gap:8px}.logo{font-size:20px}.utilities{gap:8px}.utility{padding:8px}.language{gap:6px}.orbit-field{inset:0 0 64px}.orbit{width:92%;height:74%}.orbit.two{width:114%;height:91%}.orbit.three{width:136%;height:108%}.copy{width:calc(100% - 152px);max-width:440px;gap:14px}h1{font-size:clamp(22px,6vw,32px);line-height:1.45}.copy p{font-size:16px;line-height:1.6}.cta{width:100%;padding:8px 10px;font-size:16px}.node{width:56px;font-size:12px}.shopee{left:16%;top:14%}.tiktok{left:84%;top:14%}.lazada{left:86%;top:82%}.cost{left:14%;top:82%}.shipping{left:10%;top:50%}.fees{left:90%;top:50%}.ads{left:50%;top:94%}.scope{bottom:10px;font-size:16px}}
+@media(max-width:350px){.logo{font-size:18px}.utilities{gap:4px}.utility{padding:8px 4px}.language{font-size:14px}.node{width:52px;font-size:12px}.copy{gap:10px}}
+@media(max-height:600px){.copy{gap:10px}h1{font-size:26px}.copy p{font-size:16px}.node{width:56px;font-size:12px}.scope{font-size:16px}.orbit-field{inset:0 0 64px}.hero .copy .cta{font-size:16px}.hero .copy{max-width:500px}}
+@media(max-height:500px) and (min-width:600px){body{grid-template-rows:56px minmax(0,1fr)}header{padding:4px 24px}.orbit-field{inset:0 0 48px}.copy{gap:6px;width:360px;max-width:calc(100% - 320px)}.shipping{left:77%}.copy h1{font-size:24px}.copy p{line-height:1.5}.scope span{display:inline}.scope{font-size:16px;bottom:8px}.shopee{left:8%}.lazada{left:92%}.fees{left:82%}.node{width:52px;font-size:12px}}
+@media(max-height:600px) and (max-width:350px){.copy h1{font-size:22px}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<!-- Wireframe only: controls show placement. Activation destinations are not connected. -->
+<header aria-label="ส่วนหัว">
+  <div class="logo">MarginSight</div>
+  <div class="utilities">
+    <span class="language" aria-label="ภาษาในแบบร่าง: ไทย"><strong>TH</strong><span>/ EN</span></span>
+    <button class="utility" disabled title="ตำแหน่งเข้าสู่ระบบในไวร์เฟรม ยังไม่ผูกปลายทาง">เข้าสู่ระบบ</button>
+  </div>
+</header>
+<main class="hero" aria-label="รวมหลายช่องทาง เห็นกำไรในที่เดียว">
+  <div class="orbit-field">
+    <div class="orbits" aria-hidden="true"><i class="orbit"></i><i class="orbit two"></i><i class="orbit three"></i></div>
+    <ul class="nodes" aria-label="แพลตฟอร์มและค่าใช้จ่ายที่นำมารวม">
+      <li class="node shopee">Shopee</li>
+      <li class="node lazada">Lazada</li>
+      <li class="node tiktok">TikTok<br>Shop</li>
+      <li class="node shipping">ค่า<br>ขนส่ง</li>
+      <li class="node cost">ต้นทุน<br>สินค้า</li>
+      <li class="node fees">ค่า<br>ธรรมเนียม</li>
+      <li class="node ads">ค่า<br>โฆษณา</li>
+    </ul>
+    <div class="copy">
+      <h1>รวมทุกช่องทาง<br>เห็นกำไรในที่เดียว</h1>
+      <p>รวมยอดขายและค่าใช้จ่าย<br>ให้เข้าใจว่าร้านเหลือกำไรเท่าไร</p>
+      <button class="cta" disabled title="ตำแหน่ง CTA ในไวร์เฟรม ยังไม่ผูกปลายทาง">เริ่มต้นใช้งาน</button>
+    </div>
+  </div>
+  <p class="scope"><span>เริ่มจากไฟล์ CSV / Excel ตามแบบ MarginSight</span><span>การดึงข้อมูลตรงจากทุกแพลตฟอร์มยังไม่เปิดใช้</span></p>
+</main>
+</body>
+</html>

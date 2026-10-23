@@ -127,3 +127,7 @@ VERIFIED_LOCAL / VERIFIED_AWS for this release slice: latest landing source e7c0
 ## Product name — 23 October 2026
 
 MarginShot is the current user-facing product name. VERIFIED_AWS branding source Frontend330cf09/Backend4405954 includes website, assistant/export copy and Cognito logo. Existing GitHub repository names/AWS identities/API health identifier remain compatible. Local/CloudShell53+50 tests and published name checks pass; see verification.md/cost-log.md. Overall PARTIAL_WITH_EXTERNAL_BLOCKERS and prior external integration limitations remain.
+
+## Landing logo animation - 24 October 2026 (Bangkok)
+
+VERIFIED_LOCAL / VERIFIED_AWS for this UI slice: runtimee9ef662 is live. Desktop logos orbit on the existing circles automatically, remain upright and have no pause/play control, as requested. Mobile retains a static four-logo row. Local and clean CloudShell53 tests/build checks pass; S3 twelve-file hashes, completed CloudFront invalidation, public release/HTTP protection and live browser motion checks pass. Existing Backend/auth/formula remain unchanged. See verification.md and cost-log.md. Overall PARTIAL_WITH_EXTERNAL_BLOCKERS remains.

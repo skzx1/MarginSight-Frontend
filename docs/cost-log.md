@@ -105,3 +105,11 @@ Prior HTML/config/release backups and build logs are in /tmp/marginsight-fe-2026
 ## MarginShot branding release — 23 October 2026
 
 Re-read STS109991964227 and BudgetHackathon-Team10 before preparation: limit350USD/ActualSpend0.026USD, LastUpdated2026-10-23T12:43:59.593Z (lagged, not current remaining credit). Existing Singapore stack only; team total350USD/trial target25USD unchanged. One reviewed code-only stack update, one static publish/7-path invalidation, and presentation-only Cognito logo customization. No new resource/role/reserved capacity/training/inference/OCR/LINE message or new demo seeding. Standard CloudShell/S3/Lambda/CDN/API usage may accrue. Previous release backup and logs in /tmp/marginshot-brand-20261023-pmmu_rmz are ephemeral; prior source Frontend3219d16/Backendeb7e7f9 remains in Git for reviewed rollback. Do not delete store data or change OAuth/resource identities to roll back branding.
+
+## Landing orbit release - 24 October 2026 (Bangkok)
+
+Before cloud preparation verified STS109991964227 and Singapore stackmarginsight UPDATE_COMPLETE at2026-10-23T18:34:05.088695Z. BudgetHackathon-Team10 limit350USD; ActualSpend0.026USD, LastUpdated2026-10-23T18:15:36.782Z (24 October01:15Thai). Re-read before publish still0.026USD. Billing is delayed, not current remaining credit; trial target25USD is within the350USD total team cap.
+
+Clean CloudShell build downloaded SHA-256-verified Node24.19.0 and installed pinned packages. One static publish of e9ef662 on existing private S3, twelve S3 object checksum reads, one7-path CloudFront invalidation IF09BG4JWMVD0092Y50N5RT1XD (Completed), public HTTP/browser reads. No new infrastructure, Backend/SAM/IAM/Cognito changes, reserved capacity, inference/training/OCR/LINE usage, guest seeding or merchant writes. Standard CloudShell/S3/CDN/API traffic may accrue; no zero-cost or immediate remaining-credit claim. Existing resources remain in the team budget.
+
+Rollback HTML/config/release backups and logs are in ephemeral CloudShell /tmp/marginshot-orbit-20261024-lr8kfe7q/pre-release. Durable prior Frontend runtime330cf09 is in Git; source rollback requires reviewed rebuild/publish and scoped invalidation, with no store data deletion.

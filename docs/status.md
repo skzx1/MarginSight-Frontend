@@ -122,3 +122,8 @@ VERIFIED_LOCAL / VERIFIED_AWS for this feature slice: Frontend f7dcc060b6a5d885f
 ## Latest landing publication — 23 October 2026
 
 VERIFIED_LOCAL / VERIFIED_AWS for this release slice: latest landing source e7c0701 plus security patch e26e30e is published on existing S3/CloudFront. Next16.4.3,53 tests/local and clean CloudShell verification pass; local npm audit reports zero known dependency vulnerabilities. Actual browser checked the editable illustrative discount example, missing cost, TH/EN mobile layout/menu and a fresh MOCK app overview9THB/4.5% with assistant screen opening. Backend/runtime formulas remain unchanged (margin-v1.1.0). No new AWS resources or auth policy changes. Details in verification.md and cost-log.md; overall PARTIAL_WITH_EXTERNAL_BLOCKERS and prior real OCR/LINE/native-platform/two-Cognito-user limitations remain.
+
+
+## Product name — 23 October 2026
+
+MarginShot is the current user-facing product name. VERIFIED_AWS branding source Frontend330cf09/Backend4405954 includes website, assistant/export copy and Cognito logo. Existing GitHub repository names/AWS identities/API health identifier remain compatible. Local/CloudShell53+50 tests and published name checks pass; see verification.md/cost-log.md. Overall PARTIAL_WITH_EXTERNAL_BLOCKERS and prior external integration limitations remain.

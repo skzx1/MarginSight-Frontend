@@ -4,6 +4,7 @@ import { useRef } from 'react';
 import { LanguageSwitch, useLanguage } from '../language';
 import { Brand, Icon, type IconName } from '../ui';
 import DiscountSimulator from './discount-simulator';
+import HeroOrbit from './hero-orbit';
 import s from './landing.module.css';
 
 const channels = [{ name: 'Shopee', image: 'shopee.png' }, { name: 'Lazada', image: 'lazada.png' }, { name: 'TikTok Shop', image: 'tiktok.png' }, { name: 'LINE', image: 'line.png' }];
@@ -37,9 +38,10 @@ export default function Landing() {
     </div></header>
     <main id="main" tabIndex={-1}>
       <section className={s.hero} aria-labelledby="hero-title">
-        <div className={s.heroCurves} aria-hidden="true"><i /><i /><i /></div>
+        <HeroOrbit />
         <div className={s.heroCopy}><p className={s.pill}><Icon name="calculator" />{tr('เห็นกำไร ก่อนตัดสินใจขาย', 'Know your profit before you sell')}</p><h1 id="hero-title">{tr('รู้กำไรจริงทุกออเดอร์', 'Know your real profit on every sale')}<span>{tr('ก่อนลดราคา', '— before you discount.')}</span></h1><p className={s.heroLead}>{tr('ยอดขายดี ไม่ได้แปลว่ามีกำไร รวมต้นทุน ค่าส่ง และค่าธรรมเนียมให้ครบ แล้วลองส่วนลดก่อนขายจริง', 'Strong sales do not always mean profit. Bring product costs, shipping and fees together, then try a discount before your next sale.')}</p><div className={s.actions}>{primary}<a className={s.secondary} href="#simulator"><Icon name="calculator" />{tr('ลองคำนวณส่วนลด', 'Try a discount')}</a></div></div>
-        <div className={s.heroStage}><div className={s.floatingSymbols} aria-hidden="true">{channels.map((channel, index) => <span key={channel.name} data-position={index}><img src={`/assets/images/${channel.image}`} alt="" width="24" height="24" /></span>)}<span data-position="4"><Icon name="simulation" /></span><span data-position="5"><Icon name="products" /></span></div>
+        <div className={s.mobileOrbitLogos} aria-hidden="true">{channels.map(channel => <span key={channel.name}><img src={`/assets/images/${channel.image}`} alt="" width="24" height="24" /></span>)}</div>
+        <div className={s.heroStage}>
           <div className={s.alertStack}><article className={s.alertCard}><span className={s.alertIcon}><Icon name="calculator" /></span><div><p className={s.alertEyebrow}>{tr('เช็กก่อนลดราคา', 'CHECK BEFORE DISCOUNTING')}<span>{tr('ตัวอย่าง', 'Example')}</span></p><h2>{tr('ลด 15% อาจขายแล้วขาดทุน', '15% off can turn profit into a loss')}</h2><p>{tr('จาก ฿200 เหลือ ฿170 · ขาดทุน', '฿200 → ฿170 · Loss of')} <b>฿5.50</b> {tr('ต่อชิ้น', 'per item')}</p><div className={s.alertFloor}><span>{tr('ราคาที่ไม่ขาดทุนในตัวอย่างนี้', 'Price that covers these example costs')}</span><strong>฿176.47</strong></div></div></article><div className={s.insightCard}><span className={s.iconTile}><Icon name="assistant" /></span><div><strong>{tr('เห็นเงินที่หัก ก่อนตั้งราคา', 'See the deductions before setting a price')}</strong><p>{tr('ต้นทุน ฿120 + ค่าส่ง ฿30 + ค่าธรรมเนียม ฿25.50', 'Cost ฿120 + shipping ฿30 + fees ฿25.50')}</p></div></div><p className={s.exampleCaption}><Icon name="calculator" />{tr('ตัวอย่างสมมติ · ค่าธรรมเนียม 15% ของราคาหลังลด', 'Illustrative example · 15% fee on the discounted price')}</p></div>
         </div>
       </section>

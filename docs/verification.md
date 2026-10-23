@@ -283,3 +283,11 @@ VERIFIED_LOCAL รอบสุดท้าย: npm run verify ผ่าน50test
 - Evidence: tmp/landing-discount-review/desktop.jpg, mobile.jpg, responsive.json, fallbacks.json. Full-page capture failed in this browser; no full-page image is claimed for this revision.
 - Inline review substitutes for a separate agent because user/repository prohibits subagents. See docs/landing-reference-layout.md for fidelity matrix and unresolved inputs. Local review disposition: ship for user design review, pending official logo assets/commercial policy inputs; not a blanket production/accessibility certification.
 - Manual phone checks: Safari/Chrome browser chrome resize, text scaling, tap pause/resume, OS Reduce Motion, mid-range animation smoothness.
+
+## 23 October 2026 — latest landing release preparation
+
+Pulled origin/main e7c07018338e9fe5038a8ead25a79249a3808395 by fast-forward. Backend origin/main remains eb7e7f9fcc9b3b472e39f2100cca0f6f1f224583 with no new application changes. This release updates the public landing and its deterministic example calculator; the authenticated workspace and Backend are not changed.
+
+Local npm ci succeeded. The first verify passed 53 tests but the Next16.4.0 build stopped with a security advisory; that attempt is not counted as a completed verification. npm audit independently confirmed affected Next.js dependencies (GHSA-2464-fhr4-w9xw, GHSA-p3m5-59mp-jv5r, GHSA-673q-mjm6-r5xr). Updated only Next to exact16.4.3 and the lockfile; npm audit then reported zero known vulnerabilities. The static export has no deployed Next server; this is dependency remediation, not evidence that the running S3 site was exploited.
+
+Final local npm run verify passed53/53 tests, TypeScript, generated-preview SHA-256 integrity, browser secret-pattern policy, Next16.4.3 static export and deployment packaging. Domain version remains margin-v1.1.0. AWS publication and browser results will be recorded separately after actual verification; no new live OCR/LINE/native marketplace/two-Cognito-user proof is claimed here.

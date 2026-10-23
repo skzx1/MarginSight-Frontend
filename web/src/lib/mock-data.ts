@@ -224,7 +224,7 @@ export function generateChatbotReply(question: string, products: CatalogProduct[
   }
 
   if (locale === 'en') {
-    return `🤖 **MarginSight Assistant:**\nI analyzed your store data for the active period.\n- Total catalog: **${products.length} active products**\n- Average recorded margin: **48.6%**\n- All cost versions and fee rules are active.\n\nYou can ask me specific questions like "What was my profit this week?" or "Which product makes the most profit?".`;
+    return `🤖 **MarginShot Assistant:**\nI analyzed your store data for the active period.\n- Total catalog: **${products.length} active products**\n- Average recorded margin: **48.6%**\n- All cost versions and fee rules are active.\n\nYou can ask me specific questions like "What was my profit this week?" or "Which product makes the most profit?".`;
   }
-  return `🤖 **ผู้ช่วย MarginSight วิเคราะห์ข้อมูลร้าน:**\nจากข้อมูลร้านค้าในระบบ ณ ปัจจุบัน:\n- สินค้าในระบบ: **${products.length} รายการ**\n- อัตรากำไรเฉลี่ย: **48.6%**\n- ข้อมูลต้นทุนและกฎค่าบริการได้รับการยืนยันครบถ้วน\n\nท่านสามารถถามคำถาม เช่น "สัปดาห์นี้เหลือกำไรเท่าไร?" หรือ "สินค้าตัวไหนทำกำไรสูงสุด?" ได้ตลอดเวลาครับ`;
+  return `🤖 **ผู้ช่วย MarginShot วิเคราะห์ข้อมูลร้าน:**\nจากข้อมูลร้านค้าในระบบ ณ ปัจจุบัน:\n- สินค้าในระบบ: **${products.length} รายการ**\n- อัตรากำไรเฉลี่ย: **48.6%**\n- ข้อมูลต้นทุนและกฎค่าบริการได้รับการยืนยันครบถ้วน\n\nท่านสามารถถามคำถาม เช่น "สัปดาห์นี้เหลือกำไรเท่าไร?" หรือ "สินค้าตัวไหนทำกำไรสูงสุด?" ได้ตลอดเวลาครับ`;
 }

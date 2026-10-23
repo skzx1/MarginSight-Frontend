@@ -1,5 +1,5 @@
 ---
-name: MarginSight — Landing
+name: MarginShot — Landing
 description: Reference-led marketing surface with centered copy, channel orbits and readable financial examples.
 colors:
   emerald: "#187b62"
@@ -55,7 +55,7 @@ components:
     padding: "44px"
 ---
 
-# Design System: MarginSight Landing
+# Design System: MarginShot Landing
 
 ## Overview
 
@@ -63,7 +63,7 @@ components:
 
 This document applies **only to the public landing route `/`**. It records the reference composition the user selected on 21 October 2026. It does not replace the workspace's earth palette or shared application styles. `web/src/app/globals.css` and `earth-theme.css` remain authoritative inside the app.
 
-Use a light field, centered Thai-first headlines, ample space, a restrained emerald orbit and dark financial/assistant panels. The supplied reference sets composition; the existing MarginSight fonts, channel artwork and verified product limitations supply the identity and content. The image is a low-resolution layout reference, not a readable copy specification.
+Use a light field, centered Thai-first headlines, ample space, a restrained emerald orbit and dark financial/assistant panels. The supplied reference sets composition; the existing MarginShot fonts, channel artwork and verified product limitations supply the identity and content. The image is a low-resolution layout reference, not a readable copy specification.
 
 ## Colors
 
@@ -99,7 +99,7 @@ Reuse Brand and LanguageSwitch. Primary links lead to `/login/`. Secondary text 
 
 One CSS rotation lasts 48 seconds; a synchronized inverse rotation and inverse vertical scaling keep logos upright and undistorted on elliptical paths. Pause on hover, keyboard focus, tap selection, the persistent pause control, document hiding and viewport exit. Reserve geometry before scripts load. Reduced motion and no scripts leave a static arrangement.
 
-The result card stays in a fixed central zone. Phones show the MarginSight mark at the center and move the result card below the orbit. Names remain in a static readable line. At tablet/intermediate widths, make the orbit taller to maintain clearance rather than shrinking the result text. Keep focus outlines inside the orbit's safe paint area.
+The result card stays in a fixed central zone. Phones show the MarginShot mark at the center and move the result card below the orbit. Names remain in a static readable line. At tablet/intermediate widths, make the orbit taller to maintain clearance rather than shrinking the result text. Keep focus outlines inside the orbit's safe paint area.
 
 ### Evidence panels
 

@@ -109,7 +109,7 @@ function FinanceView({ resource, base, origin, period, onPeriodChange, navigate,
     return `${change > 0 ? '+' : ''}${change.toFixed(1)}${key === 'marginPct' ? text(' จุด', ' pp') : '%'} · ${text('ช่วงก่อนหน้า', 'previous period')}`;
   };
   const exportReport = () => {
-    const rows: (string | number | null)[][] = [['MarginSight', text('รายงานการเงิน', 'Finance report'), origin], ['Period', bounds?.start ?? '', bounds?.end ?? ''], ['Channel', channel === 'all' ? text('ทุกช่องทาง', 'All channels') : channelName(channel)], ['Currency', 'THB'], ['Scope', text('เฉพาะรายการที่บันทึก ค่าใช้จ่ายเพิ่มเติมอยู่ในเบราว์เซอร์', 'Recorded entries only; added expenses are local')], [], ['Metric', 'Value (THB, percent, or count)']];
+    const rows: (string | number | null)[][] = [['MarginShot', text('รายงานการเงิน', 'Finance report'), origin], ['Period', bounds?.start ?? '', bounds?.end ?? ''], ['Channel', channel === 'all' ? text('ทุกช่องทาง', 'All channels') : channelName(channel)], ['Currency', 'THB'], ['Scope', text('เฉพาะรายการที่บันทึก ค่าใช้จ่ายเพิ่มเติมอยู่ในเบราว์เซอร์', 'Recorded entries only; added expenses are local')], [], ['Metric', 'Value (THB, percent, or count)']];
     if(resource.coverage?.partial)rows.splice(5,0,['INCOMPLETE_API_COVERAGE',resource.coverage.loaded,resource.coverage.total,'Loaded orders only; monthly counts include the requested comparison months. Not whole-store totals.']);
     kpis.forEach(k => rows.push([k.label, totals[k.key] == null ? null : ['totalOrders', 'marginPct'].includes(k.key) ? totals[k.key] : totals[k.key]! / 100]));
     rows.push([], ['Profit & loss', 'THB']); pnl.forEach(([label, value]) => rows.push([label, value == null ? null : value / 100]));
@@ -120,7 +120,7 @@ function FinanceView({ resource, base, origin, period, onPeriodChange, navigate,
     rows.push([], ['Expense date', 'Channel', 'Category', 'Amount THB', 'Note']); current.expenses.forEach(e => rows.push([e.date, channelName(e.channel), categoryNames[e.category], e.amountSatang / 100, e.note]));
     if (compare && previousCovered) { rows.push([], ['Previous period', previous?.start ?? '', previous?.end ?? '']); kpis.forEach(k => rows.push([k.label, old[k.key] == null ? null : ['totalOrders', 'marginPct'].includes(k.key) ? old[k.key] : old[k.key]! / 100])); }
     const url = URL.createObjectURL(new Blob([financeCsv(rows)], { type: 'text/csv;charset=utf-8;' }));
-    const link = document.createElement('a'); link.href = url; link.download = `MarginSight-finance-${bounds?.start}-${bounds?.end}-${channel.replace(/[^a-z0-9]/gi, '-')}.csv`; link.click(); setTimeout(() => URL.revokeObjectURL(url), 1000);
+    const link = document.createElement('a'); link.href = url; link.download = `MarginShot-finance-${bounds?.start}-${bounds?.end}-${channel.replace(/[^a-z0-9]/gi, '-')}.csv`; link.click(); setTimeout(() => URL.revokeObjectURL(url), 1000);
   };
   const saveExpense = (event: React.FormEvent) => {
     event.preventDefault(); setFormError('');

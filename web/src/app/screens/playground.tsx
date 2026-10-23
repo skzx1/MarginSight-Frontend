@@ -178,7 +178,7 @@ export default function Playground({
                     </div>
                     <div className="chat-bubble-assistant">
                       <div className="bubble-header-assistant">
-                        <strong>MarginSight Playground</strong>
+                        <strong>MarginShot Playground</strong>
                         <span className="badge mock">
                           {msg.answer?.provider==='deterministic-engine'?(locale==='th'?'คำนวณจากสูตร':'Calculation engine'):t(msg.answer?.provider === 'deterministic-fallback' ? 'fallback' : 'aiAnswer')}
                         </span>

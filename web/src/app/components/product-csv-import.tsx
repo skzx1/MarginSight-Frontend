@@ -251,19 +251,19 @@ export default function ProductCsvImport({
   // Download handlers
   const handleDownloadTemplate = () => {
     const blob = generateProductCsvTemplate();
-    triggerBlobDownload(blob, 'MarginSight-Product-Template.csv');
+    triggerBlobDownload(blob, 'MarginShot-Product-Template.csv');
   };
 
   const handleDownloadSample = () => {
     const blob = generateProductCsvSample();
-    triggerBlobDownload(blob, 'MarginSight-Product-Sample.csv');
+    triggerBlobDownload(blob, 'MarginShot-Product-Sample.csv');
   };
 
   const handleDownloadErrors = () => {
     if (!parseResult) return;
     const failed = parseResult.rows.filter(r => r.status === 'error');
     const blob = generateErrorReportCsv(failed);
-    triggerBlobDownload(blob, 'MarginSight-Import-Errors.csv');
+    triggerBlobDownload(blob, 'MarginShot-Import-Errors.csv');
   };
 
   // --- RENDER SUCCESS STATE ---

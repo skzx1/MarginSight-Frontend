@@ -1,4 +1,4 @@
-# MarginSight Frontend
+# MarginShot Frontend
 
 Frontend repository ที่ติดตั้ง/ทดสอบ/build ได้ด้วยตัวเอง แยกจาก [MarginSight-Backend](https://github.com/skzx1/MarginSight-Backend).
 ต้นทางและประวัติเดิมอยู่ [NTT-DATA](https://github.com/skzx1/NTT-DATA) ดู [SOURCE.md](SOURCE.md).

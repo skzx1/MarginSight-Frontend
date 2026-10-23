@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'เข้าสู่ระบบ — MarginSight',
+  title: 'เข้าสู่ระบบ — MarginShot',
   robots: { index: false, follow: false },
 };
 

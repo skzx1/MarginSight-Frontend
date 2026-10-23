@@ -25,7 +25,7 @@ export const assistantCopy = {
   actions: ['จัดการแชต', 'Chat actions'], copy: ['คัดลอกคำตอบ', 'Copy answer'], copied: ['คัดลอกแล้ว', 'Copied'], copyFailed: ['คัดลอกไม่ได้ ลองเลือกข้อความเพื่อคัดลอก', 'Could not copy. Select the text to copy it.'],
   regenerate: ['ตอบใหม่', 'Regenerate'], retry: ['ลองอีกครั้ง', 'Retry'], failed: ['ยังตอบคำถามนี้ไม่ได้ ลองอีกครั้งได้ครับ', 'This question could not be answered. Please try again.'],
   stopped: ['หยุดคำตอบแล้ว', 'Response stopped'], stopNote: ['หยุดรอในหน้านี้แล้ว คำขอที่เซิร์ฟเวอร์รับไว้อาจยังทำงานต่อ', 'Stopped waiting here. A request already received by the server may still run.'],
-  latest: ['ไปข้อความล่าสุด', 'Jump to latest'], assistant: ['ผู้ช่วย MarginSight', 'MarginSight assistant'], you: ['คุณ', 'You'],
+  latest: ['ไปข้อความล่าสุด', 'Jump to latest'], assistant: ['ผู้ช่วย MarginShot', 'MarginShot assistant'], you: ['คุณ', 'You'],
   recorded: ['ข้อมูลออเดอร์ที่บันทึก', 'Recorded order data'], ai: ['คำตอบจากผู้ช่วย', 'Assistant answer'], fallback: ['คำตอบจากสูตรคำนวณ', 'Calculation engine answer'], notice: ['ข้อมูลเพิ่มเติม', 'More information'],
   basedOn: ['อ้างอิงข้อมูล', 'Based on'], profit: ['กำไร', 'Profit'], revenue: ['ยอดขาย', 'Sales'], margin: ['สัดส่วนกำไร', 'Profit margin'], orders: ['ออเดอร์', 'orders'],
   before: ['ไม่เข้าโปรแกรม', 'Without program'], after: ['เข้าโปรแกรม', 'With program'], missing: ['ข้อมูลยังไม่ครบ', 'Incomplete data'], evidence: ['ดูผลคำนวณและหลักฐาน', 'View calculation and evidence'],

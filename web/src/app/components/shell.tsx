@@ -35,7 +35,7 @@ export function AppShell({ screen, navigate, stores, store, changeStore, month, 
   const [drawerExpanded, setDrawerExpanded] = useState(false);
   const drawerToggle = useRef<HTMLButtonElement>(null);
   const lastScreen = useRef<Screen | null>(null);
-  useEffect(() => { document.title = t(screen) + ' · MarginSight'; if (screen === 'store' && lastScreen.current === screen) return; lastScreen.current = screen; document.getElementById('screen-title')?.focus({ preventScroll: true }); window.scrollTo(0, 0); }, [screen, t]);
+  useEffect(() => { document.title = t(screen) + ' · MarginShot'; if (screen === 'store' && lastScreen.current === screen) return; lastScreen.current = screen; document.getElementById('screen-title')?.focus({ preventScroll: true }); window.scrollTo(0, 0); }, [screen, t]);
   return <div className={'app-shell' + (drawerExpanded ? ' drawer-expanded' : '') + (screen === 'overview' ? ' overview-shell' : '') + (screen === 'assistant' ? ' ' + assistantStyles.shell : '') + (screen === 'finance' ? ' ' + financeStyles.shell : '')}>
     <a href="#main-content" className="skip-link" onClick={e => { e.preventDefault(); document.getElementById('main-content')?.focus(); }}>{t('skip')}</a>
     <div className="topbar" onKeyDown={e => {
@@ -64,6 +64,6 @@ export function AppShell({ screen, navigate, stores, store, changeStore, month, 
       {guest && !['assistant','finance'].includes(screen) && <div className="demo-banner"><DataStatus value="MOCK" /><span>{t('demoBanner')}</span></div>}
       {!['assistant','finance'].includes(screen) && <header className="screen-header"><div>{parent !== screen && <button className="ghost back-link" onClick={() => navigate(parent)}>← {t(parent)}</button>}<span className="eyebrow">{store.name ?? store.id}</span><h1 id="screen-title" tabIndex={-1}>{t(screen)}</h1></div><div className="context-controls"><Select label={t('store')} value={store.id} onChange={e => changeStore(e.target.value)}>{stores.map(item => <option key={item.id} value={item.id}>{item.name ?? item.id}</option>)}</Select>{screen === 'overview' ? overviewControls : ['orders','reconciliation','simulation','playground'].includes(screen) && <Field label={t('month')} type="month" value={month} onChange={e => { if (e.target.value) changeMonth(e.target.value); }} />}</div></header>}
       {children}
-      {screen !== 'assistant' && <footer className="app-footer">MarginSight · {t('trustNote')}</footer>}</main>
+      {screen !== 'assistant' && <footer className="app-footer">MarginShot · {t('trustNote')}</footer>}</main>
   </div>;
 }

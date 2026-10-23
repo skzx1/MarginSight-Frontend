@@ -36,7 +36,7 @@ export function Icon({
 }
 export function Brand() {
   const { t } = useLanguage();
-  return <div className="brand"><span className="logo"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 17V7l8 7 8-7v10" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" /></svg></span><span>MarginSight<small>{t('tagline')}</small></span></div>;
+  return <div className="brand"><span className="logo"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 17V7l8 7 8-7v10" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" /></svg></span><span>MarginShot<small>{t('tagline')}</small></span></div>;
 }
 export function EmptyState({
   icon = 'orders',

@@ -1,6 +1,6 @@
 export const catalogCopy = {
   th: {
-    intro: 'จัดการสินค้า ตรวจราคาและต้นทุนในที่เดียว', loaded: 'สินค้าที่โหลดแล้ว', missingPrice: 'ยังไม่มีราคา', missingCost: 'ยังไม่มีต้นทุน',
+    intro: 'จัดการสินค้า ตรวจราคาและต้นทุนในที่เดียว', playgroundLink: 'ลองเงื่อนไขขายใน Playground', loaded: 'สินค้าที่โหลดแล้ว', missingPrice: 'ยังไม่มีราคา', missingCost: 'ยังไม่มีต้นทุน',
     filter: 'ตัวกรอง', sort: 'เรียงลำดับ', clearSearch: 'ล้างการค้นหา', placeholder: 'ค้นหาชื่อสินค้า หรือ SKU', active: 'ตัวกรองที่เลือก', remove: 'นำตัวกรองออก',
     allCosts: 'ต้นทุนทั้งหมด', costStatus: 'สถานะต้นทุน', onlyMissingCost: 'เฉพาะสินค้าที่ยังไม่มีต้นทุน', done: 'เสร็จสิ้น', close: 'ปิดแผง',
     results: 'รายการที่แสดง', of: 'จาก', items: 'รายการ', sortPrefix: 'เรียง:', searchChip: 'ค้นหา',
@@ -9,7 +9,7 @@ export const catalogCopy = {
     nameAsc: 'ชื่อ: ก → ฮ', nameDesc: 'ชื่อ: ฮ → ก', costAsc: 'ต้นทุน: ต่ำไปสูง', costDesc: 'ต้นทุน: สูงไปต่ำ',
   },
   en: {
-    intro: 'Products, prices and costs, in one place.', loaded: 'Loaded products', missingPrice: 'Missing price', missingCost: 'Missing cost',
+    intro: 'Products, prices and costs, in one place.', playgroundLink: 'Try selling scenarios in Playground', loaded: 'Loaded products', missingPrice: 'Missing price', missingCost: 'Missing cost',
     filter: 'Filter', sort: 'Sort', clearSearch: 'Clear search', placeholder: 'Search product name or SKU', active: 'Active filters', remove: 'Remove filter',
     allCosts: 'All costs', costStatus: 'Cost status', onlyMissingCost: 'Only products missing a cost', done: 'Done', close: 'Close panel',
     results: 'Showing', of: 'of', items: 'products', sortPrefix: 'Sorted:', searchChip: 'Search',

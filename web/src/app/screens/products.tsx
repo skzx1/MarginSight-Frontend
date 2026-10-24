@@ -8,6 +8,7 @@ import { useLanguage } from '../language';
 import { ErrorNotice, Field, ProductSelect, Select, Submit } from '../components/forms';
 import { EvidencePanel, Money } from '../components/ledger';
 import ProductCatalog, { useProductCatalog } from '../components/product-catalog';
+import { ProfitAmount } from '../components/profit-amount';
 
 type CatalogProps = {
   products: CatalogProduct[];
@@ -165,7 +166,7 @@ export default function Products({
               <dt>{t('unitProfit')}</dt>
               <dd className={(product.profitSatang ?? 0) >= 0 ? 'positive' : 'negative'}>
                 {product.profitSatang != null ? (
-                  <Money value={product.profitSatang} />
+                  <ProfitAmount value={product.profitSatang} />
                 ) : (
                   '—'
                 )}
@@ -316,11 +317,11 @@ export function Simulation({
             <div className="comparison">
               <div>
                 {t('before')}
-                <strong><Money value={result.baseline.profitSatang} /></strong>
+                <strong><ProfitAmount value={result.baseline.profitSatang} /></strong>
               </div>
               <div>
                 {t('after')}
-                <strong><Money value={result.scenario.profitSatang} /></strong>
+                <strong><ProfitAmount value={result.scenario.profitSatang} /></strong>
               </div>
             </div>
           )}

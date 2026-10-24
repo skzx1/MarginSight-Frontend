@@ -7,9 +7,9 @@ import { DataStatus } from './ledger';
 import { Field, Select } from './forms';
 import assistantStyles from './assistant.module.css';
 import financeStyles from './finance.module.css';
-export const primary: { screen: Screen; icon: IconName }[] = [{ screen: 'overview', icon: 'overview' }, { screen: 'products', icon: 'products' }, { screen: 'finance', icon: 'calculator' }, { screen: 'assistant', icon: 'assistant' }, { screen: 'playground', icon: 'simulation' }, { screen: 'store', icon: 'settings' }];
+export const primary: { screen: Screen; icon: IconName }[] = [{ screen: 'overview', icon: 'overview' }, { screen: 'products', icon: 'products' }, { screen: 'finance', icon: 'calculator' }, { screen: 'assistant', icon: 'assistant' }, { screen: 'store', icon: 'settings' }];
 const screens: Screen[] = ['playground','finance','overview','products','addProduct','assistant','store','orders','reconciliation','imports','receipts','rules','line','simulation'];
-export function parentScreen(screen: Screen): Screen { if (['orders','reconciliation'].includes(screen)) return 'overview'; if (['simulation','addProduct'].includes(screen)) return 'products'; if (['imports','receipts','rules','line'].includes(screen)) return 'store'; return screen; }
+export function parentScreen(screen: Screen): Screen { if (['orders','reconciliation'].includes(screen)) return 'overview'; if (['simulation','addProduct','playground'].includes(screen)) return 'products'; if (['imports','receipts','rules','line'].includes(screen)) return 'store'; return screen; }
 export function useNavigation() {
   const [screen, setScreen] = useState<Screen>('overview');
   const current = useRef<Screen>('overview'), guard = useRef<(() => boolean) | null>(null);

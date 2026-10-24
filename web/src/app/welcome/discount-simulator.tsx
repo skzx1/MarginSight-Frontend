@@ -25,9 +25,10 @@ export default function DiscountSimulator({ locale }: { locale: 'th' | 'en' }) {
   </div>;
   const profit = result?.profitSatang;
   const amount = (value: number | null | undefined) => value == null ? '—' : `${value < 0 ? '−' : ''}฿${money(Math.abs(value), locale)}`;
+  const tone = profit != null && profit < 0 ? 'loss' : undefined;
   const status = profit == null ? tr('รอข้อมูล', 'Awaiting inputs') : profit < 0 ? tr('ขาดทุน', 'Loss') : profit === 0 ? tr('คุ้มทุน', 'Break-even') : tr('มีกำไร', 'Profit');
   return <div className={s.simulator}>
-    <div className={s.mobileResult} aria-hidden="true"><span>{status} / {tr('ชิ้น', 'item')}</span><strong>{amount(profit)}</strong></div>
+    <div className={s.mobileResult} aria-hidden="true"><span>{status} / {tr('ชิ้น', 'item')}</span><strong data-tone={tone}>{amount(profit)}</strong></div>
     <div className={s.inputPanel}>
       <div className={s.inputIntro}><span className={s.iconTile}><Icon name="calculator" /></span><div><h3>{tr('ลองใส่ตัวเลขของสินค้า', 'Try your product numbers')}</h3><p>{tr('ตัวอย่าง · สินค้า 1 ชิ้น', 'Example · one item')}</p></div></div>
       <div className={s.inputGrid}>{(['price', 'cost', 'shipping', 'fee'] as ExampleKey[]).map(input)}</div>
@@ -36,7 +37,7 @@ export default function DiscountSimulator({ locale }: { locale: 'th' | 'en' }) {
       <noscript><p>{tr('เปิด JavaScript เพื่อเปลี่ยนตัวเลขและคำนวณ ตัวเลขที่แสดงเป็นตัวอย่างเริ่มต้น', 'Enable JavaScript to change inputs and calculate. The displayed result is the initial example.')}</p></noscript>
     </div>
     <div className={s.resultPanel} aria-label={tr('ผลคำนวณตัวอย่าง', 'Example calculation result')}>
-      <div className={s.resultSummary} role="status" aria-live="polite" aria-atomic="true"><div><p>{tr('กำไรหลังลดราคา / ชิ้น', 'Profit after discount / item')}</p><strong>{amount(profit)}</strong></div><span className={s.resultBadge}><Icon name={profit != null && profit >= 0 ? 'check' : 'calculator'} />{status}</span></div>
+      <div className={s.resultSummary} role="status" aria-live="polite" aria-atomic="true"><div><p>{tr('กำไรหลังลดราคา / ชิ้น', 'Profit after discount / item')}</p><strong data-tone={tone}>{amount(profit)}</strong></div><span className={s.resultBadge}><Icon name={profit != null && profit >= 0 ? 'check' : 'calculator'} />{status}</span></div>
       {!calculation ? <p className={s.resultMessage}>{failed ? tr('คำนวณไม่ได้ ลองปรับตัวเลขอีกครั้ง', 'Could not calculate. Try adjusting the values.') : tr('กรอกตัวเลขให้ครบและแก้ช่องที่แจ้งเตือน เพื่อดูผลคำนวณใหม่', 'Complete the inputs and correct the highlighted fields to see an updated result.')}</p> : <>
         <dl className={s.resultLines}><div><dt>{tr('ราคาหลังลด', 'Discounted price')}</dt><dd>{amount(result?.revenueSatang)}</dd></div><div><dt>{tr('ต้นทุนสินค้า', 'Product cost')}</dt><dd>−{amount(result?.cogsSatang)}</dd></div><div><dt>{tr('ค่าส่งที่ร้านจ่าย', 'Your shipping cost')}</dt><dd>−{amount(result?.sellerShippingSatang)}</dd></div><div><dt>{tr('ค่าธรรมเนียม', 'Fee')} ({fields.fee}%)</dt><dd>−{amount(result?.feeSatang)}</dd></div></dl>
         <div className={s.safePrice}><span>{tr('ราคาต่ำสุดที่ไม่ขาดทุน', 'Lowest price that covers costs')}</span><strong>{amount(calculation.safePrice)}</strong></div>

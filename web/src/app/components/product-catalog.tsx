@@ -7,6 +7,7 @@ import { hasListedPrice, hasProductCost, searchParts, selectCatalog, type PriceF
 import { useLanguage } from '../language';
 import { Icon } from '../ui';
 import { Money } from './ledger';
+import { ProfitAmount } from './profit-amount';
 import { catalogCopy } from './product-catalog-copy';
 import s from './product-catalog.module.css';
 
@@ -90,14 +91,14 @@ export default function ProductCatalog({ controls: v, loading = false, more, loa
   const close = () => dialogRef.current?.close();
   const clearSearch = () => { v.setSearch(''); searchRef.current?.focus(); };
   const priceLabel = v.price === 'listed' ? t('priceListed') : t('priceNotListed');
-  const profit = (product: CatalogProduct) => product.profitSatang == null ? <span className={s.unknown} aria-label={c.unknown}>—</span> : <span className={`${s.profit} ${product.profitSatang < 0 ? s.loss : ''}`}><Money value={product.profitSatang} /></span>;
+  const profit = (product: CatalogProduct) => product.profitSatang == null ? <span className={s.unknown} aria-label={c.unknown}>—</span> : <span className={`${s.profit} ${product.profitSatang < 0 ? s.loss : ''}`}><ProfitAmount value={product.profitSatang} /></span>;
   const price = (product: CatalogProduct) => hasListedPrice(product) ? <Money value={product.sellingPriceSatang} /> : <span className={s.warning}>{t('priceNotListed')}</span>;
   const cost = (product: CatalogProduct) => hasProductCost(product) ? <Money value={product.cost!.unitCostSatang} /> : <span className={s.warning}>{c.missingCost}</span>;
   const identity = (product: CatalogProduct) => <div className={s.identity}><span className={s.thumbnail} aria-hidden="true">{Array.from(product.name.trim())[0]?.toLocaleUpperCase() || 'M'}</span><div><strong><Match text={product.name} query={v.query} /></strong><small><Match text={product.sku} query={v.query} /><span> · {product.unit}</span></small><small className={s.inlineDate}>{t('dateAdded')}: {product.dateAdded || '—'}</small></div></div>;
   const columnHeader = (column: SortColumn, label: string, numeric = false, className = '') => <th scope="col" className={`${numeric ? s.numeric : ''} ${className}`} aria-sort={v.sort.startsWith(column) ? (v.sort.endsWith('Asc') ? 'ascending' : 'descending') : 'none'}><button type="button" className={s.sortHeader} onClick={() => v.toggleSort(column)}>{label}<span className={v.sort.startsWith(column) ? s.sorted : s.sortHint}><ControlIcon name="down" /></span></button></th>;
 
   return <div className={s.catalog}>
-    <div className={s.heading}><p>{c.intro}</p><button type="button" onClick={onAdd}><Icon name="plus" />{t('addProduct')}</button></div>
+    <div className={s.heading}><p>{c.intro}</p><div className={s.headingActions}><a className={s.playgroundLink} href="#playground"><Icon name="simulation" />{c.playgroundLink}</a><button type="button" onClick={onAdd}><Icon name="plus" />{t('addProduct')}</button></div></div>
     <div className={s.summary} aria-label={c.loadedScope} aria-busy={initialLoading}>
       <div className={s.summaryTotal}><strong>{initialLoading ? '—' : number(counts.total)}</strong><span>{c.loaded}</span></div>
       <button type="button" className={s.summaryAction} aria-pressed={v.price === 'unlisted'} disabled={initialLoading || (counts.price === 0 && v.price !== 'unlisted')} onClick={() => v.setPrice(v.price === 'unlisted' ? 'all' : 'unlisted')}><strong>{initialLoading ? '—' : number(counts.price)}</strong><span>{c.missingPrice}<Icon name="chevronRight" /></span></button>

@@ -8,6 +8,7 @@ import { DataStatus, EvidencePanel, Money } from '../components/ledger';
 import { Empty, ErrorNotice, Field, Loading } from '../components/forms';
 import { Icon } from '../ui';
 import { OverviewCharts } from '../components/overview-charts';
+import { ProfitAmount } from '../components/profit-amount';
 import {
   channelSummaries, orderDateTime, ordersInPeriod, periodBounds, summarizeOrders,
   OVERVIEW_CHANNELS,
@@ -47,7 +48,7 @@ export default function Overview({ base, origin, period, navigate, onMissingCost
     { label: t('platformFees'), value: stats.platformFeeSatang },
     { label: t('overviewShipping'), value: stats.shippingSatang },
     ...(stats.otherCostSatang !== 0 ? [{ label: t('otherCosts'), value: stats.otherCostSatang }] : []),
-    { label: t('profitCard'), value: stats.profitSatang }
+    { label: t('profitCard'), value: stats.profitSatang, profit: true }
   ];
 
   if (selected) {
@@ -59,21 +60,22 @@ export default function Overview({ base, origin, period, navigate, onMissingCost
     <ErrorNotice error={error} />{Boolean(error) && <button className="secondary" onClick={() => void reload()}>{t('retry')}</button>}
     {!bounds && <p className="notice" role="alert">{t('invalidRange')}</p>}
     {!loading && coverage?.partial && <p className="notice" role="alert">{locale==='th'?`API ส่งรายละเอียดมา ${coverage.loaded} จาก ${coverage.total} ออเดอร์ในเดือนที่เลือก ตัวเลขและกราฟด้านล่างรวมเฉพาะรายการที่โหลดได้ ไม่ใช่ยอดรวมทั้งร้าน`:`The API returned ${coverage.loaded} of ${coverage.total} orders in the selected months. Figures and charts cover loaded entries only, not the whole store.`}</p>}
-    {data && !loading && <>
-      <div className="row overview-status-bar"><DataStatus value={data.dataOrigin} /><span className="caption" data-testid="overview-coverage">{t('coverage')}: {stats.completeOrders}/{stats.totalOrders}</span></div>
-      {stats.missingCostOrders > 0 && <button className="overview-cost-warning" onClick={onMissingCosts}><span>{t('missingCostPrefix')} {stats.missingCostOrders} {t('missingCostSuffix')}</span><Icon name="arrow" /></button>}
-    </>}
 
     {(loading || data) && <section className="summary-cards-container" aria-label={t('overviewSummary')}>
       <article className="summary-card profit-card">
         <div className="summary-card-header"><div className="summary-card-title"><span className="summary-mark profit-mark" aria-hidden="true" /><h2>{t('profitCard')}</h2></div><small className="overview-active-period">{periodLabel}</small></div>
-        {loading ? <Loading /> : <><div className={'summary-main-number' + (stats.profitSatang != null && stats.profitSatang < 0 ? ' negative' : '')} data-testid="overview-profit"><Money value={bounds ? stats.profitSatang : null} /></div><dl className="overview-card-metric"><div><dt>{t('netMargin')}</dt><dd>{percent(bounds ? stats.marginPct : null)}</dd></div></dl>{stats.profitSatang == null && <p className="caption">{t('missingProfitNote')}</p>}</>}
+        {loading ? <Loading /> : <><div className={'summary-main-number' + (stats.profitSatang != null && stats.profitSatang < 0 ? ' negative' : '')} data-testid="overview-profit"><ProfitAmount value={bounds ? stats.profitSatang : null} /></div><dl className="overview-card-metric"><div><dt>{t('netMargin')}</dt><dd>{percent(bounds ? stats.marginPct : null)}</dd></div></dl>{stats.profitSatang == null && <p className="caption">{t('missingProfitNote')}</p>}</>}
       </article>
       <article className="summary-card sales-card">
         <div className="summary-card-header"><div className="summary-card-title"><span className="summary-mark sales-mark" aria-hidden="true" /><h2>{t('salesCard')}</h2></div><small className="overview-active-period">{periodLabel}</small></div>
         {loading ? <Loading /> : <><div className="summary-main-number" data-testid="overview-sales"><Money value={bounds ? stats.revenueSatang : null} /></div><dl className="overview-card-metric"><div><dt>{t('totalCostsFees')}</dt><dd><Money value={bounds ? stats.totalCostsSatang : null} /></dd></div></dl></>}
       </article>
     </section>}
+    {/* Profit summary comes first on small screens; data status and the missing-cost prompt follow it. */}
+    {data && !loading && <>
+      <div className="row overview-status-bar"><DataStatus value={data.dataOrigin} /><span className="caption" data-testid="overview-coverage">{t('coverage')}: {stats.completeOrders}/{stats.totalOrders}</span></div>
+      {stats.missingCostOrders > 0 && <button className="overview-cost-warning" onClick={onMissingCosts}><span>{t('missingCostPrefix')} {stats.missingCostOrders} {t('missingCostSuffix')}</span><Icon name="arrow" /></button>}
+    </>}
     <p className="caption overview-scope">{t('scope')}{' · ' + t('loadedOnly')}</p>
     {!loading && data && bounds && <OverviewCharts orders={orders} />}
 
@@ -87,8 +89,8 @@ export default function Overview({ base, origin, period, navigate, onMissingCost
     <details className="overview-insights"><summary>{t('salesAllocation')} · {t('channelInsight')}</summary>
       <p className="caption">{periodLabel}</p>
       <div className="overview-insight-grid">
-        <div><h3>{t('salesAllocation')}</h3>{loading ? <Loading /> : !orders.length ? <p className="caption">{t('noOrdersInPeriod')}</p> : <dl className="ledger-lines">{breakdown.map(row => <div key={row.label}><dt>{row.label}</dt><dd><Money value={row.value} /></dd></div>)}</dl>}</div>
-        <div><h3>{t('channelInsight')}</h3>{loading ? <Loading /> : !orders.length ? <p className="caption">{t('noOrdersInPeriod')}</p> : <ul className="overview-channels">{channels.map(row => <li className="overview-channel-row" key={row.platform}><strong>{row.platform}</strong><span className={row.profitSatang != null && row.profitSatang < 0 ? 'negative' : ''}><small>{t('profitCard')}</small>{row.totalOrders ? <Money value={row.profitSatang} /> : '—'}</span><span><small>{t('netMargin')}</small>{row.totalOrders ? percent(row.marginPct) : '—'}{!row.totalOrders && <small>{t('noChannelOrders')}</small>}</span></li>)}</ul>}</div>
+        <div><h3>{t('salesAllocation')}</h3>{loading ? <Loading /> : !orders.length ? <p className="caption">{t('noOrdersInPeriod')}</p> : <dl className="ledger-lines">{breakdown.map(row => <div key={row.label}><dt>{row.label}</dt><dd>{'profit' in row ? <ProfitAmount value={row.value} /> : <Money value={row.value} />}</dd></div>)}</dl>}</div>
+        <div><h3>{t('channelInsight')}</h3>{loading ? <Loading /> : !orders.length ? <p className="caption">{t('noOrdersInPeriod')}</p> : <ul className="overview-channels">{channels.map(row => <li className="overview-channel-row" key={row.platform}><strong>{row.platform}</strong><span className={row.profitSatang != null && row.profitSatang < 0 ? 'negative' : ''}><small>{t('profitCard')}</small>{row.totalOrders ? <ProfitAmount value={row.profitSatang} /> : '—'}</span><span><small>{t('netMargin')}</small>{row.totalOrders ? percent(row.marginPct) : '—'}{!row.totalOrders && <small>{t('noChannelOrders')}</small>}</span></li>)}</ul>}</div>
       </div><p className="caption">{t('overviewImportNote')}</p>
     </details>
 
@@ -103,7 +105,7 @@ export default function Overview({ base, origin, period, navigate, onMissingCost
           <span className="order-col-id"><strong className="order-id-text">{order.orderId}</strong><span className="order-product-text">{order.productName}</span></span>
           <span className="order-col-channel"><span className="channel-badge">{order.platform}</span></span>
           <time className="order-col-time" dateTime={order.orderAt}>{orderDateTime(order.orderAt)}</time>
-          <span className="order-col-amount"><strong className="order-amount-text"><Money value={order.revenueSatang} /></strong><small className={'order-profit-sub' + (order.profitSatang != null && order.profitSatang < 0 ? ' negative' : '')}>{t('profitCard')}: <Money value={order.profitSatang} /></small></span>
+          <span className="order-col-amount"><strong className="order-amount-text"><Money value={order.revenueSatang} /></strong><small className={'order-profit-sub' + (order.profitSatang != null && order.profitSatang < 0 ? ' negative' : '')}>{order.profitSatang == null ? <>{t('profitCard')}: —</> : <ProfitAmount value={order.profitSatang} />}</small></span>
           <span className="order-col-arrow" aria-hidden="true"><Icon name="arrow" /></span>
         </button></li>)}</ul>
         {matches.length > visibleCount && <button className="secondary" onClick={() => setVisibleCount(count => count + 5)}>{t('showMoreOrders')}</button>}

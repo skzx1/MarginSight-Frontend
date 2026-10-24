@@ -311,7 +311,7 @@ export default function AddProductPage({
                     (unitProfit != null && unitProfit < 0 ? 'negative' : 'positive')
                   }
                 >
-                  {draft.differenceSatang != null ? '฿' + money(draft.differenceSatang, locale) : '—'}
+                  {draft.differenceSatang != null ? (draft.differenceSatang < 0 ? '−' : draft.differenceSatang > 0 ? '+' : '') + '฿' + money(Math.abs(draft.differenceSatang), locale) : '—'}
                 </strong>
                 <span className="metric-margin-pct tabular-num">
                   {marginPct != null ? `${t('preFeeMargin')}: ${marginPct}%` : '—'}

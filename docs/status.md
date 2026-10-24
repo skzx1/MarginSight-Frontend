@@ -131,3 +131,7 @@ MarginShot is the current user-facing product name. VERIFIED_AWS branding source
 ## Landing logo animation - 24 October 2026 (Bangkok)
 
 VERIFIED_LOCAL / VERIFIED_AWS for this UI slice: runtimee9ef662 is live. Desktop logos orbit on the existing circles automatically, remain upright and have no pause/play control, as requested. Mobile retains a static four-logo row. Local and clean CloudShell53 tests/build checks pass; S3 twelve-file hashes, completed CloudFront invalidation, public release/HTTP protection and live browser motion checks pass. Existing Backend/auth/formula remain unchanged. See verification.md and cost-log.md. Overall PARTIAL_WITH_EXTERNAL_BLOCKERS remains.
+
+## Emerald Unified release - 24 October 2026, 20:49 Bangkok
+
+VERIFIED_LOCAL / VERIFIED_AWS for this UI slice: latest feature claude/design-tokens fast-forwarded to main34ec54d and deployed. Shared Emerald tokens, signed profit/loss, cards/charts, landing/login/workspace, favicon and Cognito presentation are live. Local/CloudShell53 tests and static build pass;13-file S3 hashes, completed CloudFront invalidation, public protections and five MOCK workspace sections checked. Backend/formula/auth policies unchanged. See verification.md/cost-log.md for exact boundaries; overall PARTIAL_WITH_EXTERNAL_BLOCKERS remains.

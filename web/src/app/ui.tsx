@@ -58,7 +58,7 @@ export function Steps({
   items: string[];
   current?: number;
 }) {
-  return <ol className="steps" aria-label="ขั้นตอนการทำงาน">{items.map((item, i) => <li key={item} className={i <= current ? 'current' : ''}><span>{i < current ? <Icon name="check" /> : i + 1}</span>{item}</li>)}</ol>;
+  return <ol className="steps" aria-label="ขั้นตอนการทำงาน">{items.map((item, i) => <li key={item} className={i <= current ? 'current' : ''} aria-current={i === current ? 'step' : undefined}><span>{i < current ? <Icon name="check" /> : i + 1}</span>{item}</li>)}</ol>;
 }
 export function PageIntro({
   icon,

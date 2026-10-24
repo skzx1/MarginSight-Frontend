@@ -67,6 +67,7 @@ export const copy = {
   rowValidBadge: ['พร้อมนำเข้า', 'Ready'],
   rowWarnBadge: ['ตรวจสอบ', 'Review'],
   rowErrorBadge: ['ผิดพลาด', 'Error'],
+  signedProfit: ['กำไร', 'Profit'], signedLoss: ['ขาดทุน', 'Loss'],
 } as const;
 export type CopyKey = keyof typeof copy;
 export type Locale = 'th' | 'en';

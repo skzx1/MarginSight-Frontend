@@ -1,20 +1,50 @@
-/* Design tokens: the only :root declaration. Load before globals.css.
-   1. Primitives hold raw values. 2. Semantic tokens name a role and reference primitives.
-   3. Legacy aliases keep existing var() names working until components move to semantic tokens.
-   CSS modules may scope overrides of legacy names (assistant, landing); keep that in mind when changing a semantic value. */
+/* Design tokens (A′ Emerald Unified): the only :root declaration. Load before globals.css.
+   1. Primitives hold raw values. 2. Semantic tokens name a role and reference primitives; components use these.
+   3. Legacy aliases keep older var() names working and resolve to A′ semantics.
+   Aliases resolve at :root, so a CSS module that re-declares a primitive does NOT change a semantic token; override semantic names instead. */
 :root{
  /* 1. Primitives */
- --brown:#7f4f24;--brown-deep:#582f0e;--tan:#936639;--sand:#a68a64;--stone:#b6ad90;--pale:#c2c5aa;--olive-light:#a4ac86;--olive:#656d4a;--olive-deep:#414833;--forest:#333d29;
- --neutral-0:#fff;--paper:#f7f6f1;--sage-tint:#eeefe5;--khaki-line:#dedecf;--khaki-field:#858971;--red:#b42318;--cream:#f5eddf;
+ --emerald-950:#0b1f19;--emerald-900:#152d26;--emerald-850:#22413a;--emerald-800:#24392f;--emerald-dark-line:#3b5a4f;
+ --emerald-700:#187b62;--emerald-400:#77b48d;--emerald-100:#e3f1ea;--emerald-50:#f0f5ef;
+ --neutral-0:#ffffff;--neutral-25:#fcfcf9;--neutral-50:#f8fcf9;--neutral-100:#eef1ee;--neutral-200:#dfe6df;--neutral-300:#c6d8cc;
+ --neutral-500:#7d8f84;--neutral-600:#6c7a72;--neutral-700:#56685e;--neutral-slate:#5c6b63;
+ --red-700:#b42318;--red-200:#ffb4a8;--red-50:#fff0ed;
+ --amber-800:#795008;--amber-600:#a87a1f;--amber-50:#fff5df;--orange-600:#c26b12;
+ --blue-700:#1f5fa8;--blue-600:#3c5fa8;--blue-50:#eaf2fb;--purple-600:#8a4f9e;
+ /* Earth primitive names kept for untouched references; they now point at A′ equivalents. */
+ --forest:var(--emerald-800);--olive-deep:var(--emerald-900);--olive:var(--neutral-700);--olive-light:var(--emerald-400);
+ --pale:var(--neutral-300);--stone:var(--neutral-500);--sand:var(--neutral-200);--tan:var(--amber-600);
+ --brown:var(--orange-600);--brown-deep:var(--amber-800);
+ --paper:var(--neutral-25);--sage-tint:var(--emerald-50);--khaki-line:var(--neutral-200);--khaki-field:var(--neutral-500);--red:var(--red-700);--cream:var(--amber-50);
 
  /* 2. Semantic roles */
- --color-text:var(--forest);--color-text-muted:var(--olive);
- --color-action:var(--olive-deep);--color-action-hover:var(--forest);
- --color-bg-canvas:var(--paper);--color-bg-surface:var(--neutral-0);--color-bg-subtle:var(--sage-tint);
- --color-border:var(--khaki-line);--color-border-strong:var(--khaki-field);
- --color-positive:var(--olive-deep);--color-negative:var(--red);
- --color-warning:var(--brown-deep);--color-warning-bg:var(--cream);
- --radius-card:16px;--nav-height:76px;
+ --color-action:var(--emerald-900);--color-action-hover:var(--emerald-950);--color-on-action:var(--neutral-0);
+ --color-text:var(--emerald-800);--color-text-muted:var(--neutral-700);
+ --color-text-inverse:var(--neutral-50);--color-text-inverse-muted:var(--neutral-300);
+ --color-accent:var(--emerald-700);--color-link:var(--emerald-700);--color-positive:var(--emerald-700);--color-selected:var(--emerald-700);
+ --color-focus:var(--emerald-700);--color-focus-on-dark:var(--emerald-400);--color-positive-on-dark:var(--emerald-400);
+ --color-negative:var(--red-700);--color-negative-bg:var(--red-50);--color-negative-on-dark:var(--red-200);
+ --color-bg-canvas:var(--neutral-25);--color-bg-surface:var(--neutral-0);--color-bg-subtle:var(--emerald-50);--color-accent-tint:var(--emerald-100);
+ --color-bg-dark:var(--emerald-900);--color-bg-dark-hover:var(--emerald-850);--color-border-on-dark:var(--emerald-dark-line);
+ --color-border:var(--neutral-200);--color-border-strong:var(--neutral-500);
+ --color-warning:var(--amber-800);--color-warning-bg:var(--amber-50);--color-warning-border:var(--amber-600);
+ --color-info:var(--blue-700);--color-info-bg:var(--blue-50);
+ --color-disabled-bg:var(--neutral-100);--color-disabled-text:var(--neutral-600);
+ --chart-1:var(--emerald-700);--chart-2:var(--orange-600);--chart-3:var(--blue-600);--chart-4:var(--purple-600);--chart-5:var(--neutral-slate);
+ --chart-sales:var(--chart-1);--chart-profit:var(--chart-2);
+
+ /* Typography */
+ --font-sans:'Anuphan','Inter',Tahoma,sans-serif;--font-numeric:'Inter','Anuphan',sans-serif;
+ --text-xs:12px;--text-sm:13px;--text-md:14px;--text-base:16px;--text-lg:18px;--text-xl:22px;--text-2xl:28px;--text-money-xl:clamp(32px,6vw,44px);
+ --weight-regular:400;--weight-medium:500;--weight-semibold:600;
+ --leading-body:1.6;--leading-heading:1.35;--leading-tight:1.2;
+
+ /* Shape, depth, space */
+ --radius-sm:6px;--radius-md:10px;--radius-lg:16px;--radius-pill:999px;--radius-round:50%;
+ --shadow-sm:0 1px 3px rgb(21 45 38/.06);--shadow-md:0 4px 16px rgb(21 45 38/.08);--shadow-lg:0 12px 32px rgb(21 45 38/.12);
+ --space-1:4px;--space-2:8px;--space-3:12px;--space-4:16px;--space-5:20px;--space-6:24px;--space-7:32px;--space-8:48px;
+ --focus-width:3px;--focus-offset:3px;--target-min:44px;--control-height:48px;
+ --nav-height:76px;--radius-card:var(--radius-lg);
 
  /* 3. Legacy aliases */
  --ink:var(--color-text);--muted:var(--color-text-muted);
@@ -23,5 +53,5 @@
  --border:var(--color-border);--field-border:var(--color-border-strong);
  --profit:var(--color-positive);--loss:var(--color-negative);
  --warning:var(--color-warning);--warning-bg:var(--color-warning-bg);
- --radius:var(--radius-card);
+ --radius:var(--radius-lg);
 }

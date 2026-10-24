@@ -4,6 +4,8 @@ import { useLanguage } from '../language';
 import { money } from '../../lib/format';
 import type { Calculation } from '../../lib/types';
 import type { CopyKey } from '../../lib/copy';
+import { ProfitAmount } from './profit-amount';
+/** Plain amount (sales, costs, fees). Profit/loss values use ProfitAmount, which adds a sign and a visible label. */
 export function Money({ value }: { value: number | null | undefined }) { const { locale } = useLanguage(); return <span className="money">{value == null ? '—' : '฿' + money(value, locale)}</span>; }
 export function DataStatus({ value }: { value?: string }) {
   const { t, locale } = useLanguage();
@@ -15,7 +17,7 @@ export function DataStatus({ value }: { value?: string }) {
 export function ProfitLedger({ result, children }: { result: { profitSatang: number | null; revenueSatang?: number; feeSatang?: number; cogsSatang?: number | null; packagingSatang?: number; adsSatang?: number; sellerShippingSatang?: number }; children?: ReactNode }) {
   const { t } = useLanguage();
   const rows: [CopyKey, number | null | undefined][] = [['revenue', result.revenueSatang], ['costs', result.cogsSatang], ['fees', result.feeSatang], ['packaging', result.packagingSatang], ['ads', result.adsSatang], ['shipping', result.sellerShippingSatang]];
-  return <section className="profit-ledger"><div className="ledger-label"><span className="ledger-mark" aria-hidden="true" />{t('profit')}</div><strong className={'profit-value ' + (result.profitSatang == null ? 'muted' : result.profitSatang < 0 ? 'negative' : 'positive')}>{result.profitSatang == null ? t('unknown') : <Money value={result.profitSatang} />}</strong><p className="caption">{t('scope')}</p>{children}<dl className="ledger-lines">{rows.filter(([, value]) => value !== undefined).map(([label, value]) => <div key={label}><dt>{t(label)}</dt><dd><Money value={value} /></dd></div>)}</dl></section>;
+  return <section className="profit-ledger"><div className="ledger-label"><span className="ledger-mark" aria-hidden="true" />{t('profit')}</div><strong className={'profit-value ' + (result.profitSatang == null ? 'muted' : result.profitSatang < 0 ? 'negative' : 'positive')}>{result.profitSatang == null ? t('unknown') : <ProfitAmount value={result.profitSatang} />}</strong><p className="caption">{t('scope')}</p>{children}<dl className="ledger-lines">{rows.filter(([, value]) => value !== undefined).map(([label, value]) => <div key={label}><dt>{t(label)}</dt><dd><Money value={value} /></dd></div>)}</dl></section>;
 }
 export function EvidencePanel({ result }: { result: Calculation }) {
   const { t } = useLanguage();

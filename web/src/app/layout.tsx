@@ -1,3 +1,4 @@
+import './tokens.css';
 import './globals.css';
 import './earth-theme.css';
 import { LanguageProvider } from './language';

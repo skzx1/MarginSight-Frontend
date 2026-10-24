@@ -1,5 +1,4 @@
-/* Shared earth palette across landing, workspace, forms and navigation. */
-:root{--brown:#7f4f24;--brown-deep:#582f0e;--tan:#936639;--sand:#a68a64;--stone:#b6ad90;--pale:#c2c5aa;--olive-light:#a4ac86;--olive:#656d4a;--olive-deep:#414833;--forest:#333d29;--radius:16px}
+/* Earth-palette component overrides for the workspace, forms and navigation. Tokens live in tokens.css. */
 ::selection{background:var(--pale);color:var(--forest)}
 body{font-optical-sizing:auto}
 .logo{background:var(--olive-deep)}

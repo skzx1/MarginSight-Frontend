@@ -1,0 +1,27 @@
+/* Design tokens: the only :root declaration. Load before globals.css.
+   1. Primitives hold raw values. 2. Semantic tokens name a role and reference primitives.
+   3. Legacy aliases keep existing var() names working until components move to semantic tokens.
+   CSS modules may scope overrides of legacy names (assistant, landing); keep that in mind when changing a semantic value. */
+:root{
+ /* 1. Primitives */
+ --brown:#7f4f24;--brown-deep:#582f0e;--tan:#936639;--sand:#a68a64;--stone:#b6ad90;--pale:#c2c5aa;--olive-light:#a4ac86;--olive:#656d4a;--olive-deep:#414833;--forest:#333d29;
+ --neutral-0:#fff;--paper:#f7f6f1;--sage-tint:#eeefe5;--khaki-line:#dedecf;--khaki-field:#858971;--red:#b42318;--cream:#f5eddf;
+
+ /* 2. Semantic roles */
+ --color-text:var(--forest);--color-text-muted:var(--olive);
+ --color-action:var(--olive-deep);--color-action-hover:var(--forest);
+ --color-bg-canvas:var(--paper);--color-bg-surface:var(--neutral-0);--color-bg-subtle:var(--sage-tint);
+ --color-border:var(--khaki-line);--color-border-strong:var(--khaki-field);
+ --color-positive:var(--olive-deep);--color-negative:var(--red);
+ --color-warning:var(--brown-deep);--color-warning-bg:var(--cream);
+ --radius-card:16px;--nav-height:76px;
+
+ /* 3. Legacy aliases */
+ --ink:var(--color-text);--muted:var(--color-text-muted);
+ --green:var(--color-action);--green-dark:var(--color-action-hover);
+ --canvas:var(--color-bg-canvas);--surface:var(--color-bg-surface);--sage:var(--color-bg-subtle);
+ --border:var(--color-border);--field-border:var(--color-border-strong);
+ --profit:var(--color-positive);--loss:var(--color-negative);
+ --warning:var(--color-warning);--warning-bg:var(--color-warning-bg);
+ --radius:var(--radius-card);
+}

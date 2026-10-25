@@ -27,7 +27,7 @@
  --color-positive:var(--green-600);--color-positive-bg:var(--green-50);--color-positive-fg:var(--green-700);
  --color-negative:var(--burgundy-700);--color-negative-bg:var(--burgundy-50);
  --color-bg-canvas:var(--cream-50);--color-bg-surface:var(--cream-0);--color-bg-subtle:var(--cream-150);
- --color-bg-sidebar:var(--cream-100);--color-nav-active-bg:var(--cream-200);
+ --color-bg-sidebar:var(--cream-0);--color-nav-active-bg:var(--cream-200);
  --color-border:var(--cream-250);--color-border-strong:var(--stone-500);
  --color-warning:var(--mustard-700);--color-warning-bg:var(--mustard-50);--color-warning-border:var(--stone-500);
  --color-info:var(--navy-700);--color-info-bg:var(--navy-50);
@@ -74,6 +74,10 @@
  --shadow-sm:none;--shadow-md:none;--shadow-lg:0 12px 32px rgb(20 20 19/.12);--shadow-composer:0 1px 2px rgb(20 20 19/.04),0 4px 16px rgb(20 20 19/.06);
  --space-1:4px;--space-2:8px;--space-3:12px;--space-4:16px;--space-5:20px;--space-6:24px;--space-7:32px;--space-8:48px;
  --focus-width:3px;--focus-offset:3px;--target-min:44px;--control-height:44px;--input-height:48px;
+ --content-wide:1600px;--content-readable:760px;
+ /* Icon gaps by role (control 10, nav 12, chip 6, inline link 4), icon sizes, and the content-sized select range. */
+ --icon-gap-control:10px;--icon-gap-nav:12px;--icon-gap-chip:6px;--icon-gap-inline:4px;--icon-md:20px;--icon-sm:16px;
+ --select-min:6rem;--select-max:22rem;--select-chevron-space:36px;
  --nav-height:76px;--radius-card:var(--radius-lg);
 
  /* 3. Legacy aliases */

@@ -6,13 +6,18 @@ import { SCREENS } from '../web/src/lib/navigation.ts';
 const route = (screen, detail = null) => ({ screen, detail });
 
 test('backward compatible: every existing #<screen> hash parses to that screen and formats back unchanged', () => {
-  assert.equal(SCREENS.length, 14);
+  assert.equal(SCREENS.length, 13);
   for (const screen of SCREENS) {
     assert.deepEqual(parseHash('#' + screen), route(screen), screen);
     assert.equal(formatHash(route(screen)), '#' + screen, screen);
     assert.equal(formatHash({ screen }), '#' + screen, screen + ' without a detail field');
     assert.deepEqual(parseHash(screen), route(screen), screen + ' without the leading #');
   }
+});
+
+test('R2 (D-R2-2): the removed #receipts page falls back to overview', () => {
+  assert.deepEqual(parseHash('#receipts'), route('overview'));
+  assert.deepEqual(parseHash('#receipts/abc'), route('overview'));
 });
 
 test('unknown, empty or differently-cased screens fall back to overview (R06)', () => {

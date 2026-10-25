@@ -52,9 +52,7 @@ export default function StoreSettings({ base, navigate, canCreate, create, store
   });
   const tools: { screen: Screen; icon: IconName; note: string; usage?: string }[] = [
     { screen: 'imports', icon: 'upload', note: text('CSV / XLSX ตามแบบฟอร์ม', 'CSV / XLSX templates') },
-    { screen: 'receipts', icon: 'receipt', note: text('AI OCR · ตรวจแล้วค่อยยืนยัน', 'AI OCR · Review and confirm') },
     { screen: 'rules', icon: 'rules', note: text('ตรวจค่าบริการก่อนใช้', 'Review platform fees') },
-    { screen: 'reconciliation', icon: 'reconcile', note: text('เทียบยอดที่ควรได้กับยอดรับ', 'Compare expected and paid') },
   ];
   const categoryLabels: Record<SettingsDraft['category'], string> = {
     general: text('ค้าปลีกทั่วไป', 'General retail'), fashion: text('แฟชั่นและเสื้อผ้า', 'Fashion & clothing'), beauty: text('ความงามและสุขภาพ', 'Beauty & wellness'),

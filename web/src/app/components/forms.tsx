@@ -26,5 +26,5 @@ export function ErrorNotice({ error }: { error: unknown }) {
   return <div className="notice error-notice" role="alert"><Icon name="warning" /><strong>{t('errorTitle')}</strong><p>{t(key)}</p>{code && <details><summary>{t('details')}</summary><p className="wrap">{code}</p></details>}</div>;
 }
 export function Loading() { const { t } = useLanguage(); return <div className="loading-state" role="status"><span className="spinner" />{t('loading')}</div>; }
-export function Empty({ title, children, action }: { title: string; children?: ReactNode; action?: ReactNode }) { return <section className="empty-state"><span className="empty-mark" aria-hidden="true">—</span><h2>{title}</h2>{children && <p>{children}</p>}{action}</section>; }
+export function Empty({ title, children, action }: { title: string; children?: ReactNode; action?: ReactNode }) { return <div className="empty-state"><span className="empty-mark" aria-hidden="true">—</span><h2>{title}</h2>{children && <p>{children}</p>}{action}</div>; }
 export function Submit({ busy, children, disabled }: { busy: boolean; children: ReactNode; disabled?: boolean }) { const { t } = useLanguage(); return <button type="submit" disabled={busy || disabled}>{busy ? t('working') : children}</button>; }

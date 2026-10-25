@@ -20,9 +20,7 @@ import { Orders, Settlement } from '../screens/orders';
 import Assistant from '../screens/assistant';
 import Playground from '../screens/playground';
 import { AssistantProvider } from '../components/assistant-provider';
-import { AssistantDrawerNav } from '../components/assistant-history';
 import Imports from '../screens/imports';
-import Receipts from '../screens/receipts';
 import Rules from '../screens/rules';
 import StoreHub, { LineConnection } from '../screens/store';
 import s from './login.module.css';
@@ -47,6 +45,7 @@ function StoreWorkspace({ stores, store, changeStore, create }: { stores: Store[
   const [selectedSku, setSelectedSku] = useState(''), [draftRequest, setDraftRequest] = useState(0);
   const [assistantDraftStore, setAssistantDraftStore] = useState('');
   const [assistantOpened, setAssistantOpened] = useState(false);
+  const [detailShown, setDetailShown] = useState(false), [simulationSku, setSimulationSku] = useState<string | null>(null);
   const [playgroundOpened, setPlaygroundOpened] = useState(false);
   useEffect(() => { if (screen === 'playground') setPlaygroundOpened(true); }, [screen]);
   useEffect(() => { if (screen === 'assistant') setAssistantOpened(true); }, [screen]);
@@ -96,18 +95,17 @@ function StoreWorkspace({ stores, store, changeStore, create }: { stores: Store[
   const key = store.id + '|' + month;
   const assistantPeriod = periodBounds(overviewPeriod, bangkokDate()) ?? { start: bangkokDate().slice(0, 7) + '-01', end: bangkokDate() };
   return <AssistantProvider key={base} base={base} defaultContext={{ ...assistantPeriod, sku: null }}>
-    <AppShell screen={screen} navigate={navigate} stores={stores} store={screen === 'store' && localStoreName ? { ...store, name: localStoreName } : store} changeStore={id => { if (id !== store.id && canLeave()) changeStore(id); }} month={month} changeMonth={setMonth} guest={guest} origin={props.origin} canLeave={canLeave} takeArrivalFocus={takeArrivalFocus} periodControl={<OverviewPeriodControl value={overviewPeriod} onChange={setOverviewPeriod} />} assistantNav={<AssistantDrawerNav />}>
-      {['products','addProduct','simulation','receipts'].includes(screen) && <><ErrorNotice error={catalogError} />{catalogError && <button className="secondary" onClick={() => void refresh(catalogTarget)}>{t('retry')}</button>}{loading && screen !== 'products' && <Loading />}{more && screen !== 'products' && screen !== 'addProduct' && <button className="secondary" disabled={loading} onClick={() => void loadMore()}>{t('next')} · {t('products')}</button>}</>}
+    <AppShell screen={screen} navigate={navigate} stores={stores} store={screen === 'store' && localStoreName ? { ...store, name: localStoreName } : store} changeStore={id => { if (id !== store.id && canLeave()) changeStore(id); }} month={month} changeMonth={setMonth} guest={guest} origin={props.origin} canLeave={canLeave} takeArrivalFocus={takeArrivalFocus} periodControl={<OverviewPeriodControl value={overviewPeriod} onChange={setOverviewPeriod} />} backContext={{ detailShown: (screen === 'orders' || screen === 'imports') && detailShown, simulationSku: screen === 'simulation' ? simulationSku : null }} backLabel={products.find(item => item.sku === simulationSku)?.name}>
+      {['products','addProduct','simulation'].includes(screen) && <><ErrorNotice error={catalogError} />{catalogError && <button className="secondary" onClick={() => void refresh(catalogTarget)}>{t('retry')}</button>}{loading && screen !== 'products' && <Loading />}{more && screen !== 'products' && screen !== 'addProduct' && <button className="secondary" disabled={loading} onClick={() => void loadMore()}>{t('next')} · {t('products')}</button>}</>}
       <div key={key} className={'screen-content screen-' + screen}>
         {screen === 'overview' && <Overview {...props} navigate={navigate} period={overviewPeriod} onMissingCosts={() => { setMissingCostsOnly(true); navigate('products'); }} />}
         {screen === 'finance' && <Finance key={base} {...props} period={overviewPeriod} onPeriodChange={setOverviewPeriod} navigate={navigate} onMissingCosts={() => { setMissingCostsOnly(true); navigate('products'); }} />}
         {screen === 'products' && <Products {...props} loading={loading} products={products} more={more} loadMore={() => void loadMore()} refresh={refresh} ask={ask} simulate={simulate} onAddProduct={() => navigate('addProduct')} initialMissingCostsOnly={missingCostsOnly} detail={detail} onDetail={productDetail} catalogFailed={!!catalogError} searchedSku={searchedSku} />}
         {screen === 'addProduct' && <AddProductPage {...props} existingProducts={products} onCancel={() => navigate('products')} onSaved={newProd => { setProducts(old => [newProd, ...old.filter(p => p.sku !== newProd.sku)]); navigate('products'); }} onBatchSaved={batch => { const skus = new Set(batch.map(b => b.sku)); setProducts(old => [...batch, ...old.filter(p => !skus.has(p.sku))]); }} />}
-        {screen === 'simulation' && <Simulation {...props} products={products} initialSku={selectedSku} />}
-        {screen === 'orders' && <Orders {...props} detail={detail} onDetail={orderDetail} />}
+        {screen === 'simulation' && <Simulation {...props} products={products} initialSku={selectedSku} onContextSku={setSimulationSku} />}
+        {screen === 'orders' && <Orders {...props} detail={detail} onDetail={orderDetail} onDetailShown={setDetailShown} />}
         {screen === 'reconciliation' && <Settlement {...props} />}
-        {screen === 'imports' && <Imports {...props} />}
-        {screen === 'receipts' && <Receipts {...props} products={products} refreshProducts={refresh} />}
+        {screen === 'imports' && <Imports {...props} onDetailShown={setDetailShown} />}
         {screen === 'rules' && <Rules {...props} />}
         {screen === 'line' && <LineConnection {...props} />}
         {screen === 'store' && <StoreHub base={base} guest={guest} storeName={store.name ?? store.id} onNameSaved={setLocalStoreName} registerGuard={registerGuard} canLeave={canLeave} navigate={navigate} canCreate={!guest && !stores.some(item => item.personal)} create={create} />}

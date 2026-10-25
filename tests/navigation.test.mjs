@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { CONTEXTUAL, MONTH_SCREENS, NAV_GROUPS, PERIOD_SCREENS, PRIMARY, SCREENS, isNavScreen, navState, parentScreen } from '../web/src/lib/navigation.ts';
+import { CONTEXTUAL, MONTH_SCREENS, NAV_GROUPS, PERIOD_SCREENS, PRIMARY, SCREENS, headerBackTarget, isNavScreen, navState, parentScreen } from '../web/src/lib/navigation.ts';
 import { copy } from '../web/src/lib/copy.ts';
 
 const union = readFileSync(new URL('../web/src/lib/types.ts', import.meta.url), 'utf8').match(/export type Screen = ([^;]+);/)[1];
@@ -10,7 +10,7 @@ const navItems = NAV_GROUPS.flatMap(group => group.items);
 
 test('SCREENS matches the Screen union exactly (no new routes)', () => {
   assert.deepEqual([...SCREENS].sort(), [...unionScreens].sort());
-  assert.equal(SCREENS.length, 14);
+  assert.equal(SCREENS.length, 13);
 });
 
 test('parentScreen for every Screen value', () => {
@@ -18,7 +18,7 @@ test('parentScreen for every Screen value', () => {
     overview: 'overview', products: 'products', finance: 'finance', assistant: 'assistant', store: 'store',
     orders: 'finance', reconciliation: 'finance',
     simulation: 'products', addProduct: 'products', playground: 'products',
-    imports: 'store', receipts: 'store', rules: 'store', line: 'store',
+    imports: 'store', rules: 'store', line: 'store',
   };
   assert.deepEqual(Object.keys(expected).sort(), [...SCREENS].sort());
   for (const screen of SCREENS) assert.equal(parentScreen(screen), expected[screen], screen);
@@ -45,6 +45,15 @@ test('no sidebar item duplicates a Screen; sub-items sit under their parent grou
   }
   const money = NAV_GROUPS.find(group => group.id === 'money').items.map(item => item.screen);
   assert.deepEqual(money, ['finance', 'orders', 'reconciliation']);
+  const store = NAV_GROUPS.find(group => group.id === 'store').items.map(item => item.screen);
+  assert.deepEqual(store, ['store', 'imports', 'rules', 'line']);
+});
+
+test('R2: the receipts page is removed and every group has a top-level item', () => {
+  assert.equal(SCREENS.includes('receipts'), false);
+  assert.equal(navItems.some(item => item.screen === 'receipts'), false);
+  for (const group of NAV_GROUPS) assert.ok(group.items.some(item => !item.sub), group.id + ' needs a top-level item');
+  assert.equal('receipts' in copy, false);
 });
 
 test('group headings exist in copy (TH + EN)', () => {
@@ -111,4 +120,30 @@ test('P4-G3: the shell reads routes through lib/routes; a refused screen change 
   assert.match(navigate, /change === 'screen' && !canLeave\(\)/, 'navigate asks the guard once, for screen changes only');
   assert.match(navigate, /if \(change === 'screen'\) arrival\.current\.set\(options\?\.focus\)/, 'A11 intent is kept for screen arrivals');
   assert.doesNotMatch(shell, /location\.hash\.slice\(1\) as Screen/, 'no direct Screen cast of the hash');
+});
+
+test('R2 §K4: header back link targets the explicit parent, independent of history', () => {
+  for (const screen of SCREENS) {
+    const target = headerBackTarget(screen);
+    if (parentScreen(screen) === screen) assert.equal(target, null, screen);
+    else assert.deepEqual(target, { screen: parentScreen(screen), detail: null }, screen);
+  }
+  assert.deepEqual(headerBackTarget('imports'), { screen: 'store', detail: null });
+  assert.deepEqual(headerBackTarget('rules'), { screen: 'store', detail: null });
+  assert.deepEqual(headerBackTarget('line'), { screen: 'store', detail: null });
+});
+
+test('R2 D-R2-12: the header link hides only while an order detail is rendered', () => {
+  assert.deepEqual(headerBackTarget('orders', { detailShown: false }), { screen: 'finance', detail: null });
+  assert.equal(headerBackTarget('orders', { detailShown: true }), null);
+  assert.deepEqual(headerBackTarget('reconciliation', { detailShown: true }), { screen: 'finance', detail: null });
+  assert.equal(headerBackTarget('imports', { detailShown: true }), null);
+  assert.deepEqual(headerBackTarget('imports', { detailShown: false }), { screen: 'store', detail: null });
+});
+
+test('R2 D-R2-13: simulation returns to its product when known, else to the products list', () => {
+  assert.deepEqual(headerBackTarget('simulation', { simulationSku: 'ABC/1' }), { screen: 'products', detail: 'ABC/1' });
+  assert.deepEqual(headerBackTarget('simulation', { simulationSku: '' }), { screen: 'products', detail: null });
+  assert.deepEqual(headerBackTarget('simulation'), { screen: 'products', detail: null });
+  assert.deepEqual(headerBackTarget('playground', { simulationSku: 'ABC' }), { screen: 'products', detail: null });
 });

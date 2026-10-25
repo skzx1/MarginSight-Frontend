@@ -4,7 +4,7 @@ body{margin:0;background:var(--color-bg-canvas);color:var(--color-text);font:var
 ::selection{background:var(--color-accent-tint);color:var(--color-text)}
 button,input,select,textarea{font:inherit}
 button,a,input,select,textarea,summary{-webkit-tap-highlight-color:transparent}
-button,.button-link{display:inline-flex;justify-content:center;align-items:center;gap:10px;min-height:var(--control-height);padding:11px 20px;border:1px solid var(--color-action);border-radius:var(--radius-md);background:var(--color-action);color:var(--color-on-action);font-weight:var(--weight-semibold);line-height:1.5;text-align:center;cursor:pointer;transition:background 150ms ease,border-color 150ms ease;text-decoration:none;overflow-wrap:anywhere}
+button,.button-link{display:inline-flex;justify-content:center;align-items:center;gap:var(--icon-gap-control);min-height:var(--control-height);padding:11px 20px;border:1px solid var(--color-action);border-radius:var(--radius-md);background:var(--color-action);color:var(--color-on-action);font-weight:var(--weight-semibold);line-height:1.5;text-align:center;cursor:pointer;transition:background 150ms ease,border-color 150ms ease;text-decoration:none;overflow-wrap:anywhere}
 button:hover,.button-link:hover{background:var(--color-action-hover)}
 button:active,.button-link:active{background:var(--color-action-hover);transform:translateY(1px)}
 button.secondary,.button-link.secondary{background:var(--color-bg-surface);color:var(--color-text);border-color:var(--color-border-strong)}
@@ -131,8 +131,6 @@ dd{margin:0;text-align:right;overflow-wrap:anywhere;min-width:0;max-width:65%}
 .conflict{border-top:1px solid var(--color-border);padding:22px 0}
 .conflict-columns>div{background:var(--color-bg-canvas);padding:16px;margin-bottom:12px;border-radius:var(--radius-md);min-width:0}
 .code-editor{font:var(--text-sm)/1.6 monospace}
-.receipt-image{display:block;max-width:100%;max-height:320px;object-fit:contain;margin:16px auto;border-radius:var(--radius-sm)}
-.receipt-draft{margin:20px 0;padding:20px 0;border-top:1px solid var(--color-border)}
 .link-code{padding:24px 0}
 .link-code>strong{font:var(--weight-semibold) var(--text-money-xl)/1.3 var(--font-numeric);letter-spacing:.1em}
 .table-scroll{max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
@@ -218,7 +216,8 @@ dd{margin:0;text-align:right;overflow-wrap:anywhere;min-width:0;max-width:65%}
 @media(min-width:768px){
  .app-shell{--drawer-width:72px;display:grid;grid-template-columns:var(--drawer-width) minmax(0,1fr);min-height:100dvh}
  .context-period{margin-left:auto}
- .topbar{position:sticky;top:0;grid-column:1;grid-row:1;align-self:start;height:100dvh;min-width:0;overflow-y:auto;overflow-x:hidden;display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start;padding:28px 16px;gap:24px;border:0;background:var(--color-bg-sidebar);color:var(--color-sidebar-text)}
+ .context-bar .context-store select,.context-bar .context-period select{justify-self:start;width:auto;field-sizing:content;min-width:var(--select-min);max-width:min(100%,var(--select-max))}
+ .topbar{position:sticky;top:0;grid-column:1;grid-row:1;align-self:start;height:100dvh;min-width:0;overflow-y:auto;overflow-x:hidden;display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start;padding:28px 16px;gap:24px;scroll-padding-block:8px;border:0;border-right:1px solid var(--color-border);background:var(--color-bg-sidebar);color:var(--color-sidebar-text)}
  .topbar .brand{gap:12px;white-space:nowrap;min-height:40px}
  .topbar .brand .logo{flex-shrink:0}
  .topbar .logo{background:transparent;color:var(--color-on-action)}
@@ -236,14 +235,14 @@ dd{margin:0;text-align:right;overflow-wrap:anywhere;min-width:0;max-width:65%}
  .topbar .drawer-toggle{background:var(--color-nav-active-bg);border-color:var(--color-border);color:var(--color-sidebar-text)}
  .topbar .drawer-toggle:hover{background:var(--color-bg-subtle)}
  .primary-nav{position:static;display:flex;flex-direction:column;flex-shrink:0;border:0;padding:0;gap:8px;width:100%;background:transparent;box-shadow:none}
- .primary-nav button{position:relative;flex-direction:row;justify-content:flex-start;gap:12px;font-size:var(--text-md);min-height:52px;padding:14px;border:1px solid transparent;border-radius:var(--radius-md);white-space:nowrap}
+ .primary-nav button{position:relative;flex-direction:row;justify-content:flex-start;gap:var(--icon-gap-nav);font-size:var(--text-md);min-height:52px;padding:14px;border:1px solid transparent;border-radius:var(--radius-md);white-space:nowrap}
  .primary-nav button span{overflow:hidden;text-overflow:ellipsis}
  .topbar .primary-nav button,.topbar button.ghost{color:var(--color-sidebar-muted);background:transparent}
  .topbar .primary-nav button:hover,.topbar button.ghost:hover{background:var(--color-nav-active-bg);color:var(--color-sidebar-text)}
  .topbar .primary-nav button.active,.topbar .primary-nav button.active:hover,.topbar .primary-nav button.section-active,.topbar .primary-nav button.section-active:hover{background:var(--color-nav-active-bg);border-color:var(--color-border);color:var(--color-sidebar-text);font-weight:var(--weight-semibold)}
  .primary-nav button.active::before,.primary-nav button.section-active::before{left:0;right:auto;top:14px;bottom:14px;width:3px;height:auto;border-radius:2px}
  .topbar .primary-nav button.active::before,.topbar .primary-nav button.section-active::before{background:var(--color-indicator)}
- .workspace{container:workspace / inline-size;grid-column:2;grid-row:1;min-width:0;width:100%;max-width:1920px;margin:0 auto;align-self:start;padding:32px 24px 40px}
+ .workspace{container:workspace / inline-size;grid-column:2;grid-row:1;min-width:0;width:100%;max-width:calc(var(--content-wide) + 48px);margin:0 auto;align-self:start;padding:32px 24px 40px}
  .screen-header{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:24px;margin-bottom:28px}
  .screen-header h1{margin-bottom:0;font-size:var(--text-title)}
  .context-controls{max-width:380px}
@@ -258,9 +257,9 @@ dd{margin:0;text-align:right;overflow-wrap:anywhere;min-width:0;max-width:65%}
  .overview-grid>section:last-child{grid-column:1/-1}
  .overview-grid .ask-card,.overview-grid .notice{margin-top:0}
  .overview-grid>*{min-width:0}
- .screen-content>form:not(.narrow){max-width:760px}
+ .screen-content>form:not(.narrow){max-width:var(--content-readable)}
  .screen-content>.form-grid{max-width:960px}
- .two-column form{max-width:760px}
+ .two-column form{max-width:var(--content-readable)}
  .workspace .evidence{max-width:960px}
  .screen-store,.screen-addProduct,.screen-products,.screen-overview{max-width:100%;width:100%}
  .conflict-columns{display:grid;grid-template-columns:1fr 1fr;gap:16px}
@@ -309,7 +308,7 @@ dd{margin:0;text-align:right;overflow-wrap:anywhere;min-width:0;max-width:65%}
  .app-shell .sidebar-logout{display:flex;gap:12px;justify-content:flex-start;min-height:44px;padding:10px 14px;font-size:var(--text-sm)}
 }
 @media(min-width:1024px){
- .workspace{padding:36px 28px 40px}
+ .workspace{padding:36px 28px 40px;max-width:calc(var(--content-wide) + 56px)}
 }
 @container workspace (max-width:619px){
  .two-column,.overview-grid,.form-grid,.conflict-columns{grid-template-columns:minmax(0,1fr)}
@@ -329,7 +328,6 @@ dd{margin:0;text-align:right;overflow-wrap:anywhere;min-width:0;max-width:65%}
    1. OVERVIEW PAGE
    ======================================================== */
 .overview-page{display:flex;flex-direction:column;gap:24px;width:100%}
-.overview-status-bar{margin-bottom:-8px}
 .summary-card{display:flex;flex-direction:column;padding:26px;background:var(--color-bg-surface);border:1px solid var(--color-border);border-radius:var(--radius-lg);box-shadow:none;margin:0}
 .summary-card-title{display:flex;align-items:center;gap:10px}
 .summary-card-title h2{font-size:var(--text-lg);font-weight:var(--weight-semibold);margin:0;color:var(--color-text)}
@@ -564,7 +562,7 @@ dd{margin:0;text-align:right;overflow-wrap:anywhere;min-width:0;max-width:65%}
 .composer-form:focus-within{border-color:var(--color-focus);outline:var(--focus-width) solid var(--color-focus);outline-offset:2px}
 .chat-textarea{flex:1;border:0;resize:none;min-height:var(--control-height);max-height:160px;padding:6px;font-size:var(--text-base);line-height:1.5;background:transparent}
 .chat-textarea:focus,.chat-textarea:focus-visible{outline:none} /* ring is drawn on .composer-form:focus-within */
-.chat-send-button{min-width:var(--control-height);min-height:var(--control-height);padding:10px 18px;border-radius:var(--radius-md);flex-shrink:0}
+.chat-send-button{min-width:var(--control-height);min-height:var(--input-height);padding:10px 18px;border-radius:var(--radius-md);flex-shrink:0}
 .composer-footer-hint{text-align:center;margin-top:6px;color:var(--color-text-muted);font-size:var(--text-xs)}
 
 /* ========================================================
@@ -646,7 +644,6 @@ dd{margin:0;text-align:right;overflow-wrap:anywhere;min-width:0;max-width:65%}
 .overview-active-period{display:block;font-size:var(--text-xs);line-height:1.5}
 .overview-page .summary-main-number{font-family:var(--font-numeric);font-size:var(--text-money-xl);font-weight:var(--weight-semibold);line-height:1.3;min-height:54px;overflow-wrap:anywhere}
 .overview-page .summary-main-number .money{white-space:normal}
-.overview-scope{margin:-12px 0 0}
 .overview-cost-warning{display:flex;justify-content:space-between;text-align:left;gap:16px;background:var(--color-warning-bg);border:1px solid var(--color-warning-border);border-radius:var(--radius-lg);color:var(--color-warning);font-size:var(--text-md);font-weight:var(--weight-medium);padding:18px 20px}
 .overview-cost-warning:hover{background:var(--color-warning-bg);border-color:var(--color-warning)}
 .overview-channels{list-style:none;padding:0;margin:0}
@@ -686,7 +683,7 @@ dd{margin:0;text-align:right;overflow-wrap:anywhere;min-width:0;max-width:65%}
 .marketplace-context{margin-top:20px;padding-top:20px;border-top:1px solid var(--color-border)}
 .marketplace-context>.field{max-width:520px}
 .marketplace-fields{display:grid;grid-template-columns:minmax(0,1fr);gap:0 18px}
-.marketplace-fields>*{min-width:0}.marketplace-fields .field select{white-space:normal}
+.marketplace-fields>*{min-width:0}
 .marketplace-campaigns legend{font-weight:var(--weight-semibold);font-size:var(--text-base)}
 .marketplace-campaign{border-top:1px solid var(--color-border);padding:8px 0}
 .marketplace-campaign .check-field{margin:0;padding:8px 0;align-items:flex-start}
@@ -723,6 +720,8 @@ dd{margin:0;text-align:right;overflow-wrap:anywhere;min-width:0;max-width:65%}
 .chart-readout{display:flex;gap:20px;align-items:center;flex-wrap:wrap;padding:16px 0;border-top:1px solid var(--color-border)}
 .chart-readout label{display:grid;gap:4px;font-size:var(--text-xs);color:var(--color-text-muted)}
 .chart-readout select{font-size:var(--text-sm);min-height:var(--target-min);padding:6px 10px}
+/* Every select keeps the native chevron and reserves its area; a long label ends in an ellipsis instead of running under it (the full text stays in the option list). */
+select,.context-controls select,.duplicate-select,.chart-readout select{padding-right:var(--select-chevron-space);text-overflow:ellipsis;white-space:nowrap;overflow:hidden}
 .chart-readout small{display:block;font-size:var(--text-xs)}.chart-readout strong{font-size:var(--text-base);font-weight:var(--weight-medium)}
 .chart-note{font-size:var(--text-xs);margin:14px 0 0}
 .chart-data{font-size:var(--text-xs);margin:0;padding:0;border:0}.chart-data summary{min-height:var(--target-min);padding:10px 0}
@@ -740,15 +739,29 @@ dd{margin:0;text-align:right;overflow-wrap:anywhere;min-width:0;max-width:65%}
 .channel-key li>span small{grid-column:2;font-size:var(--text-xs)}.channel-key strong{font-size:var(--text-sm);text-align:right;font-weight:var(--weight-medium)}.channel-key strong small{display:block;font-size:var(--text-xs)}
 @media(max-width:479px){.dashboard-charts section{padding:20px 16px}.chart-heading{flex-wrap:wrap}.chart-readout{gap:14px}.chart-unit{padding:0}.overview-page .summary-main-number{font-size:var(--text-money-xl)}}
 /* === lane A: overview + charts (P4e/G1) === */
-/* Overview layout (G6 #13-#15): main column, then the side cards; a right column from 1280 (320px; 360px from 1600); content max 1440. */
-.overview-page{max-width:1440px}
-.overview-shell .screen-header,.overview-shell .context-bar{max-width:1440px}
+/* Overview layout (G6 #13-#15, R2 D-R2-5): width = the shared --content-wide workspace; side column 320px from 1280, 360px from 1600.
+   Alert, KPIs and the meta line sit above the grid (full width). The grid's DOM order is the mobile order
+   (money, chart, orders, channels, launcher); from 1280 the areas put chart + orders in main, money, launcher, channels in side.
+   Without a chart (loading, invalid range) the orders card takes the whole main column, so no empty band opens above it.
+   The flexible row takes any height difference, so the gap appears once, below the last side card of that band. */
 .overview-layout{display:grid;grid-template-columns:minmax(0,1fr);gap:24px;align-items:start}
-.overview-main{display:flex;flex-direction:column;gap:24px;min-width:0}
-.overview-main>section,.overview-side>section{margin:0}
-.overview-side{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:24px;align-items:start;min-width:0}
-@media(min-width:1280px){.overview-layout{grid-template-columns:minmax(0,1fr) 320px}.overview-side{grid-template-columns:minmax(0,1fr)}}
+.overview-layout>*{margin:0;min-width:0}
+@media(min-width:1280px){
+ .overview-layout{grid-template-columns:minmax(0,1fr) 320px;grid-template-areas:"chart money" "chart launcher" "orders channels";grid-template-rows:auto 1fr auto}
+ .overview-layout>.overview-money{grid-area:money}
+ .overview-layout>.dashboard-charts{grid-area:chart}
+ .overview-layout>.recent-orders-section{grid-area:orders}
+ .overview-layout>.channel-panel{grid-area:channels}
+ .overview-layout>.overview-launcher{grid-area:launcher}
+ .overview-layout:not(:has(>.dashboard-charts)){grid-template-areas:"orders money" "orders launcher" "orders channels";grid-template-rows:auto auto 1fr}
+ .overview-layout .overview-channel-row{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+ .overview-layout .overview-channel-row>strong{grid-column:1/-1}
+ .overview-layout .overview-channel-row>span:first-of-type{text-align:left}
+}
 @media(min-width:1600px){.overview-layout{grid-template-columns:minmax(0,1fr) 360px}}
+/* One meta line: data status, coverage and scope (replaces the old status bar + scope caption and their negative margins). */
+.overview-meta{gap:8px 12px}
+.overview-meta>.caption{margin:0}
 /* Four light KPI cards (D2): one column, two from a 400px row, four from 760px. The amount scales with its card. */
 .overview-kpis{margin:0;padding:0;background:transparent;border:0;border-radius:0;container:overview-kpis / inline-size}
 .overview-kpis>.overview-active-period{margin:0 0 12px}
@@ -761,9 +774,13 @@ dd{margin:0;text-align:right;overflow-wrap:anywhere;min-width:0;max-width:65%}
 .overview-kpi .summary-mark{flex-shrink:0;margin-top:7px}
 .overview-page .overview-kpi .summary-main-number{font-size:clamp(var(--text-lg),11cqi,var(--text-2xl));min-height:0;margin:4px 0 8px}
 .overview-kpi>.caption{margin:0 0 8px}
+/* Loading: one quiet placeholder per card (no spinners); a single sr-only status announces the row. */
+.overview-kpi-skeleton{display:grid;gap:12px;margin:4px 0 8px}
+.overview-kpi-skeleton>span{display:block;height:36px;width:70%;border-radius:var(--radius-sm);background:var(--color-bg-subtle)}
+.overview-kpi-skeleton>span+span{height:16px;width:40%}
 .cost-mark{background:var(--chart-cost)}
 /* K1: a link-styled control under each KPI (the card itself is not interactive). */
-.overview-source-link{align-self:flex-start;margin:auto 0 0 -12px;padding:10px 12px;gap:4px;color:var(--color-link);font-size:var(--text-sm);font-weight:var(--weight-medium);text-decoration:underline;text-underline-offset:3px}
+.overview-source-link{align-self:flex-start;margin:auto 0 0;padding:10px 0;gap:4px;color:var(--color-link);font-size:var(--text-sm);font-weight:var(--weight-medium);text-decoration:underline;text-underline-offset:3px}
 .overview-source-link .icon{width:16px;height:16px}
 /* Side cards: assistant launcher (G1), where the money goes, sales channels (always open). */
 .overview-launcher{display:grid;gap:12px;background:var(--color-bg-subtle)}
@@ -774,9 +791,9 @@ dd{margin:0;text-align:right;overflow-wrap:anywhere;min-width:0;max-width:65%}
 .overview-money>.caption{margin:0}
 .overview-money .ledger-lines{margin:12px 0 16px}
 .channel-panel h3{font-size:var(--text-md);margin:24px 0 4px}
-.overview-side .overview-channel-row{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
-.overview-side .overview-channel-row>strong{grid-column:1/-1}
-.overview-side .overview-channel-row>span:first-of-type{text-align:left}
+/* Empty inside the recent-orders card: flat, no extra card chrome. */
+.recent-orders-section .empty-state{padding:24px 0 8px}
+.recent-orders-section .empty-state h2{font-size:var(--text-md);margin:0 0 12px}
 /* === end lane A === */
 /* === lane B: products + finance + orders (P4f/P4g/G3) === */
 /* Product detail (P4f): 4 KPI tiles, tools aside; >=1280 the aside becomes a right column (G6: 320, >=1600: 360). */

@@ -248,3 +248,10 @@ READY_FOR_DEPLOY: user explicitly requested commit/push/deploy. Source95ca8fb in
 ## Routed chat published and checked — 25 October 2026
 
 VERIFIED_AWS_API / VERIFIED_BROWSER_MOCK: clean Frontend release4c6880d live, CloudFront invalidationCompleted; Backend5f3c19f runtime with reviewed hash/config preserved.83Frontend/108Backend/9Python checks pass, API8/8plusauth/tenant401/403pass. Browser rank2andfollow-up rank3correct; latest100questions/campaign controls retained. See latest verification.md. Original project external blockers and research/classifier limitations remain distinct.
+
+
+## AWS verified: latest main and frontend redesign — 25 October 2026
+
+Frontend runtime 8a6a954375f4ed4fdad2c9ef3804b985f1db3a37 published13:10:32UTC (20:10:32Bangkok),74S3objects SHA256 verified, invalidation IE4416BDKY8FOT5NN9C3JNXU8T Completed. Pulled Backend43531e3 including the concurrent cited MOCK fee-answer corrections; deployed API source maps normalize to the same35runtime sources/fingerprint50ed624d0bd7b97cbdeef2624885964690d9fce3cf8d12b967b6e01096a4f007. Existing7Lambda code hash gLZBGYg1m8qxTK8lu/hp/k05ZDv6AliRhHZpdciqyM0= observed after concurrent backend publication. This operation published Frontend only; did not overwrite that backend release or execute CloudFormation.
+
+Browser on a newly opened isolatedMOCK shop: landing/login configuration, enter shop, overview1075THBsales/268THBrecordedprofit/6completeorders,7products with prices and assistant navigation/composer pass. Frontend196/Backend112 tests andPython9 pass. Overall PARTIAL_WITH_EXTERNAL_BLOCKERS unchanged: real receipt evaluation, liveLINE, native marketplace mapping, two-real-Cognito-user acceptance. Ignored evidence .local/redesign-release-20261025/release-verification.json; screenshots in Frontend evidence directory.

@@ -191,3 +191,10 @@ Commit/push/source verification and isolated clean npm-ci build only on Frontend
 ## Committed router static publication — 25 October 2026
 
 One76file publication to existing privateS3 and7path invalidation, confirmedCompleted; no capacity/Cognito/IAM/backend infrastructure changes from Frontend. One isolated browserMOCK store and2assistant questions for real UI verification; API2MOCKstores/8requests and deployment costs logged in Backend cost-log. Final budget read12:24:40UTC lagged0.034USD updated18:46:19.853+07,350team/25trial unchanged; no current-credit/final-bill claim. No REALmerchant write/training/OCR/LINE action. Backups retained locally/ignored; only sanitized deployment metadata is committed.
+
+
+## 25 October 2026 frontend redesign publication
+
+Fresh STS109991964227 / ap-southeast-1 and budget gates before publication13:10:31UTC: cap350USD total, existing operator trial25USD; laggedActualSpend0.034USD, LastUpdated11:46:19.853UTC. Not current remaining credit or final measured deployment cost.
+
+Frontend-only74file publication and one wildcardCloudFrontinvalidation, with privateS3readback and old-static backup in ephemeralCloudShelltmp. Existing backend was concurrently updated by another release and deliberately preserved after source verification. No new IAM/resources/paidcapacity/model switch/indexrebuild/training/Marketplace action or REALmerchant write. One isolatedMOCK browser session; zero model generations/OCR/LINE calls from this release. Build/static/API/storage/CDN/log usage may accrue; ordinary operational monitoring remains necessary.

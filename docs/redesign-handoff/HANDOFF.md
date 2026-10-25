@@ -55,6 +55,17 @@ Items 1-12 of "Remaining" are implemented, independently reviewed and browser-ve
 - Not run / unverified: R42 (mock has no posted fees), R15, R20, R22-R25, R28-R32, R34 in this session; manual Thai IME (Gboard/iOS) and screen readers.
 - Still open: landing hero animations only slow down under reduced motion (pre-existing, hero-depth.module.css); order deep links trust the API calculation for the key (needs a key field in the backend contract to validate); direct order link marks fees confirmed only when feeStatus is ACTUAL; achromatopsia donut pairs rely on the labelled legend; plus every item under "Open decisions" above.
 
+## R2 (2026-10-25): layout, navigation, assistant history, buttons
+
+Approved plan and owner decisions: `R2-layout-plan.md` (this folder). R2 supersedes only these earlier records, for the reasons given in that file under "Owner decisions" (D-R2-9):
+- D2 cream sidebar → white `#FFFFFF` + right hairline (D-R2-3).
+- P4e-1 overview columns → KPI row across the full width, shared 1600px content width, new mobile order (D-R2-5).
+- "copy.ts additions only" → the receipt-only keys and `navGroupData` were removed with the `#receipts` page (D-R2-8; backend `/receipts` API untouched).
+- G7 §2 (history under ถามผู้ช่วย in the sidebar), §4/§4.5 (History button <1024 only) and A5 (`#receipts`) → in-page history column ≥1360 and History sheet <1360 (D-R2-7).
+- G7 `inventory.txt:13` "Sub-screen header: ← parent" → hidden only while an order detail is rendered (D-R2-12). Simulation returns to its product when opened from one (D-R2-13).
+
+Status and verification are recorded in the R2 report, not here.
+
 ## Prompt
 
 ```

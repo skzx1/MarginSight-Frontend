@@ -6,6 +6,7 @@ import { recordedProducts } from '../../lib/catalog-actions';
 import { hasListedPrice, hasProductCost, searchParts, selectCatalog, type PriceFilter, type ProductSort, type SortColumn } from '../../lib/catalog-view';
 import { useLanguage } from '../language';
 import { Icon } from '../ui';
+import { ScreenActions } from './shell';
 import { Money } from './ledger';
 import { ProfitAmount } from './profit-amount';
 import { catalogCopy } from './product-catalog-copy';
@@ -105,7 +106,9 @@ export default function ProductCatalog({ controls: v, loading = false, more, loa
   const columnHeader = (column: SortColumn, label: string, numeric = false, className = '') => <th scope="col" className={`${numeric ? s.numeric : ''} ${className}`} aria-sort={v.sort.startsWith(column) ? (v.sort.endsWith('Asc') ? 'ascending' : 'descending') : 'none'}><button type="button" className={s.sortHeader} onClick={() => v.toggleSort(column)}>{label}<span className={v.sort.startsWith(column) ? s.sorted : s.sortHint}><ControlIcon name="down" /></span></button></th>;
 
   return <div className={s.catalog}>
-    <div className={s.heading}><p>{c.intro}</p><div className={s.headingActions}><a className={s.playgroundLink} href="#playground"><Icon name="simulation" />{c.playgroundLink}</a><button type="button" onClick={onAdd}><Icon name="plus" />{t('addProduct')}</button></div></div>
+    <div className={s.heading}><p>{c.intro}</p><div className={s.headingActions}><a className={s.playgroundLink} href="#playground"><Icon name="simulation" />{c.playgroundLink}</a></div></div>
+    {/* Primary action lives in the shared page header (D-R2-6); this component renders only on the list view. */}
+    <ScreenActions><button type="button" onClick={onAdd}><Icon name="plus" />{t('addProduct')}</button></ScreenActions>
     <div className={s.summary} aria-label={c.loadedScope} aria-busy={initialLoading}>
       <div className={s.summaryTotal}><strong>{initialLoading ? '—' : number(counts.total)}</strong><span>{c.loaded}</span></div>
       <button type="button" className={s.summaryAction} aria-pressed={v.price === 'unlisted'} disabled={initialLoading || (counts.price === 0 && v.price !== 'unlisted')} onClick={() => v.setPrice(v.price === 'unlisted' ? 'all' : 'unlisted')}><strong>{initialLoading ? '—' : number(counts.price)}</strong><span>{c.missingPrice}<Icon name="chevronRight" /></span></button>

@@ -90,7 +90,7 @@ export default function Products({
   }, [showingDetail, product?.sku, detail]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if(listingOpen&&product)return <div className="product-cost-view">
-    <button className="ghost back-link" disabled={action.busy} onClick={()=>{setListingOpen(false);action.clearError();}}>← {t('back')}</button>
+    <button className="ghost back-link" disabled={action.busy} onClick={()=>{setListingOpen(false);action.clearError();}}>← {product.name||t('back')}</button>
     <h2>{t('editListing')}</h2>
     <form className="panel narrow" onSubmit={e=>{e.preventDefault();void action.run(async()=>{
       const fields:{sellingPriceSatang?:number;quantity?:number}={};
@@ -116,7 +116,7 @@ export default function Products({
             action.clearError();
           }}
         >
-          ← {t('back')}
+          ← {product.name || t('back')}
         </button>
         <h2>{t('addCost')}</h2>
         <form
@@ -259,10 +259,14 @@ export function Simulation({
   base,
   month,
   products,
-  initialSku
-}: FeatureProps & { products: CatalogProduct[]; initialSku: string }) {
+  initialSku,
+  onContextSku
+}: FeatureProps & { products: CatalogProduct[]; initialSku: string; onContextSku?: (sku: string | null) => void }) {
   const { t } = useLanguage();
   const [sku, setSku] = useState(initialSku || products[0]?.sku || '');
+  // D-R2-13: the header back link returns to the product this simulation was opened for (only when opened with one).
+  useEffect(() => { onContextSku?.(initialSku && sku ? sku : null); }, [initialSku, sku, onContextSku]);
+  useEffect(() => () => onContextSku?.(null), [onContextSku]);
   const [mode, setMode] = useState('discount');
   const [discount, setDiscount] = useState('15');
   const [price, setPrice] = useState('');

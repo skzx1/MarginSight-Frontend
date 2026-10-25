@@ -33,8 +33,9 @@
 .formGrid{gap:20px 24px}
 .field{display:flex;flex-direction:column;align-items:stretch;gap:8px}
 .field>label,.fieldLabel,.reports legend{font-size:var(--text-md);font-weight:500;line-height:1.6;color:var(--color-text)}
-.root .field input,.root .field select{height:48px;min-height:48px;line-height:1.5;margin:0;padding:0 12px;border:1px solid var(--color-border-strong);border-radius:var(--radius-md);background:var(--color-bg-surface);color:var(--color-text);font-size:var(--text-base);opacity:1}
-.root .field select{padding-inline-end:28px}
+.root .field input,.root .field select{height:48px;min-height:48px;line-height:1.5;margin:0;padding:0 12px;border:1px solid var(--color-border-strong);border-radius:var(--radius-md);background-color:var(--color-bg-surface);color:var(--color-text);font-size:var(--text-base);opacity:1}
+.root .field select{padding-right:var(--select-chevron-space)}
+.root .field select{padding-inline-end:var(--select-chevron-space)}
 .root .field input:focus-visible,.root .field select:focus-visible{border-color:var(--color-focus);outline:var(--focus-width,3px) solid var(--color-focus);outline-offset:2px}
 .root .field input::placeholder{color:var(--color-text-muted);opacity:1}
 .root .field [aria-invalid=true]{border-color:var(--color-negative)}
@@ -63,7 +64,7 @@
 .integration small{display:block;font-size:var(--text-sm);line-height:1.6;color:var(--color-text-muted);font-weight:400}
 .channelNote{font-size:var(--text-sm);line-height:1.6;color:var(--color-text-muted);margin:16px 0 0}
 .accountActions{display:flex;gap:12px;flex-wrap:wrap}
-.root .secondary{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:9px 16px;border:1px solid var(--color-border-strong);border-radius:var(--radius-md);background:var(--color-bg-surface);color:var(--color-action);font-size:var(--text-md);font-weight:500}
+.root .secondary{display:inline-flex;align-items:center;justify-content:center;min-height:var(--input-height);padding:11px 20px;border:1px solid var(--color-border-strong);border-radius:var(--radius-md);background:var(--color-bg-surface);color:var(--color-action);font-size:var(--text-md);font-weight:500}
 .root .secondary:hover{background:var(--color-bg-subtle);color:var(--color-action-hover)}
 /* Save dock: sticky inside the settings column (not fixed), so it follows the shell's content width (sidebar 232 / rail 72 / none),
    stays above the mobile tab bar (--nav-height) and keeps its own space at the end of the page, so it never covers the last card. */
@@ -71,7 +72,7 @@
 .saveBar{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px 24px;width:100%;padding:16px 20px;background:var(--color-bg-surface);color:var(--color-text);border:1px solid var(--color-border);border-radius:var(--radius-lg);box-shadow:var(--shadow-lg);pointer-events:auto}
 .saveBar>p{flex:1;font-size:var(--text-md);line-height:1.6;margin:0;min-width:180px}
 .saveBar>div{display:flex;gap:10px;flex-shrink:0}
-.root .save{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:10px 20px;border:1px solid transparent;border-radius:var(--radius-md);background:var(--color-action);color:var(--color-on-action);font-size:var(--text-md);font-weight:500}
+.root .save{display:inline-flex;align-items:center;justify-content:center;min-height:var(--input-height);padding:11px 20px;border:1px solid transparent;border-radius:var(--radius-md);background:var(--color-action);color:var(--color-on-action);font-size:var(--text-md);font-weight:500}
 .root .save:hover:not(:disabled){background:var(--color-action-hover);color:var(--color-on-action)}
 .toast{position:fixed;bottom:calc(var(--nav-height) + env(safe-area-inset-bottom) + 16px);right:24px;left:24px;width:fit-content;max-width:calc(100% - 48px);margin-left:auto;z-index:12;display:flex;align-items:center;gap:10px;padding:14px 18px;border:1px solid var(--color-positive);border-radius:var(--radius-md);background:var(--color-positive-bg);color:var(--color-positive-fg);font-size:var(--text-md);line-height:1.6;box-shadow:var(--shadow-lg)}
 .skeleton{display:grid;gap:24px}
@@ -80,12 +81,12 @@
 .storeIdentity,.storeBlock>label{display:grid;gap:6px}
 .storeIdentity small,.storeBlock label>span{font-size:var(--text-sm);font-weight:400;line-height:1.5;color:var(--color-text-inverse-muted)}
 .storeIdentity strong{font-size:var(--text-base);line-height:1.6;font-weight:500;overflow-wrap:anywhere}
-.shell .storeBlock select{width:100%;min-height:48px;padding:10px 8px;border:1px solid var(--color-text-inverse-muted);border-radius:var(--radius-md);background:var(--color-bg-dark-hover);color:var(--color-text-inverse);font-size:var(--text-md);line-height:1.6;font-weight:500}
+.shell .storeBlock select{width:100%;min-height:48px;padding:10px var(--select-chevron-space) 10px 8px;border:1px solid var(--color-text-inverse-muted);border-radius:var(--radius-md);background-color:var(--color-bg-dark-hover);color:var(--color-text-inverse);font-size:var(--text-md);line-height:1.6;font-weight:500}
 .shell .storeBlock select:focus-visible{outline:var(--focus-width,3px) solid var(--color-focus-on-dark);outline-offset:2px}
 .storeRail{display:none}
 @media(min-width:768px){.toolGrid,.formGrid,.additionalLayout{grid-template-columns:repeat(2,minmax(0,1fr))}.shell :global(.workspace){padding-bottom:32px}.saveDock{bottom:16px}.toast{bottom:24px}}
 @media(min-width:1280px){.toolGrid{grid-template-columns:repeat(4,minmax(0,1fr))}.formsLayout{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(min-width:768px) and (max-width:1023px){.shell:not(:global(.drawer-expanded)) .storeBlock{display:none}.shell:not(:global(.drawer-expanded)) .storeRail{display:flex;width:48px;height:48px;min-width:48px;padding:12px}}
-@media(max-width:767px){.shell :global(.topbar){flex-wrap:wrap;gap:16px}.shell :global(.desktop-store){display:flex;width:100%;max-width:none;padding:0;border:0;min-height:0}.storeIdentity small,.storeBlock label>span{color:var(--color-text-muted)}.storeIdentity strong{color:var(--color-text)}.shell .storeBlock select{background:var(--color-bg-surface);color:var(--color-text);border-color:var(--color-border-strong)}.card{padding:20px}.pageHeader h1{font-size:var(--text-2xl)}.tool{min-height:0}.toolIcon{margin-bottom:0}.saveBar{padding:12px 14px}.saveBar>div{width:100%;justify-content:flex-end}.root .field input,.root .field select{font-size:var(--text-base)}}
+@media(max-width:767px){.shell :global(.topbar){flex-wrap:wrap;gap:16px}.shell :global(.desktop-store){display:flex;width:100%;max-width:none;padding:0;border:0;min-height:0}.storeIdentity small,.storeBlock label>span{color:var(--color-text-muted)}.storeIdentity strong{color:var(--color-text)}.shell .storeBlock select{background-color:var(--color-bg-surface);color:var(--color-text);border-color:var(--color-border-strong)}.card{padding:20px}.pageHeader h1{font-size:var(--text-2xl)}.tool{min-height:0}.toolIcon{margin-bottom:0}.saveBar{padding:12px 14px}.saveBar>div{width:100%;justify-content:flex-end}.root .field input,.root .field select{font-size:var(--text-base)}}
 @media(prefers-reduced-motion:no-preference){.saveBar,.toast{animation:settingsAppear 160ms ease-out}@keyframes settingsAppear{from{opacity:.8;transform:translateY(6px)}to{opacity:1;transform:none}}}
 @media(prefers-reduced-motion:reduce){.root *{transition:none!important;scroll-behavior:auto}.tool:hover .toolAction svg{transform:none}}

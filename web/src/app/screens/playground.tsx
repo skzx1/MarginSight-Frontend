@@ -126,6 +126,8 @@ export default function Playground({
           <p className="caption">{locale==='th'?'เปลี่ยนสินค้า เดือน หรือเงื่อนไข จะแสดงประวัติของชุดตัวเลือกนั้นแยกกัน':'History is separated by product, month and selected assumptions.'}</p>
         </header>
 
+        {/* Results: thread + composer (the right column on wide screens) */}
+        <div className="playground-results">
         {/* Message Thread */}
         <div className="chat-messages-scroll" role="log" aria-live="polite" aria-label={'Playground'}>
           {messages.length === 0 ? (
@@ -279,6 +281,7 @@ export default function Playground({
           <div className="composer-footer-hint">
             <small>{t('enterToSend')}</small>
           </div>
+        </div>
         </div>
       </div>
     </div>

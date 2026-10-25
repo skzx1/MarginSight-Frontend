@@ -4,7 +4,7 @@ import type { CopyKey } from './copy';
 import type { Screen } from './types';
 import type { IconName } from '../app/ui';
 
-export const SCREENS: readonly Screen[] = ['playground', 'finance', 'overview', 'products', 'addProduct', 'assistant', 'store', 'orders', 'reconciliation', 'imports', 'receipts', 'rules', 'line', 'simulation'];
+export const SCREENS: readonly Screen[] = ['playground', 'finance', 'overview', 'products', 'addProduct', 'assistant', 'store', 'orders', 'reconciliation', 'imports', 'rules', 'line', 'simulation'];
 
 /** The five destinations of the mobile tab bar (<768) and the tablet rail (768-1023). */
 export const PRIMARY: readonly Screen[] = ['overview', 'products', 'finance', 'assistant', 'store'];
@@ -17,9 +17,8 @@ export const NAV_GROUPS: readonly NavGroup[] = [
   { id: 'overview', items: [{ screen: 'overview', icon: 'overview' }] },
   { id: 'products', heading: 'navGroupProducts', items: [{ screen: 'products', icon: 'products' }, { screen: 'playground', icon: 'simulation', sub: true }] },
   { id: 'money', heading: 'navGroupMoney', items: [{ screen: 'finance', icon: 'calculator' }, { screen: 'orders', icon: 'orders', sub: true }, { screen: 'reconciliation', icon: 'reconcile', sub: true }] },
-  { id: 'data', heading: 'navGroupData', items: [{ screen: 'imports', icon: 'upload', sub: true }, { screen: 'receipts', icon: 'receipt', sub: true }, { screen: 'rules', icon: 'rules', sub: true }] },
   { id: 'assistant', heading: 'navGroupAssistant', items: [{ screen: 'assistant', icon: 'assistant' }] },
-  { id: 'store', heading: 'navGroupStore', items: [{ screen: 'store', icon: 'settings' }, { screen: 'line', icon: 'line', sub: true }] },
+  { id: 'store', heading: 'navGroupStore', items: [{ screen: 'store', icon: 'settings' }, { screen: 'imports', icon: 'upload', sub: true }, { screen: 'rules', icon: 'rules', sub: true }, { screen: 'line', icon: 'line', sub: true }] },
 ];
 
 /** Destinations reached only from page content (not listed in the sidebar). */
@@ -28,11 +27,25 @@ export const CONTEXTUAL: readonly Screen[] = ['addProduct', 'simulation'];
 const PARENT: Partial<Record<Screen, Screen>> = {
   orders: 'finance', reconciliation: 'finance',
   simulation: 'products', addProduct: 'products', playground: 'products',
-  imports: 'store', receipts: 'store', rules: 'store', line: 'store',
+  imports: 'store', rules: 'store', line: 'store',
 };
 
 /** The primary destination a screen belongs to (rail/tab highlight and the "← parent" back link). */
 export function parentScreen(screen: Screen): Screen { return PARENT[screen] ?? screen; }
+
+/**
+ * Target of the shared header's "← parent" link (R2 §K4). Always an explicit route, never browser history.
+ * - null when the screen has no parent, or while an in-page detail is rendered (an order, or an import job): its own
+ *   "← orders" / "← imports" link is the way back, so a screen never shows two back links (D-R2-12, §K6).
+ * - simulation returns to the product it was opened for when that SKU is known, else the products list (D-R2-13).
+ */
+export function headerBackTarget(screen: Screen, context: { detailShown?: boolean; simulationSku?: string | null } = {}): { screen: Screen; detail: string | null } | null {
+  const parent = parentScreen(screen);
+  if (parent === screen) return null;
+  if ((screen === 'orders' || screen === 'imports') && context.detailShown) return null;
+  if (screen === 'simulation' && context.simulationSku) return { screen: 'products', detail: context.simulationSku };
+  return { screen: parent, detail: null };
+}
 
 export const isNavScreen = (screen: Screen) => NAV_GROUPS.some(group => group.items.some(item => item.screen === screen));
 

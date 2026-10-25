@@ -1,4 +1,4 @@
-.shell :global(.workspace){width:100%;max-width:1920px;background:var(--color-bg-canvas)}
+.shell :global(.workspace){width:100%;background:var(--color-bg-canvas)}
 .page{display:grid;gap:24px;min-width:0;color:var(--color-text);font-family:var(--font-sans);font-size:var(--text-md);line-height:1.6;font-variant-numeric:tabular-nums}
 .page *{min-width:0}
 .page h1{margin:0;font-size:var(--text-title);line-height:var(--leading-heading)}
@@ -6,7 +6,8 @@
 .page h3{font-size:var(--text-base);line-height:var(--leading-heading);margin:0 0 12px}
 .page button,.page select,.page input,.page summary{min-height:44px}
 .page :is(button,input,select,summary,a):focus-visible{outline:var(--focus-width,3px) solid var(--color-focus);outline-offset:var(--focus-offset,3px)}
-.page input,.page select{background:var(--color-bg-surface);color:var(--color-text);border:1px solid var(--color-border-strong);border-radius:var(--radius-md);padding:10px 12px;width:100%;font-size:var(--text-base)}
+.page input,.page select{background-color:var(--color-bg-surface);color:var(--color-text);border:1px solid var(--color-border-strong);border-radius:var(--radius-md);padding:10px 12px;width:100%;font-size:var(--text-base)}
+.page select{padding-right:var(--select-chevron-space)}
 .page input::placeholder{color:var(--color-text-muted);opacity:1}
 .page input[type=checkbox]{width:18px;height:18px;min-height:18px;accent-color:var(--color-accent)}
 .sectionHeading{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
@@ -106,5 +107,7 @@
 @media(min-width:1024px){.page .kpis{grid-template-columns:repeat(3,minmax(0,1fr))}.summaryGrid{grid-template-columns:minmax(320px,.9fr) minmax(0,1.1fr)}}
 @media(min-width:1600px){.page .kpis{grid-template-columns:repeat(6,minmax(0,1fr))}}
 @media(max-width:767px){.controls>label{width:100%}.warning{align-items:flex-start;flex-direction:column}.statement>div{gap:8px;grid-template-columns:minmax(0,1fr) auto 44px}.statement .net{font-size:var(--text-md)}.panel{padding:16px}.page h2{font-size:var(--text-base)}.kpi h2{font-size:var(--text-sm)}}
-@media(prefers-reduced-motion:no-preference){.chart{animation:reveal .25s ease-out}.page button{transition:background-color .16s,border-color .16s}.page button:active{transform:translateY(1px)}}
+@media(prefers-reduced-motion:no-preference){.chart{animation:reveal .25s ease-out}.page button{transition:background-color .16s,border-color .16s}
+/* R2 D-R2-11: action buttons with text are 48px like the shared base button (the page's 14px text would make them 45). */
+.page .textAction{min-height:var(--input-height)}.page button:active{transform:translateY(1px)}}
 @keyframes reveal{from{opacity:.65}to{opacity:1}}

@@ -194,10 +194,18 @@ export default function Assistant({ base, guest, origin, products, initialSku, d
         {reply && reply.source !== 'recorded' && <small className={s.sourceTag}>{t(reply.source === 'assistant' ? 'ai' : reply.source === 'fallback' ? 'fallback' : 'notice')}</small>}
       </div>
       {turn.state === 'pending' ? <div className={s.typing} role="status"><span aria-hidden="true"><i /><i /><i /></span>{t('typing')}</div> : reply ? <>
-        <AnswerText text={reply.text} />
+        {reply.catalogSummary && (()=>{const c=reply.catalogSummary,remaining=c.platform?c.differenceAfterKnownFeesBeforeOtherExpensesSatang:c.differenceBeforeExpensesSatang;const label=(th:string,en:string)=>locale==='th'?th:en;return <div className={s.resultCard} aria-label={label('สรุปการลองราคา','Price comparison summary')}><div className={s.resultMain}><span>{c.platform?label('เหลือหลังต้นทุนและค่าบริการที่คำนวณได้ · ต่อ 1 หน่วย','Remaining after cost and calculated fees · per unit'):label('ส่วนต่างก่อนค่าใช้จ่ายอื่น · ต่อ 1 หน่วย','Difference before expenses · per unit')}</span><strong className={remaining==null?s.missing:remaining<0?s.loss:s.catalogAmount}>{remaining==null?t('missing'):<Money value={remaining}/>}</strong></div><dl>
+          <div><dt>{label('ราคาก่อนลด','Original price')}</dt><dd><Money value={c.originalPriceSatang}/></dd></div>
+          <div><dt>{label('ส่วนลด','Discount')}</dt><dd>{c.discountPct}%</dd></div>
+          <div><dt>{label('ราคาหลังลด','Discounted price')}</dt><dd><Money value={c.discountedPriceSatang}/></dd></div>
+          <div><dt>{label('ต้นทุนสินค้า','Product cost')}</dt><dd>{c.unitCostSatang==null?'—':<Money value={c.unitCostSatang}/>}</dd></div>
+          {c.platform&&<div><dt>{label('ค่าบริการที่คำนวณได้','Calculated fees')}</dt><dd>{c.knownPlatformFeeSatang===undefined?'—':<Money value={c.knownPlatformFeeSatang}/>}</dd></div>}
+          <div><dt>{label('ขอบเขต','Scope')}</dt><dd>{label('ก่อนค่าใช้จ่ายอื่น · ยังไม่ใช่กำไรสุทธิ','Before other expenses · not net profit')}</dd></div>
+        </dl></div>})()}
         {reply.result && <div className={s.resultCard}><div className={s.resultMain}><span>{reply.result.label}</span><strong className={reply.result.profitSatang == null ? s.missing : reply.result.profitSatang < 0 ? s.loss : ''}>{reply.result.profitSatang == null ? t('missing') : <ProfitAmount value={reply.result.profitSatang} />}</strong></div>
           <dl>{reply.result.revenueSatang !== undefined && <div><dt>{t('revenue')}</dt><dd><Money value={reply.result.revenueSatang} /></dd></div>}{reply.result.marginPct !== undefined && <div><dt>{t('margin')}</dt><dd>{reply.result.marginPct == null ? '—' : new Intl.NumberFormat(locale, { maximumFractionDigits: 1 }).format(reply.result.marginPct) + '%'}</dd></div>}{reply.result.count !== undefined && <div><dt>{locale === 'th' ? 'จากออเดอร์' : 'Recorded orders'}</dt><dd>{reply.result.count} {t('orders')}</dd></div>}{reply.result.beforeSatang !== undefined && <><div><dt>{t('before')}</dt><dd><Money value={reply.result.beforeSatang} /></dd></div><div><dt>{t('after')}</dt><dd><Money value={reply.result.afterSatang} /></dd></div></>}</dl>
         </div>}
+        <AnswerText text={reply.text} />
         <div className={s.answerFootnote}>
           <ChatIcon name="calendar" />
           <div><span>{t('basedOn')}: {answerReferenceLabel(reply.context,reply.catalogReferenceAt,locale)} · {productLabel(reply.context.sku)}</span>

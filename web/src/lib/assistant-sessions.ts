@@ -1,3 +1,4 @@
+import {catalogSummary,type CatalogSummary} from './assistant-summary.ts';
 import type { Calculation } from './types';
 import {validMarketplaceDraft,type MarketplaceDraft} from './marketplace-context.ts';
 
@@ -8,7 +9,7 @@ export type ChatResult = {
 };
 export type ChatReply = {
   text: string; source: 'recorded' | 'assistant' | 'fallback' | 'notice';
-  context: ChatContext; note?: string; result?: ChatResult; calculation?: Calculation; catalogReferenceAt?: string;
+  context: ChatContext; note?: string; result?: ChatResult; calculation?: Calculation; catalogReferenceAt?: string; catalogSummary?:CatalogSummary;
 };
 export type ChatTurn = {
   id: string; question: string; requestQuestion?: string; createdAt: string; context: ChatContext;
@@ -54,6 +55,7 @@ export function parseArchive(raw: string | null): ChatArchive {
         (turn.reply && (typeof turn.reply.text !== 'string' || !validContext(turn.reply.context) || !['recorded','assistant','fallback','notice'].includes(turn.reply.source)))) throw Error('INVALID_CHAT_TURN');
       if (turn.reply?.result && (typeof turn.reply.result.label !== 'string' || (turn.reply.result.profitSatang !== null && !Number.isFinite(turn.reply.result.profitSatang)) || ['revenueSatang','marginPct','beforeSatang','afterSatang','count'].some(key => { const value = turn.reply!.result![key as keyof ChatResult]; return value !== undefined && value !== null && !Number.isFinite(value); }))) throw Error('INVALID_CHAT_RESULT');
       if (turn.reply?.calculation && (!Array.isArray(turn.reply.calculation.items) || !Array.isArray(turn.reply.calculation.missingFields) || !Array.isArray(turn.reply.calculation.evidence))) throw Error('INVALID_CHAT_EVIDENCE');
+      if(turn.reply?.catalogSummary!==undefined&&!catalogSummary(turn.reply.catalogSummary))throw Error('INVALID_CATALOG_SUMMARY');
       if(turn.reply?.catalogReferenceAt!==undefined&&(typeof turn.reply.catalogReferenceAt!=='string'||turn.reply.catalogReferenceAt.length>40||!Number.isFinite(Date.parse(turn.reply.catalogReferenceAt))))throw Error('INVALID_CATALOG_REFERENCE');
       return { ...turn, state: turn.state === 'pending' ? 'stopped' as const : turn.state };
     });

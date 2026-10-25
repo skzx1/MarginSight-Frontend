@@ -124,3 +124,23 @@ One clean CloudShell build/verified Node download, one static publish, thirteen 
 ## Store wording/catalog changes — 25 October 2026
 
 Local-only development, static build/tests and isolated local MOCK sessions. Local AI disabled. No AWS requests, resource creation, publish, inference or training in this slice; no new cloud spend from these operations. Existing retained AWS resources may continue accruing charges; no fresh budget/credit snapshot was taken.
+
+
+## Release preparation — 25 October 2026
+
+CloudShell preflight04:33:33UTC read team account109991964227, Singapore stable stack, budget350USD and lagged ActualSpend0.033USD. Clean source builds/backups and SAM prepare were initiated; no stack execute/static publish/model request was issued by this agent before browser tools became unavailable. Preparation can upload SAM artifacts and consume standard S3/CloudShell/API usage; not a local dry run. New logo rendering/build is local only. Verify change-set state and budget before resuming; no final deployment cost or completion claimed.
+
+
+## Completed code/static publication and palette follow-up — 25 October 2026
+
+Fresh preflight06:23:58UTC/read-before-execute BudgetHackathon-Team10 still limit350USD/laggedActualSpend0.033USD, LastUpdated04:22:10UTC. Team350/trial25 unchanged. One reviewed existing-stack code update,18S3readbackobjects and one8path CDN invalidation; no added capacity/resources/IAM. API verification created2 isolatedMOCKsessions and browser1; one real Qwen API question plus one browser question, bounded simulations and reads. No real merchant write/OCR/LINE/training. Standard traffic/inference/storage may accrue; no fresh measured final charge claimed. Pending palette/Sign-in is appearance-only: local53-test build and palette checks so far. Re-read budget before publishing that follow-up.
+
+
+## Appearance follow-up completed — 25 October 2026
+
+Before Cognito/static updates and final readback budgetlimit350USD/laggedActualSpend0.033USD, LastUpdated2026-10-25 04:22:10.530000+00:00. One further CloudShell frontend build, one presentation-only Cognito CSS/logo update with readback/public-image hash, one static publish and one8path invalidationI615ZICUQLD4WENLVHV65VL3Z5 Completed;18S3hashes plus publicread checks. One additional isolatedMOCK browser session for five screen reads; no extra inference/OCR/LINE/real merchant write in this appearance follow-up. No Backend/IaC/IAM/resource/capacity/authpolicy update. Standard build/storage/API/CDN traffic may accrue; lagged spend is not a real-time final bill or remaining credit. Existing team350USD/trial25USD bounds remain.
+
+
+## Product listing release — 25 October 2026
+
+Fresh account109991964227/Singapore/budget gates before build, SAM preparation, review/execute and publication; final read07:41:21UTC: team cap350USD, laggedActualSpend0.033USD, LastUpdated04:22:10UTC, trial target25USD unchanged. First prepare failed before SAM upload on live FeeRules parameter drift; recovered existing source/template and preserved all values rather than dropping settings. One reviewed existing-stack code update, static publish and8path invalidation; no new resources/IAM/capacity, model switch, index rebuild, training or Marketplace action. Two API MOCK sessions plus one browser MOCK session for bounded catalog/cost edits and reads; no REALmerchant writes/model inference/OCR/LINE action. Read-only Qwen metadata gate is not inference. Standard build/API/storage/Lambda/CDN charges may accrue; this is not a final measured cost or current remaining-credit claim. Backups /tmp/marginshot-listing-20261025-15_tvv_j ephemeral; previous sources and recovered pre-price live code retained in Git for reviewed rollback without deleting merchant data.

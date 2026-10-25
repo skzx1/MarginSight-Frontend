@@ -188,7 +188,7 @@ export default function ProductCsvImport({
         sku: cleanSku || r.sku,
         sellingPriceSatang: priceParsed.satang,
         costSatang,
-        quantity: qtyParsed.quantity ?? 1,
+        quantity: qtyParsed.quantity,
         status,
         errors,
         warnings
@@ -283,7 +283,7 @@ export default function ProductCsvImport({
           </div>
         </div>
 
-        <p className="notice">{locale==='th'?'บันทึก SKU ชื่อสินค้า หน่วยขาย และต้นทุนเท่านั้น ราคาขายและจำนวนในไฟล์ใช้ตรวจร่าง ยังไม่ถูกบันทึกเป็นราคาขายหรือสต็อก และไม่ใช่กำไรสุทธิ':'Saves SKU, name, selling unit and cost only. CSV prices and quantities are draft checks, not saved sale prices, inventory or net profit.'}</p>
+        <p className="notice">{locale==='th'?'บันทึกสินค้า ราคาขาย จำนวนที่ระบุ และต้นทุน ช่องจำนวนที่เว้นว่างจะคงค่าเดิม จำนวนนี้เป็นค่าที่ร้านกรอก ไม่ปรับอัตโนมัติตามออเดอร์ และไม่ใช่กำไรสุทธิ':'Saves products, prices, entered quantities and costs. Blank quantity keeps the existing value. Quantity is merchant-entered, not automatically adjusted by orders. These are not net profit.'}</p>
         <div className="csv-success-actions">
           <button type="button" onClick={onNavigateToProducts} className="primary-btn">
             <Icon name="products" />
@@ -300,7 +300,7 @@ export default function ProductCsvImport({
 
   return (
     <div className="csv-import-flow" role="region" aria-label={t('addCsvTab')}>
-      <p className="notice">{locale==='th'?'บันทึก SKU ชื่อสินค้า หน่วยขาย และต้นทุนเท่านั้น ราคาขายและจำนวนในไฟล์ใช้ตรวจร่าง ยังไม่ถูกบันทึกเป็นราคาขายหรือสต็อก และไม่ใช่กำไรสุทธิ':'Saves SKU, name, selling unit and cost only. CSV prices and quantities are draft checks, not saved sale prices, inventory or net profit.'}</p>
+      <p className="notice">{locale==='th'?'บันทึกสินค้า ราคาขาย จำนวนที่ระบุ และต้นทุน ช่องจำนวนที่เว้นว่างจะคงค่าเดิม จำนวนนี้เป็นค่าที่ร้านกรอก ไม่ปรับอัตโนมัติตามออเดอร์ และไม่ใช่กำไรสุทธิ':'Saves products, prices, entered quantities and costs. Blank quantity keeps the existing value. Quantity is merchant-entered, not automatically adjusted by orders. These are not net profit.'}</p>
       {/* 3-Step Merchant Hint */}
       <ol className="steps" aria-label="ขั้นตอนการนำเข้าสินค้าจาก CSV">
         <li className={!file ? 'current' : ''}>

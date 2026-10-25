@@ -1,13 +1,14 @@
-.logo-customizable { max-width: 85%; max-height: 100%; }
-.banner-customizable { padding: 24px 20px 24px 20px; background-color: #fcfcf9; }
-.label-customizable { font-weight: 600; color: #56685e; }
-.textDescription-customizable { padding-top: 12px; padding-bottom: 16px; display: block; font-size: 16px; color: #24392f; }
-.submitButton-customizable { font-size: 16px; font-weight: 600; margin: 20px 0px 12px 0px; height: 48px; width: 100%; color: #ffffff; background-color: #152d26; border-radius: 999px; }
-.submitButton-customizable:hover { color: #ffffff; background-color: #0b1f19; }
-.inputField-customizable { width: 100%; height: 48px; color: #24392f; background-color: #ffffff; border: 1px solid #7d8f84; border-radius: 10px; }
-.inputField-customizable:focus { border-color: #187b62; outline: 2px solid #187b62; outline-offset: 2px; }
-.errorMessage-customizable { padding: 12px; font-size: 13px; width: 100%; background: #fff0ed; border: 1px solid #b42318; color: #b42318; }
-.legalText-customizable { color: #56685e; font-size: 12px; }
-.background-customizable { background-color: #fcfcf9; }
-.passwordCheck-valid-customizable { color: #187b62; }
-.passwordCheck-notValid-customizable { color: #b42318; }
+.logo-customizable { max-width: 90%; max-height: 100%; }
+.banner-customizable { padding: 24px 20px 16px 20px; background-color: #faf9f5; }
+.label-customizable { font-weight: 600; color: #66625a; }
+.textDescription-customizable { padding-top: 8px; padding-bottom: 20px; display: block; font-size: 16px; color: #141413; }
+.submitButton-customizable { font-size: 16px; font-weight: 600; margin: 24px 0px 16px 0px; height: 48px; width: 100%; color: #ffffff; background-color: #b04f2c; border-radius: 999px; }
+.submitButton-customizable:hover { color: #ffffff; background-color: #933f22; }
+.inputField-customizable { width: 100%; height: 48px; color: #141413; background-color: #ffffff; border: 1px solid #8c877d; border-radius: 10px; }
+.inputField-customizable:focus { border-color: #b04f2c; outline: 2px solid #b04f2c; outline-offset: 2px; }
+.errorMessage-customizable { padding: 12px; font-size: 13px; width: 100%; background: #f7e3e8; border: 1px solid #8e1238; color: #8e1238; }
+.legalText-customizable { color: #66625a; font-size: 12px; }
+.redirect-customizable { text-align: center; color: #66625a; }
+.background-customizable { background-color: #faf9f5; }
+.passwordCheck-valid-customizable { color: #141413; }
+.passwordCheck-notValid-customizable { color: #8e1238; }

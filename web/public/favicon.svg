@@ -1,1 +1,8 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" fill="none"><rect width="128" height="128" rx="28" fill="#0D2923"/><g transform="translate(10 10) scale(.84)"><path d="M12 35h8l20 20-5 5Zm0 0 23 23-23 23Zm0 59 22-22v33H12Zm66-12 22-26v49H78Z" fill="#F0F6E9"/><path d="m12 96 31-31 16 16 44-47-5-5 18-13-6 30-6-6-45 53-16-16-31 31Z" fill="#F0F6E9"/><path d="m12 96 31-31 16 16 44-47-5-5 18-13-28 7 7 6-37 40-15-14-31 31Z" fill="#B5D99C"/></g></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" fill="none" role="img" aria-labelledby="title"><title id="title">MarginShot — M + Rising Line</title><defs>
+ <linearGradient id="rise" x1="24" y1="190" x2="225" y2="42" gradientUnits="userSpaceOnUse"><stop stop-color="#F28A4A"/><stop offset=".48" stop-color="#D56832"/><stop offset="1" stop-color="#A7441F"/></linearGradient>
+ <linearGradient id="stone" x1="174" y1="124" x2="216" y2="207" gradientUnits="userSpaceOnUse"><stop stop-color="#A39F90"/><stop offset="1" stop-color="#8C887A"/></linearGradient>
+</defs><rect width="128" height="128" rx="24" fill="#141711"/><g transform="translate(2 2) scale(.48)"><path fill="#F9F9F0" d="M24 65 65 108 24 151ZM24 207V194L66 150V207Z"/>
+ <path fill="#F9F9F0" d="M24 65H37L77 108 66 120ZM170 163 213 115V207H170Z"/>
+ <path fill="url(#rise)" d="M24 178 80 119 112 151 195 61 182 49 236 36 228 92 215 79 112 183 79 151 24 207Z"/>
+ <path fill="#F49A62" fill-opacity=".46" d="M24 178 80 119 112 151 195 61 201 68 112 165 80 132 24 192Z"/>
+ <path fill="#7C341B" fill-opacity=".14" d="m24 201 55-59 33 33L215 70v9L112 183 79 151 24 207Z"/></g></svg>

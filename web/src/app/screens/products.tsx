@@ -9,6 +9,7 @@ import { ErrorNotice, Field, ProductSelect, Select, Submit } from '../components
 import { EvidencePanel, Money } from '../components/ledger';
 import ProductCatalog, { useProductCatalog } from '../components/product-catalog';
 import { ProfitAmount } from '../components/profit-amount';
+import {saveProductListing} from '../../lib/catalog-actions';
 
 type CatalogProps = {
   products: CatalogProduct[];
@@ -44,10 +45,30 @@ export default function Products({
   const [effective, setEffective] = useState(bangkokDate());
   const [source, setSource] = useState('');
   const action = useAction();
+  const [listingOpen,setListingOpen]=useState(false);
+  const [listingPrice,setListingPrice]=useState('');
+  const [listingQuantity,setListingQuantity]=useState('');
 
   const catalog = useProductCatalog(rawProducts, initialMissingCostsOnly, locale);
   const products = catalog.products;
   const product = products.find(p => p.sku === selectedSku);
+
+  if(listingOpen&&product)return <div className="product-cost-view">
+    <button className="ghost back-link" disabled={action.busy} onClick={()=>{setListingOpen(false);action.clearError();}}>← {t('back')}</button>
+    <h2>{t('editListing')}</h2>
+    <form className="panel narrow" onSubmit={e=>{e.preventDefault();void action.run(async()=>{
+      const fields:{sellingPriceSatang?:number;quantity?:number}={};
+      if(listingPrice.trim()){const value=parseBaht(listingPrice);if(value>1e12)throw Error('MONEY_INPUT');fields.sellingPriceSatang=value;}
+      if(listingQuantity.trim()){if(!/^\d+$/.test(listingQuantity.trim())||Number(listingQuantity)>1e6)throw Error('INVALID_INPUT');fields.quantity=Number(listingQuantity);}
+      if(!Object.keys(fields).length)throw Error('INVALID_INPUT');
+      await saveProductListing(request,base,product,fields);
+      await refresh(product.sku);setListingOpen(false);
+    });}}><fieldset disabled={action.busy}>
+      <p><strong>{product.name}</strong> · {product.sku}</p><p className="caption">{t('listingNote')}</p>
+      <Field label={t('sellingPrice')} value={listingPrice} inputMode="decimal" onChange={e=>setListingPrice(e.target.value)} />
+      <Field label={t('stockQty')} value={listingQuantity} inputMode="numeric" onChange={e=>setListingQuantity(e.target.value)} />
+      <ErrorNotice error={action.error}/><Submit busy={action.busy}>{t('save')}</Submit>
+    </fieldset></form></div>;
 
   if (costFormOpen && product) {
     return (
@@ -191,6 +212,7 @@ export default function Products({
           </dl>
 
           <div className="actions">
+            <button className="secondary" onClick={()=>{setListingPrice(product.sellingPriceSatang==null?'':String(product.sellingPriceSatang/100));setListingQuantity(product.quantity==null?'':String(product.quantity));action.clearError();setListingOpen(true);}}>{t('editListing')}</button>
             <button
               onClick={() => {
                 setCost(product.cost ? String(product.cost.unitCostSatang / 100) : '');

@@ -161,7 +161,7 @@ export function parseAmountToSatang(raw: string): { satang: number | null; error
 /** Parse quantity string to integer, or null if empty / invalid */
 export function parseQuantity(raw: string): { quantity: number | null; error?: string } {
   const cleaned = cleanNumberText(raw);
-  if (!cleaned) return { quantity: 1 }; // Default to 1 if blank
+  if (!cleaned) return { quantity: null }; // Unknown; never overwrite recorded stock with a default.
 
   if (!/^\d+$/.test(cleaned)) {
     if (/^-\d+/.test(cleaned)) {
@@ -354,7 +354,7 @@ export function processProductCsv(
         if (duplicatePolicy === 'skip') {
           warnings.push(`ชื่อซ้ำกับสินค้าในร้าน "${existProd.name}" (${existProd.sku}) — จะถูกข้าม`);
         } else if (duplicatePolicy === 'update') {
-          warnings.push(`ชื่อซ้ำกับสินค้าในร้าน — จะอัปเดตต้นทุนไปยัง ${existProd.sku}`);
+          warnings.push(`ชื่อซ้ำกับสินค้าในร้าน — จะอัปเดตราคา จำนวน และต้นทุนที่ระบุไปยัง ${existProd.sku}`);
           if (!finalSku) finalSku = existProd.sku;
         } else {
           warnings.push(`ชื่อซ้ำกับสินค้าในร้าน — จะเพิ่มเป็นสินค้าใหม่`);
@@ -383,12 +383,12 @@ export function processProductCsv(
       name: rawName,
       sellingPriceText: rawPrice,
       costText: rawCost,
-      quantityText: rawQty || '1',
+      quantityText: rawQty,
       skuText: rawSku,
       unitText: rawUnit,
       sellingPriceSatang: priceParsed.satang,
       costSatang,
-      quantity: qtyParsed.quantity ?? 1,
+      quantity: qtyParsed.quantity,
       sku: finalSku,
       unit: rawUnit,
       status,

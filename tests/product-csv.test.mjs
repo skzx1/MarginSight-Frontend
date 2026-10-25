@@ -55,7 +55,7 @@ test('cleanNumberText and parseAmountToSatang clean currency symbols, commas and
 
 test('parseQuantity handles integer validation', () => {
   assert.equal(parseQuantity('50').quantity, 50);
-  assert.equal(parseQuantity('').quantity, 1); // default 1
+  assert.equal(parseQuantity('').quantity, null); // unknown, never invent stock
   assert.equal(parseQuantity('1,000').quantity, 1000);
 
   const float = parseQuantity('10.5');

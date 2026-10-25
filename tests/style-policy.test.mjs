@@ -8,7 +8,7 @@ import { readRootProperties, resolve, stripComments } from './lib/css.mjs';
 const ROOT = 'web/src';
 const TOKENS = 'app/tokens.css';
 // Temporary: the browser theme colour is a Next.js viewport string, not CSS; it changes with the other brand surfaces (P5).
-const ALLOWED = { 'app/layout.tsx': ["'#152d26'"] };
+const ALLOWED = { 'app/layout.tsx': ["'#FAF9F5'"] };
 const HEX = /#[0-9a-fA-F]{3,8}\b/g;
 const FUNCTION = /\b(?:rgba?|hsla?|hwb|lab|lch|oklab|oklch)\(/g;
 const QUOTED_HEX = /(['"`])#(?:[0-9a-fA-F]{3,4}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})\1/g;

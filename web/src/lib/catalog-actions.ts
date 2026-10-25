@@ -28,8 +28,14 @@ export function productDraftPreview(price:string,cost:string,quantity:string){
 }
 
 type Requester=<T>(path:string,body:unknown)=>Promise<T>;
-export async function saveProductAndCost(api:Requester,base:string,details:{sku:string;name:string;unit:string;costSatang:number;effectiveFrom:string;origin:'MOCK'|'REAL'},onCreated:(product:CatalogProduct)=>void,existing?:CatalogProduct){
-  const product=existing??await api<CatalogProduct>(base+'/products',{sku:details.sku,name:details.name,unit:details.unit});
+export async function saveProductListing(api:Requester,base:string,product:CatalogProduct,fields:{sellingPriceSatang?:number;quantity?:number}){
+  const saved=await api<CatalogProduct>(base+'/products/'+encodeURIComponent(product.sku)+'/listing',{...fields,expectedListingVersion:product.listingVersion??0});
+  return {...saved,cost:product.cost};
+}
+export async function saveProductAndCost(api:Requester,base:string,details:{sku:string;name:string;unit:string;sellingPriceSatang:number;quantity:number;costSatang:number;effectiveFrom:string;origin:'MOCK'|'REAL'},onCreated:(product:CatalogProduct)=>void,existing?:CatalogProduct){
+  const fields={sellingPriceSatang:details.sellingPriceSatang,quantity:details.quantity};
+  let product=existing??await api<CatalogProduct>(base+'/products',{sku:details.sku,name:details.name,unit:details.unit,...fields});
+  if(existing&&(existing.sellingPriceSatang!==fields.sellingPriceSatang||existing.quantity!==fields.quantity))product=await saveProductListing(api,base,existing,fields);
   onCreated(product); // Keep a confirmed partial save so retry never creates the product twice.
   const cost=await api<Cost>(base+'/products/'+encodeURIComponent(product.sku)+'/cost-versions',{
     sku:product.sku,unitCostSatang:details.costSatang,effectiveFrom:details.effectiveFrom,

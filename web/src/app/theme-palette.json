@@ -1,0 +1,338 @@
+{
+  "name": "Claude × uniz",
+  "mode": "light",
+  "tokens": {
+    "canvas": "#FAF9F5",
+    "surface": "#FFFFFF",
+    "surfaceAlt": "#F0EEE6",
+    "sidebar": "#F4F2EC",
+    "text": "#141413",
+    "muted": "#66625A",
+    "border": "#E6E2D8",
+    "borderStrong": "#8C877D",
+    "sidebarFg": "#141413",
+    "sidebarMuted": "#66625A",
+    "navActiveBg": "#E8E5DC",
+    "navActiveFg": "#141413",
+    "navIndicator": "#C8643F",
+    "primary": "#B04F2C",
+    "primaryHover": "#933F22",
+    "onPrimary": "#FFFFFF",
+    "primaryDisabledBg": "#F0EEE6",
+    "primaryDisabledFg": "#8C877D",
+    "brandBright": "#D97757",
+    "link": "#A2482A",
+    "focus": "#B04F2C",
+    "gain": "#141413",
+    "gainBg": "#ECE9E1",
+    "gainFg": "#3B3833",
+    "loss": "#8E1238",
+    "lossBg": "#F7E3E8",
+    "warn": "#735C00",
+    "warnBg": "#F5EDCF",
+    "info": "#2F5784",
+    "infoBg": "#E5ECF4",
+    "chartRevenue": "#2B2A27",
+    "chartCost": "#8C877D",
+    "chartHighlight": "#B04F2C",
+    "chartLoss": "#8E1238",
+    "chartCh1": "#2B2A27",
+    "chartCh2": "#4E6E8E",
+    "chartCh3": "#9A7B3E"
+  },
+  "contrast": [
+    {
+      "label": "Body text / canvas",
+      "fg": "text",
+      "bg": "canvas",
+      "ratio": 17.5,
+      "min": 4.5,
+      "pass": true
+    },
+    {
+      "label": "Body text / card",
+      "fg": "text",
+      "bg": "surface",
+      "ratio": 18.43,
+      "min": 4.5,
+      "pass": true
+    },
+    {
+      "label": "Muted / card",
+      "fg": "muted",
+      "bg": "surface",
+      "ratio": 6.07,
+      "min": 4.5,
+      "pass": true
+    },
+    {
+      "label": "Muted / canvas",
+      "fg": "muted",
+      "bg": "canvas",
+      "ratio": 5.76,
+      "min": 4.5,
+      "pass": true
+    },
+    {
+      "label": "Muted / alt surface",
+      "fg": "muted",
+      "bg": "surfaceAlt",
+      "ratio": 5.23,
+      "min": 4.5,
+      "pass": true
+    },
+    {
+      "label": "Muted / sidebar",
+      "fg": "sidebarMuted",
+      "bg": "sidebar",
+      "ratio": 5.42,
+      "min": 4.5,
+      "pass": true
+    },
+    {
+      "label": "Active nav label",
+      "fg": "navActiveFg",
+      "bg": "navActiveBg",
+      "ratio": 14.64,
+      "min": 4.5,
+      "pass": true
+    },
+    {
+      "label": "Button label / primary",
+      "fg": "onPrimary",
+      "bg": "primary",
+      "ratio": 5.25,
+      "min": 4.5,
+      "pass": true
+    },
+    {
+      "label": "Button label / hover",
+      "fg": "onPrimary",
+      "bg": "primaryHover",
+      "ratio": 7.06,
+      "min": 4.5,
+      "pass": true
+    },
+    {
+      "label": "Disabled label (exempt)",
+      "fg": "primaryDisabledFg",
+      "bg": "primaryDisabledBg",
+      "ratio": 3.08,
+      "min": 0,
+      "pass": true
+    },
+    {
+      "label": "Link / card",
+      "fg": "link",
+      "bg": "surface",
+      "ratio": 6.01,
+      "min": 4.5,
+      "pass": true
+    },
+    {
+      "label": "Link / canvas",
+      "fg": "link",
+      "bg": "canvas",
+      "ratio": 5.7,
+      "min": 4.5,
+      "pass": true
+    },
+    {
+      "label": "Loss text / card",
+      "fg": "loss",
+      "bg": "surface",
+      "ratio": 9.16,
+      "min": 4.5,
+      "pass": true
+    },
+    {
+      "label": "Loss badge",
+      "fg": "loss",
+      "bg": "lossBg",
+      "ratio": 7.46,
+      "min": 4.5,
+      "pass": true
+    },
+    {
+      "label": "Gain badge",
+      "fg": "gainFg",
+      "bg": "gainBg",
+      "ratio": 9.62,
+      "min": 4.5,
+      "pass": true
+    },
+    {
+      "label": "Warning text / card",
+      "fg": "warn",
+      "bg": "surface",
+      "ratio": 6.44,
+      "min": 4.5,
+      "pass": true
+    },
+    {
+      "label": "Warning badge",
+      "fg": "warn",
+      "bg": "warnBg",
+      "ratio": 5.49,
+      "min": 4.5,
+      "pass": true
+    },
+    {
+      "label": "Info text / card",
+      "fg": "info",
+      "bg": "surface",
+      "ratio": 7.45,
+      "min": 4.5,
+      "pass": true
+    },
+    {
+      "label": "Info badge",
+      "fg": "info",
+      "bg": "infoBg",
+      "ratio": 6.26,
+      "min": 4.5,
+      "pass": true
+    },
+    {
+      "label": "Control border / card",
+      "fg": "borderStrong",
+      "bg": "surface",
+      "ratio": 3.57,
+      "min": 3,
+      "pass": true
+    },
+    {
+      "label": "Focus ring / card",
+      "fg": "focus",
+      "bg": "surface",
+      "ratio": 5.25,
+      "min": 3,
+      "pass": true
+    },
+    {
+      "label": "Focus ring / canvas",
+      "fg": "focus",
+      "bg": "canvas",
+      "ratio": 4.98,
+      "min": 3,
+      "pass": true
+    },
+    {
+      "label": "Primary button / card",
+      "fg": "primary",
+      "bg": "surface",
+      "ratio": 5.25,
+      "min": 3,
+      "pass": true
+    },
+    {
+      "label": "Active indicator / sidebar",
+      "fg": "navIndicator",
+      "bg": "sidebar",
+      "ratio": 3.51,
+      "min": 3,
+      "pass": true
+    },
+    {
+      "label": "Bright accent / sidebar (decorative)",
+      "fg": "brandBright",
+      "bg": "sidebar",
+      "ratio": 2.79,
+      "min": 0,
+      "pass": true
+    },
+    {
+      "label": "Chart revenue",
+      "fg": "chartRevenue",
+      "bg": "surface",
+      "ratio": 14.35,
+      "min": 3,
+      "pass": true
+    },
+    {
+      "label": "Chart cost",
+      "fg": "chartCost",
+      "bg": "surface",
+      "ratio": 3.57,
+      "min": 3,
+      "pass": true
+    },
+    {
+      "label": "Chart highlight",
+      "fg": "chartHighlight",
+      "bg": "surface",
+      "ratio": 5.25,
+      "min": 3,
+      "pass": true
+    },
+    {
+      "label": "Chart loss",
+      "fg": "chartLoss",
+      "bg": "surface",
+      "ratio": 9.16,
+      "min": 3,
+      "pass": true
+    },
+    {
+      "label": "Channel 2 slate",
+      "fg": "chartCh2",
+      "bg": "surface",
+      "ratio": 5.32,
+      "min": 3,
+      "pass": true
+    },
+    {
+      "label": "Channel 3 sand",
+      "fg": "chartCh3",
+      "bg": "surface",
+      "ratio": 3.98,
+      "min": 3,
+      "pass": true
+    },
+    {
+      "label": "Hairline border (decorative)",
+      "fg": "border",
+      "bg": "surface",
+      "ratio": 1.29,
+      "min": 0,
+      "pass": true
+    }
+  ],
+  "deltaE": [
+    {
+      "a": "primary",
+      "b": "loss",
+      "dE76": 33.7
+    },
+    {
+      "a": "primary",
+      "b": "warn",
+      "dE76": 37.6
+    },
+    {
+      "a": "warn",
+      "b": "loss",
+      "dE76": 61.8
+    },
+    {
+      "a": "brandBright",
+      "b": "loss",
+      "dE76": 40.4
+    },
+    {
+      "a": "chartHighlight",
+      "b": "chartLoss",
+      "dE76": 33.7
+    },
+    {
+      "a": "chartRevenue",
+      "b": "chartLoss",
+      "dE76": 53.6
+    },
+    {
+      "a": "info",
+      "b": "chartCh2",
+      "dE76": 12.8
+    }
+  ]
+}

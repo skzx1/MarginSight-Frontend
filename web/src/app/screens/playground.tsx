@@ -214,10 +214,7 @@ export default function Playground({
                           )}
                         </div>
                       ) : msg.error ? (
-                        <div className="notice error-notice">
-                          <strong>{t('errorTitle')}</strong>
-                          <ErrorNotice error={msg.error}/>
-                        </div>
+                        <ErrorNotice error={msg.error}/>
                       ) : null}
                     </div>
                   </div>

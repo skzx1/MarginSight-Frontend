@@ -3,7 +3,7 @@ import { useId, useState } from 'react';
 import { request } from '../../lib/auth';
 import { useAction } from '../../lib/use-resource';
 import { bangkokDate, dateAt, parseBaht } from '../../lib/format';
-import { baht, signedBaht, signedPercent } from '../../lib/signed-money';
+import { baht, percent, signedBaht } from '../../lib/signed-money';
 import type { CatalogProduct, FeatureProps } from '../../lib/types';
 import { useLanguage } from '../language';
 import { ErrorNotice, Submit } from '../components/forms';
@@ -316,7 +316,7 @@ export default function AddProductPage({
                   {signedBaht(draft.differenceSatang, locale)}
                 </strong>
                 <span className="metric-margin-pct tabular-num">
-                  {marginPct != null ? `${t('preFeeMargin')}: ${signedPercent(marginPct, locale)}` : '—'}
+                  {marginPct != null ? `${t('preFeeMargin')}: ${percent(marginPct, locale)}` : '—'}
                 </span>
               </div>
 

@@ -45,6 +45,16 @@ Paste the "Prompt" section into the new session. Everything it refers to is in t
 - Known risks: deuteranopia Shopee/LINE similarity; expense meter 3.08:1; 768px landing hero tile overlaps lead text; production AWS runs upstream 2bc06b9 theme values.
 - The owner floated Tailwind; recommendation given: not in this redesign (token/test architecture is CSS-module based); revisit later.
 
+## Cloud session result (2026-10-25, HEAD after 50a6f46)
+
+Items 1-12 of "Remaining" are implemented, independently reviewed and browser-verified on this branch (not pushed, not merged, not deployed).
+- Commits: 98599cc/5e11d57 QA tools for Linux · b138eb2 composer radius · fdfb4ce P4i + P5(a) · 5918480 P4e-1/P4e-2/G1 + chart labels · c65c642 P4f/P4g/G3 · e27f517, 6b99df5 review fixes · b75a77c, 1eef9a5, 3b0acc0, 7c9991a, 50a6f46 QA fixes.
+- `npm run verify` PASS (170/170 tests, build, package-deploy) on 50a6f46; empty diff vs c9b43a3 for format.ts, tests/frontend.test.mjs, domain.generated.*, lib/types.ts.
+- L2: computed semantic probe 0 issues TH+EN on the final-candidate build 3b0acc0 (only assistant CSS changed after it) → the L2 production blocker is closed on this branch.
+- QA evidence lives only in the session scratchpad (not committed): capture 15 pages x 9 widths TH+EN (0 overflow, 0 console errors), label probe (all chart text >= 12px, U+2212 ticks), typo/contrast/target audits 0 issues, R01-R09/R10-R14/R16-R19/R21/R26/R27/R33/R35-R41/R47 + deep links PASS.
+- Not run / unverified: R42 (mock has no posted fees), R15, R20, R22-R25, R28-R32, R34 in this session; manual Thai IME (Gboard/iOS) and screen readers.
+- Still open: landing hero animations only slow down under reduced motion (pre-existing, hero-depth.module.css); order deep links trust the API calculation for the key (needs a key field in the backend contract to validate); direct order link marks fees confirmed only when feeStatus is ACTUAL; achromatopsia donut pairs rely on the labelled legend; plus every item under "Open decisions" above.
+
 ## Prompt
 
 ```

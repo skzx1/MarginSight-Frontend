@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { request, download } from '../../lib/auth';
 import { useAction, useResource } from '../../lib/use-resource';
 import { bangkokDate } from '../../lib/format';
@@ -7,16 +7,40 @@ import type { Calculation, FeatureProps, OrderSummary, PageResult, Reconciliatio
 import { useLanguage } from '../language';
 import { Empty, ErrorNotice, Loading, Submit } from '../components/forms';
 import { DataStatus, EvidencePanel, Money } from '../components/ledger';
-export function Orders({ base, month }: FeatureProps) {
+import { Icon } from '../ui';
+import { SCREEN_TITLE_ID } from '../../lib/navigation';
+import { DETAIL_TITLE_ID } from '../../lib/routes';
+/** Orders list and evidence detail. The open order is the route (#orders/<key>, P4-G3): refresh, Back/Forward and links reopen it. */
+export function Orders({ base, month, detail, onDetail }: FeatureProps & { detail: string | null; onDetail: (key: string | null, options?: { replace?: boolean }) => void }) {
   const { t } = useLanguage();
   const [cursor, setCursor] = useState('');
   const { data, error, loading, reload } = useResource<PageResult<OrderSummary>>(base + '/orders?month=' + month + (cursor ? '&cursor=' + encodeURIComponent(cursor) : ''));
   const action = useAction();
   const [selected, setSelected] = useState<{ order: OrderSummary; result: Calculation }>();
-  const [checked, setChecked] = useState(false);
-  const open = (order: OrderSummary) => action.run(async () => { const result = await request<Calculation>(base + '/orders/' + order.key + '/calculation'); setChecked(false); setSelected({ order, result }); });
-  if (selected) return <><button className="ghost back-link" onClick={() => setSelected(undefined)}>← {t('orders')}</button><h2>{selected.order.orderId}</h2><ErrorNotice error={action.error} /><EvidencePanel result={selected.result} />{!selected.order.feesConfirmed && !!selected.result.postedFees?.length && <form className="confirm-panel" onSubmit={e => { e.preventDefault(); void action.run(async () => { const result = await request<Calculation>(base + '/orders/' + selected.order.key + '/settle', { confirmAllFeeLines: true, expectedInputHash: selected.result.inputHash }); setSelected({ order: { ...selected.order, feesConfirmed: true }, result }); setChecked(false); await reload(); }); }}><label className="check-field"><input type="checkbox" checked={checked} onChange={e => setChecked(e.target.checked)} />{t('feeReview')}</label><Submit busy={action.busy} disabled={!checked}>{t('confirmFees')}</Submit></form>}<button className="secondary" disabled={action.busy} onClick={() => void open(selected.order)}>{t('refresh')}</button></>;
-  return <><ErrorNotice error={error || action.error} />{error && <button className="secondary" onClick={() => void reload()}>{t('retry')}</button>}{loading && <Loading />}{data?.items.length === 0 && <Empty title={t('noOrders')} />}{data?.items.map(order => <button className="list-link" key={order.key} disabled={action.busy} onClick={() => void open(order)}><span><strong>{order.orderId}</strong><small>{bangkokDate(order.orderAt)} · {order.platform}</small></span><DataStatus value={order.feesConfirmed ? 'CONFIRMED' : 'ESTIMATED'} /><span aria-hidden="true">→</span></button>)}{data?.next && <button className="secondary" onClick={() => setCursor(data.next!)}>{t('next')}</button>}</>;
+  const [checked, setChecked] = useState(false), [linkMissing, setLinkMissing] = useState(false);
+  const wanted = useRef(detail), pending = useRef<string | null>(null); wanted.current = detail;
+  /** Fetch the calculation; true when it is shown (false after an error, or when the route moved on meanwhile). */
+  const open = async (order: OrderSummary) => { let shownNow = false; await action.run(async () => { const result = await request<Calculation>(base + '/orders/' + order.key + '/calculation'); if (wanted.current !== order.key) return; setChecked(false); setSelected({ order, result }); shownNow = true; }); return shownNow; };
+  // Route → detail: find the order in the loaded list, then fetch its calculation. Not in the list → list + notice; fetch failed → list + error.
+  const shown = selected && selected.order.key === detail ? selected : undefined;
+  useEffect(() => {
+    if (!detail || shown || !data) return;
+    const order = data.items.find(item => item.key === detail);
+    if (!order) { setLinkMissing(true); onDetail(null, { replace: true }); return; }
+    if (pending.current === order.key) return;
+    setLinkMissing(false); pending.current = order.key;
+    void open(order).then(ok => { pending.current = null; if (!ok && wanted.current === order.key) onDetail(null, { replace: true }); });
+  }, [detail, data]); // eslint-disable-line react-hooks/exhaustive-deps
+  // Focus (G7 F2): the detail heading on open; the originating list button on close.
+  const returnTo = useRef<string | null>(null);
+  useEffect(() => {
+    if (shown) { returnTo.current = shown.order.key; document.getElementById(DETAIL_TITLE_ID)?.focus(); return; }
+    const key = returnTo.current; if (!key) return; returnTo.current = null;
+    const row = [...document.querySelectorAll<HTMLElement>('[data-order-key]')].find(element => element.dataset.orderKey === key);
+    (row ?? document.getElementById(SCREEN_TITLE_ID))?.focus();
+  }, [shown?.order.key]); // eslint-disable-line react-hooks/exhaustive-deps
+  if (shown) return <><button className="ghost back-link" onClick={() => onDetail(null)}>← {t('orders')}</button><h2 id={DETAIL_TITLE_ID} tabIndex={-1}>{shown.order.orderId}</h2><ErrorNotice error={action.error} /><EvidencePanel result={shown.result} />{!shown.order.feesConfirmed && !!shown.result.postedFees?.length && <form className="confirm-panel" onSubmit={e => { e.preventDefault(); void action.run(async () => { const result = await request<Calculation>(base + '/orders/' + shown.order.key + '/settle', { confirmAllFeeLines: true, expectedInputHash: shown.result.inputHash }); setSelected({ order: { ...shown.order, feesConfirmed: true }, result }); setChecked(false); await reload(); }); }}><label className="check-field"><input type="checkbox" checked={checked} onChange={e => setChecked(e.target.checked)} />{t('feeReview')}</label><Submit busy={action.busy} disabled={!checked}>{t('confirmFees')}</Submit></form>}<button className="secondary" disabled={action.busy} onClick={() => void open(shown.order)}>{t('refresh')}</button></>;
+  return <>{linkMissing && <p className="notice info" role="status"><Icon name="info" />{t('orderLinkMissing')}</p>}<ErrorNotice error={error || action.error} />{error && <button className="secondary" onClick={() => void reload()}>{t('retry')}</button>}{loading && <Loading />}{data?.items.length === 0 && <Empty title={t('noOrders')} />}{data?.items.map(order => <button className="list-link" key={order.key} data-order-key={order.key} disabled={action.busy} onClick={() => { setLinkMissing(false); onDetail(order.key); }}><span><strong>{order.orderId}</strong><small>{bangkokDate(order.orderAt)} · {order.platform}</small></span><DataStatus value={order.feesConfirmed ? 'CONFIRMED' : 'ESTIMATED'} /><span aria-hidden="true">→</span></button>)}{data?.next && <button className="secondary" onClick={() => setCursor(data.next!)}>{t('next')}</button>}</>;
 }
 export function Settlement({ base, month }: FeatureProps) {
   const { t } = useLanguage();

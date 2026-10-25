@@ -83,6 +83,12 @@ export const copy = {
   assistantLauncherHelper: ['ถามเรื่องกำไร ต้นทุน หรือราคาขายของร้าน เช่น “ถ้าลดราคา 15% จะเหลือเท่าไร?”', 'Ask about your profit, costs or prices, e.g. “What would I keep after a 15% discount?”'],
   assistantLauncherAction: ['เปิดผู้ช่วย', 'Open the assistant'],
   // lane B (products, finance, deep links) keys:
+  productDetailTools: ['ลองคิดต่อกับสินค้านี้', 'Explore this product'],
+  productLinkMissing: ['ไม่พบสินค้าตามลิงก์นี้ จึงแสดงรายการสินค้าทั้งหมดแทน', 'The product in this link was not found, so the full product list is shown.'],
+  orderLinkMissing: ['ไม่พบออเดอร์ตามลิงก์นี้ในเดือนที่เลือก จึงแสดงรายการออเดอร์แทน', 'The order in this link is not in the selected month, so the order list is shown.'],
+  financeRecords: ['หลักฐานรายออเดอร์และยอดรับ', 'Order evidence and settlements'],
+  ordersCardBody: ['ดูหลักฐานการคำนวณของแต่ละออเดอร์ และยืนยันค่าธรรมเนียม', 'See the calculation evidence for each order and confirm its fees.'],
+  reconciliationCardBody: ['เทียบค่าธรรมเนียมที่ประมาณไว้กับยอดที่แพลตฟอร์มหักจริง', 'Compare estimated fees with what the platform actually deducted.'],
   // lane C (remaining screens) keys:
 } as const;
 export type CopyKey = keyof typeof copy;

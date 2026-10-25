@@ -2,7 +2,8 @@
 import { createContext, Fragment, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { logout } from '../../lib/auth';
-import { MONTH_SCREENS, NAV_GROUPS, OWN_HEADER_SCREENS, PERIOD_SCREENS, SCREENS, createArrivalFocus, navState, nextDrawerOpen, parentScreen, type DrawerEvent } from '../../lib/navigation';
+import { MONTH_SCREENS, NAV_GROUPS, OWN_HEADER_SCREENS, PERIOD_SCREENS, SCREEN_TITLE_ID, createArrivalFocus, navState, nextDrawerOpen, parentScreen, type DrawerEvent } from '../../lib/navigation';
+import { DETAIL_SCREENS, DETAIL_TITLE_ID, formatHash, parseHash, routeChange, type Route } from '../../lib/routes';
 import type { Screen, Store } from '../../lib/types';
 import { LanguageSwitch, useLanguage } from '../language';
 import { Brand, Icon } from '../ui';
@@ -11,31 +12,44 @@ import { Field, Select } from './forms';
 import assistantStyles from './assistant.module.css';
 import financeStyles from './finance.module.css';
 export { parentScreen } from '../../lib/navigation';
-/** Optional arrival intent: the id of the element the destination screen focuses itself (A11), so the shell skips the h1. */
-export type NavigateOptions = { focus?: string };
+/**
+ * focus: arrival intent, the id of the element the destination screen focuses itself (A11), so the shell skips the h1.
+ * detail: open a detail route (#products/<sku>, #orders/<key>); omitted = the screen itself (list).
+ * replace: rewrite the current history entry instead of adding one (e.g. a deep link whose id was not found).
+ */
+export type NavigateOptions = { focus?: string; detail?: string | null; replace?: boolean };
 const TABLET = '(min-width:768px) and (max-width:1023px)';
+const withHash = (hash: string) => location.pathname + location.search + hash;
 export function useNavigation() {
-  const [screen, setScreen] = useState<Screen>('overview');
-  const current = useRef<Screen>('overview'), guard = useRef<(() => boolean) | null>(null), arrival = useRef(createArrivalFocus());
+  const [route, setRoute] = useState<Route>({ screen: 'overview', detail: null });
+  const current = useRef<Route>(route), guard = useRef<(() => boolean) | null>(null), arrival = useRef(createArrivalFocus());
   const registerGuard = useCallback((check: () => boolean) => { guard.current = check; return () => { if (guard.current === check) guard.current = null; }; }, []);
   const canLeave = useCallback(() => guard.current?.() ?? true, []);
   useEffect(() => {
+    // Back/forward, refresh and typed URLs. A refused screen change restores the previous full hash (detail included).
     const read = () => {
-      const candidate = location.hash.slice(1) as Screen, next = SCREENS.includes(candidate) ? candidate : 'overview';
-      if (next !== current.current && !canLeave()) { history.replaceState(history.state, '', location.pathname + location.search + '#' + current.current); return; }
-      if (next !== current.current) arrival.current.clear();
-      current.current = next; setScreen(next);
+      const next = parseHash(location.hash), change = routeChange(current.current, next);
+      if (change === 'none') return;
+      if (change === 'screen' && !canLeave()) { history.replaceState(history.state, '', withHash(formatHash(current.current))); return; }
+      arrival.current.clear();
+      current.current = next; setRoute(next);
     };
     read(); window.addEventListener('hashchange', read); return () => window.removeEventListener('hashchange', read);
   }, [canLeave]);
-  const navigate = useCallback((next: Screen, options?: NavigateOptions) => {
-    if (next === current.current || !canLeave()) return;
-    arrival.current.set(options?.focus);
-    current.current = next; if (location.hash !== '#' + next) location.hash = next; setScreen(next);
+  const navigate = useCallback((screen: Screen, options?: NavigateOptions) => {
+    const next: Route = { screen, detail: DETAIL_SCREENS.includes(screen) ? options?.detail ?? null : null };
+    const change = routeChange(current.current, next);
+    if (change === 'none' || (change === 'screen' && !canLeave())) return;
+    if (change === 'screen') arrival.current.set(options?.focus);
+    current.current = next;
+    const hash = formatHash(next);
+    if (options?.replace) history.replaceState(history.state, '', withHash(hash));
+    else if (location.hash !== hash) location.hash = hash.slice(1);
+    setRoute(next);
   }, [canLeave]);
   /** The element id to focus for this arrival (the h1 unless the caller passed an intent); consumes the intent. */
   const takeArrivalFocus = useCallback(() => arrival.current.take(), []);
-  return { screen, navigate, registerGuard, canLeave, takeArrivalFocus };
+  return { screen: route.screen, detail: route.detail, navigate, registerGuard, canLeave, takeArrivalFocus };
 }
 const ScreenActionsSlot = createContext<HTMLElement | null>(null);
 /** Renders a screen's own header actions (e.g. finance Export) into the shared page header. */
@@ -55,7 +69,10 @@ export function AppShell({ screen, navigate, stores, store, changeStore, month, 
   // Focus moves only when the screen changes (not on a language switch). An arrival intent (A11) hands focus to the screen.
   useEffect(() => {
     window.scrollTo(0, 0);
-    const target = document.getElementById(takeArrivalFocus?.() ?? 'screen-title');
+    // Arriving on a detail route that is already rendered (e.g. Back from the assistant to #products/<sku>) focuses the detail heading.
+    const wanted = takeArrivalFocus?.() ?? SCREEN_TITLE_ID;
+    const id = wanted === SCREEN_TITLE_ID && document.getElementById(DETAIL_TITLE_ID) ? DETAIL_TITLE_ID : wanted;
+    const target = document.getElementById(id) ?? document.getElementById(SCREEN_TITLE_ID);
     if (target && document.activeElement !== target) target.focus({ preventScroll: true });
   }, [screen]); // eslint-disable-line react-hooks/exhaustive-deps
   // Tablet drawer (768-1023, non-modal overlay): closes on screen change, nav choice, scrim click, Escape (focus → toggle) and leaving the tablet range.

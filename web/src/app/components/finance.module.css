@@ -87,13 +87,22 @@
 .expenseForm label{display:grid;gap:4px;font-size:var(--text-sm)}
 .formActions{display:flex;justify-content:flex-end;gap:12px;align-items:center;flex-wrap:wrap;grid-column:1/-1}
 .formMessage{grid-column:1/-1;margin:0;color:var(--color-negative)}
-.jumpLinks{display:flex;gap:20px;overflow:auto;border-bottom:1px solid var(--color-border)}
-.jumpLinks a{min-height:44px;display:flex;align-items:center;white-space:nowrap;color:var(--color-link);font-weight:500;font-size:var(--text-sm);text-decoration:underline;text-underline-offset:3px}
-.page section[id]{scroll-margin-top:20px}
+/* Sticky section nav (P4g). The 6px padding keeps the 3px focus ring + 3px offset inside the scroll box (no clipping). */
+.jumpLinks{position:sticky;top:0;z-index:5;display:flex;gap:4px;overflow-x:auto;padding:6px;background:var(--color-bg-canvas);border-bottom:1px solid var(--color-border);scrollbar-width:thin}
+.jumpLinks a{flex-shrink:0;min-height:44px;min-width:44px;padding:0 12px;display:flex;align-items:center;justify-content:center;white-space:nowrap;border-radius:var(--radius-sm);color:var(--color-link);font-weight:500;font-size:var(--text-sm);line-height:1.6;text-decoration:underline;text-underline-offset:3px}
+.jumpLinks a:hover{background:var(--color-bg-subtle)}
+/* Jump targets clear the sticky nav (44px link + 12px padding + border). */
+.page [id^=finance-]{scroll-margin-top:76px}
+.recordCards{display:grid;gap:12px;margin-top:16px}
+.page .recordCard{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;justify-content:stretch;gap:12px;padding:16px;border-radius:var(--radius-lg);text-align:left;font-weight:400;white-space:normal}
+.recordCard>svg{width:20px;height:20px;color:var(--color-text-muted)}
+.recordCard>span{display:grid;gap:4px}
+.recordCard strong{font-weight:600}
+.recordCard small{line-height:1.6}
 .chartEmpty{padding:50px 10px;text-align:center;color:var(--color-text-muted)}
 .skeleton{height:120px;background:var(--color-bg-subtle);border-radius:var(--radius-lg)}
 .loading{display:grid;gap:16px}
-@media(min-width:768px){.page .kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.orderFilters{grid-template-columns:2fr 1fr}.rankingGrid,.expenseForm{grid-template-columns:repeat(2,minmax(0,1fr))}.panel{padding:24px}}
+@media(min-width:768px){.page .kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.orderFilters{grid-template-columns:2fr 1fr}.rankingGrid,.expenseForm,.recordCards{grid-template-columns:repeat(2,minmax(0,1fr))}.panel{padding:24px}}
 @media(min-width:1024px){.page .kpis{grid-template-columns:repeat(3,minmax(0,1fr))}.summaryGrid{grid-template-columns:minmax(320px,.9fr) minmax(0,1.1fr)}}
 @media(min-width:1600px){.page .kpis{grid-template-columns:repeat(6,minmax(0,1fr))}}
 @media(max-width:767px){.controls>label{width:100%}.warning{align-items:flex-start;flex-direction:column}.statement>div{gap:8px;grid-template-columns:minmax(0,1fr) auto 44px}.statement .net{font-size:var(--text-md)}.panel{padding:16px}.page h2{font-size:var(--text-base)}.kpi h2{font-size:var(--text-sm)}}

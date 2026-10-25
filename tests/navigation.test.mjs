@@ -101,3 +101,14 @@ test('N3: the tablet drawer closes on nav choice, scrim, Escape, screen change a
     assert.equal(nextDrawerOpen(false, event), false, event);
   }
 });
+
+test('P4-G3: the shell reads routes through lib/routes; a refused screen change restores the previous full hash', () => {
+  const shell = readFileSync(new URL('../web/src/app/components/shell.tsx', import.meta.url), 'utf8');
+  const read = shell.slice(shell.indexOf('const read = () =>'), shell.indexOf("window.addEventListener('hashchange', read)"));
+  assert.match(read, /parseHash\(location\.hash\)/);
+  assert.match(read, /change === 'screen' && !canLeave\(\)\) \{ history\.replaceState\(history\.state, '', withHash\(formatHash\(current\.current\)\)\); return; \}/);
+  const navigate = shell.slice(shell.indexOf('const navigate = useCallback'), shell.indexOf('const takeArrivalFocus'));
+  assert.match(navigate, /change === 'screen' && !canLeave\(\)/, 'navigate asks the guard once, for screen changes only');
+  assert.match(navigate, /if \(change === 'screen'\) arrival\.current\.set\(options\?\.focus\)/, 'A11 intent is kept for screen arrivals');
+  assert.doesNotMatch(shell, /location\.hash\.slice\(1\) as Screen/, 'no direct Screen cast of the hash');
+});

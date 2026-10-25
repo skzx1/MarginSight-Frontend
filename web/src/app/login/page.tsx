@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { demo, fullDemo, fullDemoMode, localMode, login, request, session } from '../../lib/auth';
 import { bangkokDate } from '../../lib/format';
 import { useAction } from '../../lib/use-resource';
@@ -29,7 +29,10 @@ import s from './login.module.css';
 import assistantStyles from '../components/assistant.module.css';
 
 function StoreWorkspace({ stores, store, changeStore, create }: { stores: Store[]; store: Store; changeStore: (id: string) => void; create: () => void }) {
-  const { screen, navigate, registerGuard, canLeave, takeArrivalFocus } = useNavigation();
+  const { screen, detail, navigate, registerGuard, canLeave, takeArrivalFocus } = useNavigation();
+  // Detail routes (P4-G3): #products/<sku>, #orders/<key>. Opening/closing stays on the screen (no leave guard, no h1 focus).
+  const productDetail = useCallback((sku: string | null, options?: { replace?: boolean }) => navigate('products', { detail: sku, replace: options?.replace }), [navigate]);
+  const orderDetail = useCallback((key: string | null, options?: { replace?: boolean }) => navigate('orders', { detail: key, replace: options?.replace }), [navigate]);
   const [localStoreName, setLocalStoreName] = useState<string>();
   const { t } = useLanguage();
   const [month, setMonth] = useState(bangkokDate().slice(0, 7));
@@ -62,7 +65,8 @@ function StoreWorkspace({ stores, store, changeStore, create }: { stores: Store[
     catch (e) { if (id === version.current) setCatalogError(e); }
     finally { if (id === version.current) setLoading(false); }
   };
-  useEffect(() => { void refresh(); return () => { version.current++; }; }, [base, screen]);
+  // Arriving on #products/<sku> keeps loading pages until that SKU is found (refresh(targetSku)).
+  useEffect(() => { void refresh(screen === 'products' ? detail ?? undefined : undefined); return () => { version.current++; }; }, [base, screen]); // eslint-disable-line react-hooks/exhaustive-deps
   const loadMore = async () => {
     if (!more || loading) return;
     const id = ++version.current; setLoading(true); setCatalogError(undefined);
@@ -80,10 +84,10 @@ function StoreWorkspace({ stores, store, changeStore, create }: { stores: Store[
       <div key={key} className={'screen-content screen-' + screen}>
         {screen === 'overview' && <Overview {...props} navigate={navigate} period={overviewPeriod} onMissingCosts={() => { setMissingCostsOnly(true); navigate('products'); }} />}
         {screen === 'finance' && <Finance key={base} {...props} period={overviewPeriod} onPeriodChange={setOverviewPeriod} navigate={navigate} onMissingCosts={() => { setMissingCostsOnly(true); navigate('products'); }} />}
-        {screen === 'products' && <Products {...props} loading={loading} products={products} more={more} loadMore={() => void loadMore()} refresh={refresh} ask={ask} simulate={simulate} onAddProduct={() => navigate('addProduct')} initialMissingCostsOnly={missingCostsOnly} />}
+        {screen === 'products' && <Products {...props} loading={loading} products={products} more={more} loadMore={() => void loadMore()} refresh={refresh} ask={ask} simulate={simulate} onAddProduct={() => navigate('addProduct')} initialMissingCostsOnly={missingCostsOnly} detail={detail} onDetail={productDetail} catalogFailed={!!catalogError} />}
         {screen === 'addProduct' && <AddProductPage {...props} existingProducts={products} onCancel={() => navigate('products')} onSaved={newProd => { setProducts(old => [newProd, ...old.filter(p => p.sku !== newProd.sku)]); navigate('products'); }} onBatchSaved={batch => { const skus = new Set(batch.map(b => b.sku)); setProducts(old => [...batch, ...old.filter(p => !skus.has(p.sku))]); }} />}
         {screen === 'simulation' && <Simulation {...props} products={products} initialSku={selectedSku} />}
-        {screen === 'orders' && <Orders {...props} />}
+        {screen === 'orders' && <Orders {...props} detail={detail} onDetail={orderDetail} />}
         {screen === 'reconciliation' && <Settlement {...props} />}
         {screen === 'imports' && <Imports {...props} />}
         {screen === 'receipts' && <Receipts {...props} products={products} refreshProducts={refresh} />}

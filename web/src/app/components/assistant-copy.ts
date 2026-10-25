@@ -4,7 +4,7 @@ export const assistantCopy = {
   untitled: ['แชตใหม่', 'New chat'], noHistory: ['บทสนทนาของคุณจะอยู่ที่นี่', 'Your conversations will appear here'],
   local: ['บันทึกในเบราว์เซอร์นี้', 'Saved in this browser'], localNote: ['แยกตามบัญชีและร้าน · ยังไม่ซิงก์ข้ามอุปกรณ์', 'Separate for each account and store · No device sync'],
   greeting: ['วันนี้ให้ช่วยเรื่องอะไรดี?', 'What can I help you with?'],
-  intro: ['ถามเรื่องทั่วไปได้เลย หรือดูข้อมูลกำไรจากร้านพร้อมที่มาของตัวเลข', 'Ask general questions or check shop profit with recorded evidence.'],
+  intro: ['คุยทั่วไปหรือถามข้อมูลร้านได้ ผู้ช่วยใช้ 5 ข้อความล่าสุดของแชตนี้ประกอบคำถามต่อเนื่อง เรื่องกำไรจะตรวจข้อมูลและแสดงที่มา', 'Chat or ask about your shop. The assistant uses the last 5 messages in this chat for follow-ups and checks recorded data for profit questions.'],
   prompts: ['ลองเริ่มจากคำถามเหล่านี้', 'A few places to start'],
   profitPrompt: ['กำไรเดือนนี้เหลือเท่าไร?', 'How much profit this month?'],
   rankingPrompt: ['สินค้าไหนกำไรน้อยที่สุด?', 'Which product earns the least?'],

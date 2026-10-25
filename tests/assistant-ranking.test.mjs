@@ -5,7 +5,12 @@ import {answerQuestion} from '../web/src/lib/assistant-service.ts';
 const context={start:'2026-10-01',end:'2026-10-25',sku:'CUP-003'};
 const values=[['BAG-001',900],['BAG-002',5420],['CUP-003',7720],['CASE-004',5020],['CAP-005',4720],['BOOK-006',3020]];
 const rows=values.map(([sku,profitSatang])=>({orderId:sku,platform:'mock',orderAt:'2026-10-15T05:00:00Z',items:[{sku}],revenueSatang:20000,profitSatang,cogsSatang:10000,feeSatang:2000,sellerShippingSatang:0,packagingSatang:0,adsSatang:0,status:'COMPLETE',missingFields:[]}));
-function ask(question,results=rows){return answerQuestion({base:'/stores/Q',question,context,products:[],locale:'th',signal:new AbortController().signal},async(path,body)=>body?.mode==='chat'?{kind:'STORE_DATA'}:{totalOrders:results.length,results});}
+// These fixtures test display and forwarding; actual ranking is covered by Backend tests.
+function ask(question,results=rows){
+ const eligible=results.filter(r=>r.profitSatang!==null&&r.items.length===1),low=/น้อย|ต่ำ|least|lowest/i.test(question);eligible.sort((a,b)=>(low?a.profitSatang-b.profitSatang:b.profitSatang-a.profitSatang)||a.items[0].sku.localeCompare(b.items[0].sku,'en'));const rank=requestedRank(question),row=eligible[rank-1];
+ const response=row&&rank>0?{provider:'calculator',decision:{route:'FEE_PIPELINE'},answer:'ลำดับ '+rank,result:{label:'อันดับ '+rank+' · '+row.items[0].sku,profitSatang:row.profitSatang},context:{...context,sku:null}}:{provider:'clarify',decision:{route:'FEE_PIPELINE'},answer:'มีสินค้าที่ข้อมูลครบ '+eligible.length+' รายการ'};
+ return answerQuestion({base:'/stores/Q',question,context,products:[],locale:'th',signal:new AbortController().signal},async(path,body)=>{assert.equal(path,'/stores/Q/assistant');assert.equal(body.mode,'chat');return response;});
+}
 test('ordinal parsing accepts Thai digits/words and uses the last explicit requested rank',()=>{
  for(const q of ['อันดับ 2','อันดับที่ 2','อันดับที่สอง','อันดับ ๒','rank 2','second highest'])assert.equal(requestedRank(q),2,q);
  assert.equal(requestedRank('อันดับ 2\nแล้วอันดับ 3 ล่ะ'),3);

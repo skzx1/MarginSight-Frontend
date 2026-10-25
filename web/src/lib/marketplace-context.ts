@@ -26,6 +26,13 @@ export function marketplaceRequest(d:MarketplaceDraft,options:MarketplaceOptions
  if(d.platform==='recorded')return undefined;
  const p=options?.platforms.find(p=>p.id===d.platform);
  if(!p||!p.categories.some(c=>c.id===d.category)||d.campaigns.some(id=>!p.campaigns.some(c=>c.id===id)))throw Error('INVALID_SCENARIO_CONTEXT');
+ return marketplacePayload(d);
+}
+// Serialization only: the server validates platform/category/campaign membership.
+// Sending a chat message never needs an extra options request or client-side routing.
+export function marketplacePayload(d:MarketplaceDraft){
+ if(!validMarketplaceDraft(d))throw Error('INVALID_SCENARIO_CONTEXT');
+ if(d.platform==='recorded')return undefined;
  if(!d.confirmed)throw Error('SCENARIO_ACKNOWLEDGEMENT_REQUIRED');
  if(new Set(d.campaigns).size!==d.campaigns.length||d.campaigns.includes('tiktok-bcd')&&d.campaigns.includes('tiktok-flash'))throw Error('INVALID_SCENARIO_CONTEXT');
  if(d.sellerType==='MALL'&&d.growthTier==='SMALL')throw Error('INVALID_SCENARIO_CONTEXT');

@@ -6,7 +6,7 @@ import type { CatalogProduct, FeatureProps } from '../../lib/types';
 import { bangkokDate, money } from '../../lib/format';
 import { contextLabel, contextPreset, resolveChatContext, answerReferenceLabel } from '../../lib/assistant-context';
 import { answerQuestion } from '../../lib/assistant-service';
-import { createChat, sessionTitle, validContext, type ChatContext, type ChatTurn } from '../../lib/assistant-sessions';
+import { createChat, sessionTitle, validContext, recentChatMessages, type ChatContext, type ChatTurn } from '../../lib/assistant-sessions';
 import { useLanguage } from '../language';
 import { Icon } from '../ui';
 import { EvidencePanel, Money } from '../components/ledger';
@@ -138,10 +138,9 @@ export default function Assistant({ base, guest, origin, products, initialSku, d
     const controller = new AbortController();
     pending.current.set(sessionId, { turnId: turn.id, controller });
     try {
-      const earlier=archive.sessions.find(chat=>chat.id===sessionId)?.turns??[];
-      const stop=earlier.findIndex(item=>item.id===turn.id);
-      const history=(stop<0?earlier:earlier.slice(0,stop)).filter(item=>item.state==='complete'&&item.reply?.conversation==='general'&&item.reply.source==='assistant').slice(-4).flatMap(item=>[{role:'user' as const,text:item.question},{role:'assistant' as const,text:item.reply!.text}]);
-      const reply = await answerQuestion({ base, question: turn.requestQuestion ?? turn.question, context: turn.context, products, locale, signal: controller.signal,history });
+      const session = archive.sessions.find(chat => chat.id === sessionId);
+      const history = recentChatMessages(session?.turns ?? [], turn.id);
+      const reply = await answerQuestion({ base, question: turn.question, context: turn.context, history, products, locale, signal: controller.signal });
       if (!controller.signal.aborted) updateSession(sessionId, chat => ({ ...chat, updatedAt: new Date().toISOString(), turns: chat.turns.map(item => item.id === turn.id ? { ...item, reply, state: 'complete' } : item) }));
     } catch {
       if (!controller.signal.aborted) updateSession(sessionId, chat => ({ ...chat, turns: chat.turns.map(item => item.id === turn.id ? { ...item, state: 'failed' } : item) }));

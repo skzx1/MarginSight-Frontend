@@ -1,9 +1,16 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { createChat, historyGroup, localChatStorage, parseArchive, sessionTitle, validContext } from '../web/src/lib/assistant-sessions.ts';
+import { createChat, historyGroup, localChatStorage, parseArchive, sessionTitle, validContext, recentChatMessages } from '../web/src/lib/assistant-sessions.ts';
 import { contextPreset, monthContext, resolveChatContext } from '../web/src/lib/assistant-context.ts';
 
 const context = { start: '2026-10-01', end: '2026-10-17', sku: null };
+test('router history includes only the last five completed messages before a turn; retries exclude later turns', () => {
+  const turns = Array.from({length:5},(_,i)=>({id:String(i),question:'q'+i,state:'complete',createdAt:'2026-10-01',context,reply:{text:'a'+i,source:'assistant',context}}));
+  assert.deepEqual(recentChatMessages(turns,'new').map(m=>m.text),['a2','q3','a3','q4','a4']);
+  assert.deepEqual(recentChatMessages(turns,'2').map(m=>m.text),['q0','a0','q1','a1']);
+  assert.deepEqual(recentChatMessages([{...turns[0],state:'failed'}, {...turns[1],state:'pending'}],'new'),[]);
+  assert.deepEqual(recentChatMessages([],'new'),[]);
+});
 test('chat archive saves, restores, deletes and isolates storage keys', () => {
   const map = new Map(), storage = { getItem: key => map.get(key) ?? null, setItem: (key, value) => map.set(key, value) };
   const a = localChatStorage('account-a/store-a', storage), b = localChatStorage('account-b/store-a', storage);

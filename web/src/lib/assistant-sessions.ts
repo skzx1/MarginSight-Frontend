@@ -15,6 +15,14 @@ export type ChatTurn = {
   id: string; question: string; requestQuestion?: string; createdAt: string; context: ChatContext;
   reply?: ChatReply; state: 'pending' | 'complete' | 'failed' | 'stopped';
 };
+export function recentChatMessages(turns: ChatTurn[], beforeId: string): Array<{role: 'user' | 'assistant';text:string}> {
+  const index = turns.findIndex(t => t.id === beforeId);
+  const previous = index < 0 ? turns : turns.slice(0, index);
+  return previous.filter(t => t.state === 'complete' && t.reply).flatMap(t => [
+    { role: 'user' as const, text: t.question.slice(0, 1500) },
+    { role: 'assistant' as const, text: t.reply!.text.slice(0, 4500) }
+  ]).slice(-5);
+}
 export type ChatSession = {
   id: string; title: string; renamed?: boolean; createdAt: string; updatedAt: string;
   context: ChatContext; turns: ChatTurn[]; draft: string;

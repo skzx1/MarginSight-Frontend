@@ -198,3 +198,8 @@ One76file publication to existing privateS3 and7path invalidation, confirmedComp
 Fresh STS109991964227 / ap-southeast-1 and budget gates before publication13:10:31UTC: cap350USD total, existing operator trial25USD; laggedActualSpend0.034USD, LastUpdated11:46:19.853UTC. Not current remaining credit or final measured deployment cost.
 
 Frontend-only74file publication and one wildcardCloudFrontinvalidation, with privateS3readback and old-static backup in ephemeralCloudShelltmp. Existing backend was concurrently updated by another release and deliberately preserved after source verification. No new IAM/resources/paidcapacity/model switch/indexrebuild/training/Marketplace action or REALmerchant write. One isolatedMOCK browser session; zero model generations/OCR/LINE calls from this release. Build/static/API/storage/CDN/log usage may accrue; ordinary operational monitoring remains necessary.
+
+
+## R2 static publication — 25 October 2026
+
+Verified account109991964227 / ap-southeast-1, total team cap350USD and existing trial target25USD. Fresh budget gates; reported laggedActualSpend0.034USD, LastUpdated2026-10-25 11:46:19.853000+00:00; not real-time remaining credit or final release bill. One74file publication and one wildcardCloudFrontinvalidation, plus private readback and old-static backup in ephemeralCloudShelltmp. No new resources/IAM/paidcapacity/model switch/index rebuild/training/Marketplace or backend overwrite. One isolatedMOCK browser shop and one financial assistant request; actualmodel calls/tokens not measured. No REALmerchant writes/OCR/LINE operations. Ordinary build/API/Lambda/Bedrock/DynamoDB/S3/CDN/log usage can accrue.

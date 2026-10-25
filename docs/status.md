@@ -191,3 +191,12 @@ Status remains PARTIAL_WITH_EXTERNAL_BLOCKERS for the previously recorded real r
 ## Requested answer cards and listed-fee subtotal — local verification
 
 Frontend70 and Backend81 tests/builds pass. Catalog answers now include a separate summary card with original/discounted price, cost, calculated fees and backend-owned remaining-after-known-fees subtotal. Monthly result cards remain actual-order measures. Removed the requested long base-fee warning; the numeric subtotal explicitly deducts only calculated fee lines, while missingFields and netProfit:null remain unchanged. Unknown fees/costs are not converted to zero or described as complete net profit. Verified hypothetical200THB discounted price,120cost,24.19known fees gives55.81remaining; complete44.19fees gives35.81. No financial history or campaign enrollment mutation. Deployment pending at this source commit.
+
+
+## AWS verified: numeric answer cards and listed-fee subtotal — 25 October 2026
+
+Runtime Frontend `d2f12d52433ecae3b2ccafbffd4a6fd7c91ca7ed`, Backend `8ee733d91fa95af292fbf63d621c9a6f9ff48195`. Reviewed exact logged change set `samcli-deploy1792919770` executed09:17:57UTC; stack UPDATE_COMPLETE, seven Lambda hashes match reviewed bundle. Frontend published09:19:53UTC,18object hashes verified; invalidation `I78F5Y93IWBFWO9FPFJ046THQ6` Completed, public release commit matches. No resource/parameter/IAM changes.
+
+AWS API09:21:06UTC: catalog250→200, cost120, known Lazada fees17.12, remaining62.88. Full platform fee total and net profit remain null when base rates/other expenses are missing; no zero substitution or financial-history writes. Requested long warning removed from new answers, replaced with numeric subtotal and a clear listed-deductions scope. Browser existing session survives reload; BAG-001200→160, cost130, fees13.70, card remaining16.30. Card has per-unit scope, rows and collapsed calculation detail; monthly recorded268/6orders unchanged. Old historical replies remain unchanged; ask again or regenerate to see the new card.
+
+All earlier usage-quota removals remain active. PARTIAL_WITH_EXTERNAL_BLOCKERS unchanged for external acceptance inputs previously listed.

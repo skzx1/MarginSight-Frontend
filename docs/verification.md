@@ -435,3 +435,12 @@ User requested all app usage limits removed: no 2-hour guest lifetime, daily/ses
 - AWS API at09:02:25UTC: nonExpiring new session, backdated old expiry accepted/cleared; repeated reads and merchant0/edited metadata preserved; custom no-order product discount exact; no saved scenario. Spoofed price400, tenant403, origin403, normal no-auth401, private S3403. Existing legacy fixture backfill was VERIFIED_LOCAL; pre-release legacy-session creation was blocked by the old global quota, so do not claim that backfill was tested on an old live tenant this release. Fresh seven-row listings verified live.
 - AWS browser: one-click entry succeeds; seven price/quantity rows; no2-hour/3-import/3-AI quota copy. Campaign dialog inputs checkbox/radio only,0selects/0details. Lazada Premium selection applied to catalog discount; monthly268 from6orders with campaign excluded from actual totals. Screenshots in Frontend `.local/catalog-scenarios-20261025/evidence/`.
 - Safe machine-readable proof (ignored, no raw capability): `.local/catalog-scenarios-20261025/aws-final-report.json` and `browser-verification.json`. Runtime commits, stack/change-set/invalidation IDs in status.md. Do not commit raw sessions/backups/merchant records.
+
+
+## 25 October 2026 answer-card/subtotal verification
+
+Frontend70 / Backend81 tests and Python6 operator tests pass in CloudShell, plus typechecks/static export/bundled handlers/domain contract. Tests cover exact complete-vs-partial known fees, zero, missing cost, negative subtotal display, no invented net profit, persistence and malformed stored summary rejection. Frontend only displays backend satang fields.
+
+AWS/API: known fee17.12 and subtotal62.88 under incomplete base-rate assumptions; obsolete warning absent; actual monthly268 and6orders unchanged, tenant/origin403, spoofed-price400, no-auth401/privateS3403. Non-expiring guest session and backdated old expiry checks still pass. Browser card16.30 after13.70knownfees, calculation details collapsed, prior session/history survived refresh. No REAL merchant writes or model/OCR inference. Evidence ignored under `.local/summary-cards-20261025/aws-final-report.json`, `browser-verification.json`; Frontend screenshots `evidence/aws-card.png` and `evidence/aws-assistant.png`.
+
+Preparation encountered two available change sets; no arbitrary/latest selection was executed. Selected only the exact ARN printed in the current SAM preparation log, then independently reviewed it and rechecked live drift/budget before execution. The other available change set was not executed.

@@ -165,3 +165,8 @@ VERIFIED_AWS appearance: Frontend2bc06b9 is live with user-provided cream/ink/te
 ## Product listing persistence — 25 October 2026
 
 VERIFIED_LOCAL; AWS pending at this commit. Manual/CSV creation saves price and entered quantity. Existing products have an edit form with conflict protection; unknown remains unknown and historic finance is unchanged. See product-listing.md and verification.md. Overall PARTIAL_WITH_EXTERNAL_BLOCKERS remains.
+
+
+## Product prices live — 25 October 2026
+
+VERIFIED_AWS for product listing persistence and corrections. Frontendf9bc84e/Backend5b61c6a deployed and checked; local/CloudShell56+70tests/Python6. Price and merchant-entered quantity survive create/edit/refresh; cost/history unaffected; zero/missing and tenant/version guards pass. Existing Fee Rules runtime/parameters preserved. Old discarded inputs require one manual re-entry. See latest verification.md and product-listing.md. Overall PARTIAL_WITH_EXTERNAL_BLOCKERS remains.

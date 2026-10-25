@@ -7,7 +7,9 @@
 .playgroundLink svg{width:18px;height:18px;flex-shrink:0}
 .playgroundLink:hover{color:var(--color-action)}
 .playgroundLink:focus-visible{outline:var(--focus-width,3px) solid var(--color-focus);outline-offset:var(--focus-offset,3px)}
-.summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));background:var(--color-bg-surface);border:1px solid var(--color-border);border-radius:var(--radius-lg);margin-bottom:24px;overflow:hidden;box-shadow:none}
+.summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));background:var(--color-bg-surface);border:1px solid var(--color-border);border-radius:var(--radius-lg);margin-bottom:24px;box-shadow:none}
+/* No overflow clip on .summary (it cut the 3px focus ring); the last button carries the card's right corners instead. */
+.summary>:last-child{border-radius:0 calc(var(--radius-lg) - 1px) calc(var(--radius-lg) - 1px) 0}
 .summaryTotal,.summaryAction{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:4px;padding:20px 24px;min-height:104px;min-width:0}
 .summary strong{font:600 var(--text-2xl)/1.4 var(--font-numeric);font-variant-numeric:tabular-nums;color:var(--color-text)}
 .summaryTotal>span,.summaryAction>span{display:flex;align-items:center;gap:8px;font-size:var(--text-sm);line-height:1.6;color:var(--color-text-muted);text-align:left;font-weight:400}
@@ -19,7 +21,7 @@
 .summaryAction[aria-pressed=true]>span>svg{color:var(--color-action)}
 .summaryAction:disabled{opacity:1;cursor:default;background:transparent}
 .summaryAction:disabled>span>svg{visibility:hidden}
-.summaryAction:focus-visible{outline:var(--focus-width,3px) solid var(--color-focus);outline-offset:-4px}
+.summaryAction:focus-visible{position:relative;z-index:1;outline:var(--focus-width,3px) solid var(--color-focus);outline-offset:var(--focus-offset,3px)}
 .toolbar{display:grid;grid-template-columns:minmax(0,1fr);gap:12px;align-items:start}
 .searchBox{display:flex;align-items:center;min-width:0;width:100%;height:48px;border:1px solid var(--color-border-strong);border-radius:var(--radius-md);background:var(--color-bg-surface);padding-left:14px;gap:10px}
 .searchBox>svg{color:var(--color-text-muted);width:20px;height:20px;flex-shrink:0}
@@ -74,7 +76,8 @@
 .table th[aria-sort=ascending] .sorted{transform:rotate(180deg)}
 .table th[aria-sort=ascending] button,.table th[aria-sort=descending] button{color:var(--color-action);font-weight:600}
 .table .dateColumn{display:none}
-.table .actionColumn{width:52px;padding:8px 4px}
+/* 8px side padding leaves room for the 44px button's 3px ring + 3px offset inside .tableWrap's clip. */
+.table .actionColumn{width:60px;padding:8px}
 .openProduct{display:grid;place-items:center;width:44px;min-width:44px;min-height:44px;height:44px;padding:10px;background:transparent;color:var(--color-action);border:1px solid transparent;border-radius:50%}
 .openProduct:hover{background:var(--color-bg-surface);border-color:var(--color-border)}
 .identity{display:flex;gap:12px;align-items:center;min-width:0;width:100%;text-align:left}
@@ -141,7 +144,7 @@
 .panelFooter>.clearAll{margin-right:auto}
 @container catalog (min-width:620px){.toolbar{grid-template-columns:minmax(0,1fr) 280px}.cards{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @container catalog (min-width:680px){.tableWrap{display:block}.cards{display:none}}
-@container catalog (min-width:1050px){.table .dateColumn{display:table-cell;width:116px}.table th:first-child{width:32%}.table .inlineDate{display:none}.table th,.table td{padding-inline:16px}.table .actionColumn{padding-inline:4px}.table .sortHeader{font-size:var(--text-sm)}}
+@container catalog (min-width:1050px){.table .dateColumn{display:table-cell;width:116px}.table th:first-child{width:32%}.table .inlineDate{display:none}.table th,.table td{padding-inline:16px}.table .actionColumn{padding-inline:8px}.table .sortHeader{font-size:var(--text-sm)}}
 @container catalog (max-width:480px){.heading{gap:16px;margin-bottom:20px}.heading p{font-size:var(--text-xs);max-width:55%}.heading>button{padding:10px 14px;font-size:var(--text-md)}.summaryTotal,.summaryAction{padding:16px 12px;min-height:108px}.summary strong{font-size:var(--text-2xl)}.summaryTotal>span,.summaryAction>span{font-size:var(--text-xs);gap:3px;align-items:flex-start}.summaryAction>span>svg{width:12px;height:18px}.summary{margin-bottom:20px}.searchBox input{font-size:var(--text-base)}.card{padding:18px}.identity strong{font-size:var(--text-base)}.resultInfo p{font-size:var(--text-xs)}.heading p{max-width:none}.headingActions{width:100%;justify-content:space-between}}
 @media(max-width:767px){.dialog{left:0;right:0;top:auto;bottom:0;width:100%;max-width:none;max-height:85dvh;margin:0;border-radius:var(--radius-dialog) var(--radius-dialog) 0 0;border-bottom:0;padding-bottom:env(safe-area-inset-bottom)}.dialog::backdrop{background:color-mix(in srgb,var(--color-text) 30%,transparent)}.panelBody{padding-block:16px}.panelHeader{padding-top:18px}.option{min-height:52px}}
 @media(prefers-reduced-motion:no-preference){.list{animation:catalog-arrive 180ms ease-out}@keyframes catalog-arrive{from{opacity:.6;transform:translateY(4px)}to{opacity:1;transform:none}}.skeleton>div>div{animation:catalog-pulse 1.4s ease-in-out infinite alternate}@keyframes catalog-pulse{from{opacity:.5}to{opacity:1}}}

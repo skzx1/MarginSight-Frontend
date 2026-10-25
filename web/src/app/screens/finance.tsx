@@ -58,6 +58,15 @@ function ProfitValue({ value, locale }: { value: number | null; locale: string }
   return <><span aria-hidden="true">{shown == null || parts.kind === 'missing' ? '—' : prefix + '฿' + money(Math.abs(shown), locale)}</span><span className="sr-only">{parts.spoken}</span></>;
 }
 
+/** Keep a focused jump link (and its 3px ring + 3px offset) inside the horizontal scroller of the sticky section nav. */
+function revealJumpLink(link: HTMLElement) {
+  const bar = link.parentElement, room = 8;
+  if (!bar) return;
+  const start = link.offsetLeft - room, end = link.offsetLeft + link.offsetWidth + room;
+  if (start < bar.scrollLeft) bar.scrollLeft = start;
+  else if (end > bar.scrollLeft + bar.clientWidth) bar.scrollLeft = end - bar.clientWidth;
+}
+
 function FinanceView({ resource, base, origin, period, onPeriodChange, navigate, onMissingCosts }: Props & { resource: Resource }) {
   const { locale, t } = useLanguage(), th = locale === 'th', mock = origin === 'MOCK', today = bangkokDate();
   const text = (thai: string, english: string) => th ? thai : english;
@@ -153,7 +162,7 @@ function FinanceView({ resource, base, origin, period, onPeriodChange, navigate,
       {estimated && !totals.missingCostOrders && <p className={s.muted}>{text('ข้อมูลเงินหักยังไม่ครบ กำไรจะแสดงเมื่อมีข้อมูลครบ', 'Some deductions are missing. Profit is available when records are complete.')}</p>}
       <section className={s.kpis} aria-label={text('สรุปการเงิน', 'Finance summary')}>{kpis.map(k => <article className={s.kpi + (k.key === 'profitSatang' ? ' ' + s.kpiProfit : '')} key={k.key}><h2 title={k.key === 'averageSatang' ? text('ยอดขายสุทธิหารด้วยจำนวนออเดอร์ทุกสถานะ', 'Net sales divided by orders of all statuses') : undefined}>{k.label}{estimated && ['profitSatang', 'marginPct', 'totalCostsSatang'].includes(k.key) ? ' · ' + text('ประมาณการ', 'Incomplete estimate') : ''}</h2><strong className={totals[k.key] != null && totals[k.key]! < 0 ? s.negative : ''}>{k.key === 'profitSatang' ? <ProfitValue value={totals[k.key]} locale={locale} /> : k.key === 'marginPct' ? margin(totals[k.key]) : k.key === 'totalOrders' ? totals[k.key].toLocaleString(locale) : cash(totals[k.key])}</strong>{compare && previousCovered && <Delta className={s.delta} change={delta(k.key)} unit={k.key === 'marginPct' ? 'pp' : 'pct'} />}<Sparkline values={days.map(d => d[k.key])} label={text('แนวโน้มรายวัน · ดูตัวเลขในกราฟด้านล่าง', 'Daily trend · Exact values in chart below')} /></article>)}</section>
       {!current.orders.length && !current.expenses.length && <Empty title={t('noOrdersInPeriod')} action={<button className="secondary" onClick={() => { setChannel('all'); onPeriodChange({ ...period, type: 'month' }); }}>{text('ดูทุกช่องทางในเดือนนี้', 'View all channels this month')}</button>} />}
-      <nav className={s.jumpLinks} aria-label={text('ส่วนต่าง ๆ ของการเงิน', 'Finance sections')}>{[['finance-summary', text('สรุป / กำไรขาดทุน', 'Summary / Profit & loss')], ['finance-channels', text('ช่องทางขาย', 'Channels')], ['finance-orders', text('ออเดอร์', 'Orders')], ['finance-products', text('สินค้า', 'Products')], ['finance-expenses', text('ค่าใช้จ่าย', 'Expenses')]].map(([id, label]) => <a key={id} href={'#' + id} onClick={e => { e.preventDefault(); const section = document.getElementById(id); section?.scrollIntoView({ behavior: 'instant', block: 'start' }); section?.focus({ preventScroll: true }); }}>{label}</a>)}</nav>
+      <nav className={s.jumpLinks} aria-label={text('ส่วนต่าง ๆ ของการเงิน', 'Finance sections')}>{[['finance-summary', text('สรุป / กำไรขาดทุน', 'Summary / Profit & loss')], ['finance-channels', text('ช่องทางขาย', 'Channels')], ['finance-orders', text('ออเดอร์', 'Orders')], ['finance-products', text('สินค้า', 'Products')], ['finance-expenses', text('ค่าใช้จ่าย', 'Expenses')]].map(([id, label]) => <a key={id} href={'#' + id} onFocus={e => revealJumpLink(e.currentTarget)} onClick={e => { e.preventDefault(); const section = document.getElementById(id); section?.scrollIntoView({ behavior: 'instant', block: 'start' }); section?.focus({ preventScroll: true }); }}>{label}</a>)}</nav>
       <div id="finance-summary" tabIndex={-1} className={s.summaryGrid}>
         <section className={s.panel}><div className={s.sectionHeading}><h2>{text('งบกำไรขาดทุน', 'Profit & loss')}</h2><span className={s.muted}>{text('บาท / % ยอดขายสุทธิ', 'THB / % net sales')}</span></div>
           <div className={s.allocation} aria-hidden="true">{totals.totalCostsSatang != null && totals.revenueSatang > 0 && <><span style={{ width: `${Math.min(100, Math.max(0, (totals.profitSatang ?? 0) / totals.revenueSatang * 100))}%` }} /><span style={{ flex: 1 }} /></>}</div>

@@ -51,8 +51,8 @@ export default function StoreSettings({ base, navigate, canCreate, create, store
     onBlur: () => setTouched(old => ({ ...old, [key]: true })),
   });
   const tools: { screen: Screen; icon: IconName; note: string; usage?: string }[] = [
-    { screen: 'imports', icon: 'upload', note: text('CSV / XLSX ตามแบบฟอร์ม', 'CSV / XLSX templates'), usage: guest ? text('นำเข้าได้ 3 ไฟล์ต่อรอบ', 'Up to 3 imports per session') : undefined },
-    { screen: 'receipts', icon: 'receipt', note: text('AI OCR · ตรวจแล้วค่อยยืนยัน', 'AI OCR · Review and confirm'), usage: guest ? text('สูงสุด 3 ครั้ง/รอบ · รวมกับผู้ช่วย', 'Up to 3/session · shared with AI chat') : undefined },
+    { screen: 'imports', icon: 'upload', note: text('CSV / XLSX ตามแบบฟอร์ม', 'CSV / XLSX templates') },
+    { screen: 'receipts', icon: 'receipt', note: text('AI OCR · ตรวจแล้วค่อยยืนยัน', 'AI OCR · Review and confirm') },
     { screen: 'rules', icon: 'rules', note: text('ตรวจค่าบริการก่อนใช้', 'Review platform fees') },
     { screen: 'reconciliation', icon: 'reconcile', note: text('เทียบยอดที่ควรได้กับยอดรับ', 'Compare expected and paid') },
   ];

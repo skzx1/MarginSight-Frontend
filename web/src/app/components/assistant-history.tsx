@@ -54,7 +54,6 @@ export function AssistantHistory({ drawer = false }: { drawer?: boolean }) {
   const groups = ['today','yesterday','week','older'] as const;
   const ordered = groups.flatMap(group => sessions.filter(chat => historyGroup(chat.updatedAt, bangkokDate()) === group));
   const selectedFocus = ordered.some(chat => chat.id === focusId) ? focusId : ordered.some(chat => chat.id === active?.id) ? active!.id : ordered[0]?.id;
-  const limit = archive.sessions.length >= 100 && !archive.sessions.some(chat => !chat.turns.length && !chat.draft.trim());
   useEffect(() => { setFocusId(active?.id ?? null); }, [active?.id]);
   const navigateRows = (event: KeyboardEvent<HTMLDivElement>) => {
     const target = event.target as HTMLElement;
@@ -71,10 +70,9 @@ export function AssistantHistory({ drawer = false }: { drawer?: boolean }) {
   };
   return <div className={s.surface + (drawer ? ' ' + s.drawerNav : ' ' + s.fullHistory)} aria-label={t(drawer ? 'recentChats' : 'allHistoryTitle')}>
     <div className={s.historyTop}>
-      <button type="button" className={s.newChat} onClick={newChat} disabled={!ready || limit} title={limit ? t('sessionLimit') : undefined}><Icon name="plus" /><span>{t('newChat')}</span></button>
+      <button type="button" className={s.newChat} onClick={newChat} disabled={!ready}><Icon name="plus" /><span>{t('newChat')}</span></button>
       {!drawer && <div className={s.searchWrap}><Icon name="search" /><input type="search" aria-label={t('searchHistory')} placeholder={t('searchHistory')} value={search} onChange={e => setSearch(e.target.value)} /></div>}
       {drawer && <h2 className={s.recentHeading}>{t('recentChats')}</h2>}
-      {limit && <p className={s.limit}>{t('sessionLimit')}</p>}
     </div>
     <div ref={list} className={s.list} onKeyDown={navigateRows} aria-busy={!ready}>
       {!ready ? <><span className="sr-only" role="status">{t('loading')}</span><div className={s.skeleton} aria-hidden="true">{[1,2,3].map(i => <div key={i}><i /><i /></div>)}</div></>

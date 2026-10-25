@@ -170,3 +170,8 @@ VERIFIED_LOCAL; AWS pending at this commit. Manual/CSV creation saves price and 
 ## Product prices live — 25 October 2026
 
 VERIFIED_AWS for product listing persistence and corrections. Frontendf9bc84e/Backend5b61c6a deployed and checked; local/CloudShell56+70tests/Python6. Price and merchant-entered quantity survive create/edit/refresh; cost/history unaffected; zero/missing and tenant/version guards pass. Existing Fee Rules runtime/parameters preserved. Old discarded inputs require one manual re-entry. See latest verification.md and product-listing.md. Overall PARTIAL_WITH_EXTERNAL_BLOCKERS remains.
+
+
+## Application usage quotas removed — 25 October 2026
+
+User requested all app usage limits removed: no 2-hour guest lifetime, daily/session/write/AI/import/receipt quotas, 100-chat or 200-turn caps. Guest records no longer receive 24-hour TTL; legacy rows read by the app have TTL removed conditionally without changing financial values/version. Opaque guest tokens remain MOCK-only, origin/tenant-bound, revocable and stored in sessionStorage; Cognito remains unchanged. File/content validation, per-request deadlines/token/context bounds, native browser/provider quotas and the $350 team budget remain. Local verification and AWS release evidence follow; deployment is pending at this source commit. No cloud charges from these local tests. Overall PARTIAL_WITH_EXTERNAL_BLOCKERS unchanged.

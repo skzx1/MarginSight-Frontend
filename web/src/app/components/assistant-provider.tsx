@@ -79,7 +79,6 @@ export function AssistantProvider({
 
   const newChat = () => {
     const empty = archive.sessions.find(chat => !chat.turns.length && !chat.draft.trim());
-    if (!empty && archive.sessions.length >= 100) return;
     const chat = empty ? { ...empty, context: { ...defaultContext } } : createChat(defaultContext);
     setArchive(old => ({
       ...old,

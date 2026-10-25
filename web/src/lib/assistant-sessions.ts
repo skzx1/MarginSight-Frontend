@@ -43,10 +43,10 @@ export function historyGroup(timestamp: string, today: string): 'today' | 'yeste
 export function parseArchive(raw: string | null): ChatArchive {
   if (!raw) return empty();
   const value = JSON.parse(raw) as ChatArchive;
-  if (value.version !== 1 || !Array.isArray(value.sessions) || value.sessions.length > 100) throw Error('INVALID_CHAT_ARCHIVE');
+  if (value.version !== 1 || !Array.isArray(value.sessions)) throw Error('INVALID_CHAT_ARCHIVE');
   const sessions = value.sessions.map(session => {
     if (typeof session.id !== 'string' || typeof session.title !== 'string' || session.title.length > 120 || !validContext(session.context) ||
-      !Number.isFinite(Date.parse(session.createdAt)) || !Number.isFinite(Date.parse(session.updatedAt)) || !Array.isArray(session.turns) || session.turns.length > 200 ||
+      !Number.isFinite(Date.parse(session.createdAt)) || !Number.isFinite(Date.parse(session.updatedAt)) || !Array.isArray(session.turns) ||
       typeof session.draft !== 'string' || session.draft.length > 1500) throw Error('INVALID_CHAT_SESSION');
     const turns = session.turns.map(turn => {
       if (typeof turn.id !== 'string' || typeof turn.question !== 'string' || turn.question.length > 1500 || (turn.requestQuestion !== undefined && (typeof turn.requestQuestion !== 'string' || turn.requestQuestion.length > 3200)) || !validContext(turn.context) ||

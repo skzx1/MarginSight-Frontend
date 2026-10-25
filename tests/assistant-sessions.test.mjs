@@ -40,3 +40,10 @@ test('date and product defaults resolve without choosing a random first product'
   assert.deepEqual(resolveChatContext('profit 2026-09', context, products, '2026-10-17'), { start: '2026-09-01', end: '2026-09-30', sku: null });
   assert.deepEqual(context, { start: '2026-10-01', end: '2026-10-17', sku: null });
 });
+
+test('history restores more than 100 chats and 200 turns without an application quota',()=>{
+ const sessions=Array.from({length:101},()=>createChat(context,'2026-10-25T00:00:00Z'));
+ sessions[0].turns=Array.from({length:201},(_,i)=>({id:String(i),question:'กำไร',context,createdAt:sessions[0].createdAt,state:'complete'}));
+ const restored=parseArchive(JSON.stringify({version:1,activeId:sessions[0].id,sessions}));
+ assert.equal(restored.sessions.length,101);assert.equal(restored.sessions[0].turns.length,201);
+});

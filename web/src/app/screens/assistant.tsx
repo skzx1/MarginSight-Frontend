@@ -90,7 +90,7 @@ export default function Assistant({ base, guest, origin, products, initialSku, d
     draftHandled.current = draftRequest;
     const chat = createChat({ ...defaultContext, sku: initialSku });
     chat.draft = locale === 'th' ? 'สินค้านี้เหลือกำไรเท่าไร?' : 'How much profit does this product make?';
-    setArchive(old => old.sessions.length >= 100 ? old : { ...old, activeId: chat.id, sessions: [chat, ...old.sessions] });
+    setArchive(old => ({ ...old, activeId: chat.id, sessions: [chat, ...old.sessions] }));
     onDraftHandled();
     textareaRef.current?.focus({ preventScroll: true });
   }, [ready, visible, draftRequest, initialSku, defaultContext, locale, setArchive, onDraftHandled, textareaRef]);
@@ -147,7 +147,6 @@ export default function Assistant({ base, guest, origin, products, initialSku, d
     if (!active || pending.current.has(active.id)) return;
     const question = (explicit ?? active.draft).trim();
     if (!question) return;
-    if (active.turns.length >= 200) { setNotice('turnLimit'); return; }
     const context = resolveChatContext(question, active.context, products, bangkokDate());
     const previous = active.turns.at(-1);
     const productOnly = products.some(p => [p.sku, p.name].some(v => v.toLocaleLowerCase() === question.toLocaleLowerCase()));
@@ -233,7 +232,7 @@ export default function Assistant({ base, guest, origin, products, initialSku, d
               <span className={s.editHintIcon} aria-hidden="true"><ChatIcon name="edit" /></span>
             </button>
           )}
-          {(guest || origin === 'MOCK') && <span className={s.mockBadge} title={locale === 'th' ? 'นำเข้าได้ 3 ไฟล์ · ผู้ช่วยและอ่านบิลรวม 3 ครั้งต่อรอบ' : '3 imports · 3 assistant/receipt requests per session'} tabIndex={0} role="note" aria-label={t('mock')}>{t('mock')}</span>}
+          {(guest || origin === 'MOCK') && <span className={s.mockBadge} title={locale === 'th' ? 'ข้อมูลจำลอง · ใช้งานฟีเจอร์ของร้านได้ครบ' : 'Sample data · Full store features'} tabIndex={0} role="note" aria-label={t('mock')}>{t('mock')}</span>}
         </div>
         <div className={s.headerRight}>
           <button type="button" className={s.historyHeaderButton} onClick={openSheet} aria-label={t('history')} aria-expanded={panel === 'sheet'} aria-haspopup="dialog"><ChatIcon name="history" /><span>{t('historyShort')}</span></button>

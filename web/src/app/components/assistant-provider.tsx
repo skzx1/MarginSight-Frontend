@@ -4,7 +4,7 @@ import type { ChatArchive, ChatContext, ChatSession } from '../../lib/assistant-
 import { createChat } from '../../lib/assistant-sessions';
 import { useChatSessions } from './use-chat-sessions';
 
-export type AssistantPanel = 'period' | 'products' | 'campaigns' | 'rename' | 'delete' | 'allHistory' | 'sheet' | null;
+export type AssistantPanel = 'period' | 'products' | 'campaigns' | 'questions' | 'rename' | 'delete' | 'allHistory' | 'sheet' | null;
 
 export function ChatIcon({ name }: { name: 'history' | 'copy' | 'edit' | 'trash' | 'down' | 'stop' | 'calendar' | 'dots' | 'check' }) {
   const paths = {

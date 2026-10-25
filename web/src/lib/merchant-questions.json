@@ -1,0 +1,805 @@
+{
+  "version": "merchant-questions-v1",
+  "questions": [
+    {
+      "id": "profit-01",
+      "category": "profit",
+      "categoryLabel": "กำไรร้าน",
+      "text": "กำไรเดือนนี้เท่าไร",
+      "expectedMode": "STORE_DATA",
+      "requiresProduct": false
+    },
+    {
+      "id": "profit-02",
+      "category": "profit",
+      "categoryLabel": "กำไรร้าน",
+      "text": "เดือนนี้ร้านเหลือกำไรกี่บาท",
+      "expectedMode": "STORE_DATA",
+      "requiresProduct": false
+    },
+    {
+      "id": "profit-03",
+      "category": "profit",
+      "categoryLabel": "กำไรร้าน",
+      "text": "กำไรสัปดาห์นี้เป็นยังไง",
+      "expectedMode": "STORE_DATA",
+      "requiresProduct": false
+    },
+    {
+      "id": "profit-04",
+      "category": "profit",
+      "categoryLabel": "กำไรร้าน",
+      "text": "วันนี้มีกำไรเท่าไร",
+      "expectedMode": "STORE_DATA",
+      "requiresProduct": false
+    },
+    {
+      "id": "profit-05",
+      "category": "profit",
+      "categoryLabel": "กำไรร้าน",
+      "text": "สัปดาห์ที่แล้วกำไรเท่าไร",
+      "expectedMode": "STORE_DATA",
+      "requiresProduct": false
+    },
+    {
+      "id": "profit-06",
+      "category": "profit",
+      "categoryLabel": "กำไรร้าน",
+      "text": "เดือนที่แล้วร้านเหลือกำไรเท่าไร",
+      "expectedMode": "STORE_DATA",
+      "requiresProduct": false
+    },
+    {
+      "id": "profit-07",
+      "category": "profit",
+      "categoryLabel": "กำไรร้าน",
+      "text": "กำไรทุกสินค้าเดือนนี้เท่าไร",
+      "expectedMode": "STORE_DATA",
+      "requiresProduct": false
+    },
+    {
+      "id": "profit-08",
+      "category": "profit",
+      "categoryLabel": "กำไรร้าน",
+      "text": "อยากดูกำไรทั้งร้านในเดือนนี้",
+      "expectedMode": "STORE_DATA",
+      "requiresProduct": false
+    },
+    {
+      "id": "profit-09",
+      "category": "profit",
+      "categoryLabel": "กำไรร้าน",
+      "text": "สินค้าที่เลือกเดือนนี้มีกำไรเท่าไร",
+      "expectedMode": "STORE_DATA",
+      "requiresProduct": false
+    },
+    {
+      "id": "profit-10",
+      "category": "profit",
+      "categoryLabel": "กำไรร้าน",
+      "text": "เดือนนี้ร้านขาดทุนไหม",
+      "expectedMode": "STORE_DATA",
+      "requiresProduct": false
+    },
+    {
+      "id": "sales-01",
+      "category": "sales",
+      "categoryLabel": "ยอดขายและกำไร",
+      "text": "เดือนนี้ยอดขายกับกำไรเท่าไร",
+      "expectedMode": "STORE_DATA",
+      "requiresProduct": false
+    },
+    {
+      "id": "sales-02",
+      "category": "sales",
+      "categoryLabel": "ยอดขายและกำไร",
+      "text": "ช่วยสรุปยอดขายและกำไรสัปดาห์นี้",
+      "expectedMode": "STORE_DATA",
+      "requiresProduct": false
+    },
+    {
+      "id": "sales-03",
+      "category": "sales",
+      "categoryLabel": "ยอดขายและกำไร",
+      "text": "วันนี้ร้านขายได้เท่าไรและกำไรเท่าไร",
+      "expectedMode": "STORE_DATA",
+      "requiresProduct": false
+    },
+    {
+      "id": "sales-04",
+      "category": "sales",
+      "categoryLabel": "ยอดขายและกำไร",
+      "text": "ขอดูยอดขายพร้อมกำไรของเดือนที่แล้ว",
+      "expectedMode": "STORE_DATA",
+      "requiresProduct": false
+    },
+    {
+      "id": "sales-05",
+      "category": "sales",
+      "categoryLabel": "ยอดขายและกำไร",
+      "text": "สรุปยอดขายกับกำไรทุกสินค้าเดือนนี้",
+      "expectedMode": "STORE_DATA",
+      "requiresProduct": false
+    },
+    {
+      "id": "sales-06",
+      "category": "sales",
+      "categoryLabel": "ยอดขายและกำไร",
+      "text": "ออเดอร์ที่บันทึกในสัปดาห์นี้ทำกำไรเท่าไร",
+      "expectedMode": "STORE_DATA",
+      "requiresProduct": false
+    },
+    {
+      "id": "sales-07",
+      "category": "sales",
+      "categoryLabel": "ยอดขายและกำไร",
+      "text": "เดือนนี้ขายดีแต่เหลือกำไรเท่าไร",
+      "expectedMode": "STORE_DATA",
+      "requiresProduct": false
+    },
+    {
+      "id": "sales-08",
+      "category": "sales",
+      "categoryLabel": "ยอดขายและกำไร",
+      "text": "ยอดขายและกำไรของสินค้าที่เลือกเดือนนี้เท่าไร",
+      "expectedMode": "STORE_DATA",
+      "requiresProduct": false
+    },
+    {
+      "id": "sales-09",
+      "category": "sales",
+      "categoryLabel": "ยอดขายและกำไร",
+      "text": "กำไรกับยอดขายสัปดาห์ที่แล้วเท่าไร",
+      "expectedMode": "STORE_DATA",
+      "requiresProduct": false
+    },
+    {
+      "id": "sales-10",
+      "category": "sales",
+      "categoryLabel": "ยอดขายและกำไร",
+      "text": "ช่วยดูยอดขายกับกำไรในช่วงวันที่ที่เลือก",
+      "expectedMode": "STORE_DATA",
+      "requiresProduct": false
+    },
+    {
+      "id": "ranking-01",
+      "category": "ranking",
+      "categoryLabel": "อันดับสินค้า",
+      "text": "สินค้าไหนกำไรมากที่สุดในร้าน",
+      "expectedMode": "STORE_DATA",
+      "requiresProduct": false
+    },
+    {
+      "id": "ranking-02",
+      "category": "ranking",
+      "categoryLabel": "อันดับสินค้า",
+      "text": "สินค้าไหนกำไรมากสุดในร้านอันดับ 2",
+      "expectedMode": "STORE_DATA",
+      "requiresProduct": false
+    },
+    {
+      "id": "ranking-03",
+      "category": "ranking",
+      "categoryLabel": "อันดับสินค้า",
+      "text": "สินค้าตัวไหนกำไรมากสุดอันดับ 3",
+      "expectedMode": "STORE_DATA",
+      "requiresProduct": false
+    },
+    {
+      "id": "ranking-04",
+      "category": "ranking",
+      "categoryLabel": "อันดับสินค้า",
+      "text": "สินค้าไหนกำไรมากที่สุดอันดับ 4",
+      "expectedMode": "STORE_DATA",
+      "requiresProduct": false
+    },
+    {
+      "id": "ranking-05",
+      "category": "ranking",
+      "categoryLabel": "อันดับสินค้า",
+      "text": "สินค้าไหนกำไรมากที่สุดอันดับ 5",
+      "expectedMode": "STORE_DATA",
+      "requiresProduct": false
+    },
+    {
+      "id": "ranking-06",
+      "category": "ranking",
+      "categoryLabel": "อันดับสินค้า",
+      "text": "สินค้าไหนกำไรน้อยที่สุด",
+      "expectedMode": "STORE_DATA",
+      "requiresProduct": false
+    },
+    {
+      "id": "ranking-07",
+      "category": "ranking",
+      "categoryLabel": "อันดับสินค้า",
+      "text": "สินค้าตัวไหนกำไรน้อยที่สุดอันดับ 2",
+      "expectedMode": "STORE_DATA",
+      "requiresProduct": false
+    },
+    {
+      "id": "ranking-08",
+      "category": "ranking",
+      "categoryLabel": "อันดับสินค้า",
+      "text": "สินค้าไหนกำไรน้อยสุดอันดับ 3",
+      "expectedMode": "STORE_DATA",
+      "requiresProduct": false
+    },
+    {
+      "id": "ranking-09",
+      "category": "ranking",
+      "categoryLabel": "อันดับสินค้า",
+      "text": "ขอดูสินค้าไหนกำไรมากสุดอันดับที่สอง",
+      "expectedMode": "STORE_DATA",
+      "requiresProduct": false
+    },
+    {
+      "id": "ranking-10",
+      "category": "ranking",
+      "categoryLabel": "อันดับสินค้า",
+      "text": "สินค้าตัวไหนกำไรมากที่สุดในเดือนนี้",
+      "expectedMode": "STORE_DATA",
+      "requiresProduct": false
+    },
+    {
+      "id": "discount-01",
+      "category": "discount",
+      "categoryLabel": "ลองส่วนลด",
+      "text": "สินค้าตัวนี้ลดราคา 5% จะเหลือเท่าไร",
+      "expectedMode": "STORE_DATA",
+      "requiresProduct": true
+    },
+    {
+      "id": "discount-02",
+      "category": "discount",
+      "categoryLabel": "ลองส่วนลด",
+      "text": "ถ้าลดราคา 10% ยังเหลือกำไรไหม",
+      "expectedMode": "STORE_DATA",
+      "requiresProduct": true
+    },
+    {
+      "id": "discount-03",
+      "category": "discount",
+      "categoryLabel": "ลองส่วนลด",
+      "text": "ลดราคา 15% จะเหลือเท่าไร",
+      "expectedMode": "STORE_DATA",
+      "requiresProduct": true
+    },
+    {
+      "id": "discount-04",
+      "category": "discount",
+      "categoryLabel": "ลองส่วนลด",
+      "text": "ลดราคา 20% แล้วเหลือกี่บาท",
+      "expectedMode": "STORE_DATA",
+      "requiresProduct": true
+    },
+    {
+      "id": "discount-05",
+      "category": "discount",
+      "categoryLabel": "ลองส่วนลด",
+      "text": "สินค้าตัวนี้ลดราคา 25% ไหวไหม",
+      "expectedMode": "STORE_DATA",
+      "requiresProduct": true
+    },
+    {
+      "id": "discount-06",
+      "category": "discount",
+      "categoryLabel": "ลองส่วนลด",
+      "text": "ถ้าลดราคา 30% จะขาดทุนไหม",
+      "expectedMode": "STORE_DATA",
+      "requiresProduct": true
+    },
+    {
+      "id": "discount-07",
+      "category": "discount",
+      "categoryLabel": "ลองส่วนลด",
+      "text": "ลองลดราคา 35% ให้หน่อย",
+      "expectedMode": "STORE_DATA",
+      "requiresProduct": true
+    },
+    {
+      "id": "discount-08",
+      "category": "discount",
+      "categoryLabel": "ลองส่วนลด",
+      "text": "ถ้าลดราคา 40% เหลือเท่าไร",
+      "expectedMode": "STORE_DATA",
+      "requiresProduct": true
+    },
+    {
+      "id": "discount-09",
+      "category": "discount",
+      "categoryLabel": "ลองส่วนลด",
+      "text": "ลดราคา 50% ยังเหลือส่วนต่างไหม",
+      "expectedMode": "STORE_DATA",
+      "requiresProduct": true
+    },
+    {
+      "id": "discount-10",
+      "category": "discount",
+      "categoryLabel": "ลองส่วนลด",
+      "text": "ตัวนี้ลดสิบห้าเปอร์ยังไหวปะ",
+      "expectedMode": "STORE_DATA",
+      "requiresProduct": true
+    },
+    {
+      "id": "pricing-01",
+      "category": "pricing",
+      "categoryLabel": "ราคาคุ้มทุน",
+      "text": "ราคาคุ้มทุนของสินค้าตัวนี้เท่าไร",
+      "expectedMode": "STORE_DATA",
+      "requiresProduct": true
+    },
+    {
+      "id": "pricing-02",
+      "category": "pricing",
+      "categoryLabel": "ราคาคุ้มทุน",
+      "text": "ต้องขายขั้นต่ำกี่บาทถึงคุ้มทุน",
+      "expectedMode": "STORE_DATA",
+      "requiresProduct": true
+    },
+    {
+      "id": "pricing-03",
+      "category": "pricing",
+      "categoryLabel": "ราคาคุ้มทุน",
+      "text": "สินค้านี้ตั้งราคาคุ้มทุนได้กี่บาท",
+      "expectedMode": "STORE_DATA",
+      "requiresProduct": true
+    },
+    {
+      "id": "pricing-04",
+      "category": "pricing",
+      "categoryLabel": "ราคาคุ้มทุน",
+      "text": "ขอราคาคุ้มทุนตามต้นทุนที่บันทึกไว้",
+      "expectedMode": "STORE_DATA",
+      "requiresProduct": true
+    },
+    {
+      "id": "pricing-05",
+      "category": "pricing",
+      "categoryLabel": "ราคาคุ้มทุน",
+      "text": "ราคาขายขั้นต่ำที่ไม่ขาดทุนคือเท่าไร",
+      "expectedMode": "STORE_DATA",
+      "requiresProduct": true
+    },
+    {
+      "id": "pricing-06",
+      "category": "pricing",
+      "categoryLabel": "ราคาคุ้มทุน",
+      "text": "ช่วยหาราคาคุ้มทุนต่อชิ้นให้หน่อย",
+      "expectedMode": "STORE_DATA",
+      "requiresProduct": true
+    },
+    {
+      "id": "pricing-07",
+      "category": "pricing",
+      "categoryLabel": "ราคาคุ้มทุน",
+      "text": "ดูราคาคุ้มทุนจากออเดอร์เดือนนี้ให้หน่อย",
+      "expectedMode": "STORE_DATA",
+      "requiresProduct": true
+    },
+    {
+      "id": "pricing-08",
+      "category": "pricing",
+      "categoryLabel": "ราคาคุ้มทุน",
+      "text": "ถ้าจะไม่ขาดทุนต้องขายขั้นต่ำกี่บาท",
+      "expectedMode": "STORE_DATA",
+      "requiresProduct": true
+    },
+    {
+      "id": "pricing-09",
+      "category": "pricing",
+      "categoryLabel": "ราคาคุ้มทุน",
+      "text": "ขอดูราคาคุ้มทุนสินค้าที่เลือก",
+      "expectedMode": "STORE_DATA",
+      "requiresProduct": true
+    },
+    {
+      "id": "pricing-10",
+      "category": "pricing",
+      "categoryLabel": "ราคาคุ้มทุน",
+      "text": "เดือนนี้สินค้านี้มีราคาคุ้มทุนเท่าไร",
+      "expectedMode": "STORE_DATA",
+      "requiresProduct": true
+    },
+    {
+      "id": "campaign-01",
+      "category": "campaign",
+      "categoryLabel": "ลองแคมเปญ",
+      "text": "แคมเปญนี้เหลือเท่าไร",
+      "expectedMode": "STORE_DATA",
+      "requiresProduct": true
+    },
+    {
+      "id": "campaign-02",
+      "category": "campaign",
+      "categoryLabel": "ลองแคมเปญ",
+      "text": "เข้าแคมเปญที่เลือกแล้วเหลือกี่บาท",
+      "expectedMode": "STORE_DATA",
+      "requiresProduct": true
+    },
+    {
+      "id": "campaign-03",
+      "category": "campaign",
+      "categoryLabel": "ลองแคมเปญ",
+      "text": "สินค้าตัวนี้เข้าแคมเปญแล้วเหลือกำไรไหม",
+      "expectedMode": "STORE_DATA",
+      "requiresProduct": true
+    },
+    {
+      "id": "campaign-04",
+      "category": "campaign",
+      "categoryLabel": "ลองแคมเปญ",
+      "text": "ไม่ลดราคาแต่เข้าแคมเปญจะเหลือเท่าไร",
+      "expectedMode": "STORE_DATA",
+      "requiresProduct": true
+    },
+    {
+      "id": "campaign-05",
+      "category": "campaign",
+      "categoryLabel": "ลองแคมเปญ",
+      "text": "ลองแคมเปญกับราคาปัจจุบันแล้วเหลือกี่บาท",
+      "expectedMode": "STORE_DATA",
+      "requiresProduct": true
+    },
+    {
+      "id": "campaign-06",
+      "category": "campaign",
+      "categoryLabel": "ลองแคมเปญ",
+      "text": "แคมเปญที่เลือกทำให้เหลือส่วนต่างเท่าไร",
+      "expectedMode": "STORE_DATA",
+      "requiresProduct": true
+    },
+    {
+      "id": "campaign-07",
+      "category": "campaign",
+      "categoryLabel": "ลองแคมเปญ",
+      "text": "ใช้แคมเปญนี้แล้วหักค่าบริการเหลือเท่าไร",
+      "expectedMode": "STORE_DATA",
+      "requiresProduct": true
+    },
+    {
+      "id": "campaign-08",
+      "category": "campaign",
+      "categoryLabel": "ลองแคมเปญ",
+      "text": "เข้าโปรแกรมที่เลือกแล้วเหลือเท่าไร",
+      "expectedMode": "STORE_DATA",
+      "requiresProduct": true
+    },
+    {
+      "id": "campaign-09",
+      "category": "campaign",
+      "categoryLabel": "ลองแคมเปญ",
+      "text": "ถ้าร่วมแคมเปญนี้จะเหลือกี่บาทต่อชิ้น",
+      "expectedMode": "STORE_DATA",
+      "requiresProduct": true
+    },
+    {
+      "id": "campaign-10",
+      "category": "campaign",
+      "categoryLabel": "ลองแคมเปญ",
+      "text": "สินค้าที่เลือกลองแคมเปญแล้วเหลือเท่าไร",
+      "expectedMode": "STORE_DATA",
+      "requiresProduct": true
+    },
+    {
+      "id": "cost-01",
+      "category": "cost",
+      "categoryLabel": "เข้าใจต้นทุน",
+      "text": "ต้นทุนสินค้าควรรวมอะไรบ้าง อธิบายหน่อย",
+      "expectedMode": "GENERAL",
+      "requiresProduct": false
+    },
+    {
+      "id": "cost-02",
+      "category": "cost",
+      "categoryLabel": "เข้าใจต้นทุน",
+      "text": "อธิบายว่าค่าแพ็กควรนับเป็นต้นทุนไหม",
+      "expectedMode": "GENERAL",
+      "requiresProduct": false
+    },
+    {
+      "id": "cost-03",
+      "category": "cost",
+      "categoryLabel": "เข้าใจต้นทุน",
+      "text": "กำไรกับเงินที่เข้าบัญชีต่างกันยังไง",
+      "expectedMode": "GENERAL",
+      "requiresProduct": false
+    },
+    {
+      "id": "cost-04",
+      "category": "cost",
+      "categoryLabel": "เข้าใจต้นทุน",
+      "text": "margin กับ markup ต่างกันยังไง",
+      "expectedMode": "GENERAL",
+      "requiresProduct": false
+    },
+    {
+      "id": "cost-05",
+      "category": "cost",
+      "categoryLabel": "เข้าใจต้นทุน",
+      "text": "อธิบายค่าคอมมิชชั่นกับค่าธรรมเนียมชำระเงิน",
+      "expectedMode": "GENERAL",
+      "requiresProduct": false
+    },
+    {
+      "id": "cost-06",
+      "category": "cost",
+      "categoryLabel": "เข้าใจต้นทุน",
+      "text": "มีวิธีเก็บต้นทุนสินค้ายังไงให้ไม่ลืม",
+      "expectedMode": "GENERAL",
+      "requiresProduct": false
+    },
+    {
+      "id": "cost-07",
+      "category": "cost",
+      "categoryLabel": "เข้าใจต้นทุน",
+      "text": "อธิบายต้นทุนคงที่กับต้นทุนผันแปร",
+      "expectedMode": "GENERAL",
+      "requiresProduct": false
+    },
+    {
+      "id": "cost-08",
+      "category": "cost",
+      "categoryLabel": "เข้าใจต้นทุน",
+      "text": "ควรแยกค่าส่งกับค่ากล่องอย่างไร",
+      "expectedMode": "GENERAL",
+      "requiresProduct": false
+    },
+    {
+      "id": "cost-09",
+      "category": "cost",
+      "categoryLabel": "เข้าใจต้นทุน",
+      "text": "ทำไมยอดขายดีแต่เงินสดไม่เพิ่ม อธิบายหน่อย",
+      "expectedMode": "GENERAL",
+      "requiresProduct": false
+    },
+    {
+      "id": "cost-10",
+      "category": "cost",
+      "categoryLabel": "เข้าใจต้นทุน",
+      "text": "อธิบายวิธีคิดกำไรแบบง่ายให้แม่ค้ามือใหม่",
+      "expectedMode": "GENERAL",
+      "requiresProduct": false
+    },
+    {
+      "id": "stock-01",
+      "category": "stock",
+      "categoryLabel": "จัดการสินค้า",
+      "text": "มีวิธีตั้งจุดสั่งซื้อสินค้าซ้ำยังไง",
+      "expectedMode": "GENERAL",
+      "requiresProduct": false
+    },
+    {
+      "id": "stock-02",
+      "category": "stock",
+      "categoryLabel": "จัดการสินค้า",
+      "text": "ช่วยแนะนำวิธีจัด SKU สำหรับร้านเล็ก",
+      "expectedMode": "GENERAL",
+      "requiresProduct": false
+    },
+    {
+      "id": "stock-03",
+      "category": "stock",
+      "categoryLabel": "จัดการสินค้า",
+      "text": "มีวิธีจัดสต็อกหลายช่องทางยังไง",
+      "expectedMode": "GENERAL",
+      "requiresProduct": false
+    },
+    {
+      "id": "stock-04",
+      "category": "stock",
+      "categoryLabel": "จัดการสินค้า",
+      "text": "ขอไอเดียจัดสินค้าที่ขายช้า",
+      "expectedMode": "GENERAL",
+      "requiresProduct": false
+    },
+    {
+      "id": "stock-05",
+      "category": "stock",
+      "categoryLabel": "จัดการสินค้า",
+      "text": "อธิบายวิธีตรวจนับสต็อกให้ผิดพลาดน้อย",
+      "expectedMode": "GENERAL",
+      "requiresProduct": false
+    },
+    {
+      "id": "stock-06",
+      "category": "stock",
+      "categoryLabel": "จัดการสินค้า",
+      "text": "มีวิธีจัดการสินค้าคืนยังไง",
+      "expectedMode": "GENERAL",
+      "requiresProduct": false
+    },
+    {
+      "id": "stock-07",
+      "category": "stock",
+      "categoryLabel": "จัดการสินค้า",
+      "text": "ควรแยกสินค้าชำรุดอย่างไร",
+      "expectedMode": "GENERAL",
+      "requiresProduct": false
+    },
+    {
+      "id": "stock-08",
+      "category": "stock",
+      "categoryLabel": "จัดการสินค้า",
+      "text": "แนะนำวิธีเตรียมสินค้าให้หยิบแพ็กง่าย",
+      "expectedMode": "GENERAL",
+      "requiresProduct": false
+    },
+    {
+      "id": "stock-09",
+      "category": "stock",
+      "categoryLabel": "จัดการสินค้า",
+      "text": "มีวิธีจัดสินค้าที่มีหลายสีหลายไซซ์ยังไง",
+      "expectedMode": "GENERAL",
+      "requiresProduct": false
+    },
+    {
+      "id": "stock-10",
+      "category": "stock",
+      "categoryLabel": "จัดการสินค้า",
+      "text": "อธิบายวิธีวางแผนสั่งสินค้าแบบร้านเล็ก",
+      "expectedMode": "GENERAL",
+      "requiresProduct": false
+    },
+    {
+      "id": "marketing-01",
+      "category": "marketing",
+      "categoryLabel": "การตลาด",
+      "text": "มีวิธีเพิ่มยอดขายยังไง",
+      "expectedMode": "GENERAL",
+      "requiresProduct": false
+    },
+    {
+      "id": "marketing-02",
+      "category": "marketing",
+      "categoryLabel": "การตลาด",
+      "text": "ช่วยคิดไอเดียโปรโมตร้านโดยใช้งบน้อย",
+      "expectedMode": "GENERAL",
+      "requiresProduct": false
+    },
+    {
+      "id": "marketing-03",
+      "category": "marketing",
+      "categoryLabel": "การตลาด",
+      "text": "ช่วยเขียนแคปชั่นขายกระเป๋าผ้า",
+      "expectedMode": "GENERAL",
+      "requiresProduct": false
+    },
+    {
+      "id": "marketing-04",
+      "category": "marketing",
+      "categoryLabel": "การตลาด",
+      "text": "แนะนำวิธีถ่ายรูปสินค้าให้ดูน่าซื้อ",
+      "expectedMode": "GENERAL",
+      "requiresProduct": false
+    },
+    {
+      "id": "marketing-05",
+      "category": "marketing",
+      "categoryLabel": "การตลาด",
+      "text": "ช่วยคิดชื่อโปรโมชั่นร้านเครื่องเขียน",
+      "expectedMode": "GENERAL",
+      "requiresProduct": false
+    },
+    {
+      "id": "marketing-06",
+      "category": "marketing",
+      "categoryLabel": "การตลาด",
+      "text": "ขอไอเดียทำคลิปขายสินค้าแบบสั้น",
+      "expectedMode": "GENERAL",
+      "requiresProduct": false
+    },
+    {
+      "id": "marketing-07",
+      "category": "marketing",
+      "categoryLabel": "การตลาด",
+      "text": "มีวิธีทำให้ลูกค้ากลับมาซื้อซ้ำยังไง",
+      "expectedMode": "GENERAL",
+      "requiresProduct": false
+    },
+    {
+      "id": "marketing-08",
+      "category": "marketing",
+      "categoryLabel": "การตลาด",
+      "text": "ช่วยวางแผนโพสต์ร้านหนึ่งสัปดาห์",
+      "expectedMode": "GENERAL",
+      "requiresProduct": false
+    },
+    {
+      "id": "marketing-09",
+      "category": "marketing",
+      "categoryLabel": "การตลาด",
+      "text": "มีเทคนิคไลฟ์ขายของสำหรับมือใหม่ไหม",
+      "expectedMode": "GENERAL",
+      "requiresProduct": false
+    },
+    {
+      "id": "marketing-10",
+      "category": "marketing",
+      "categoryLabel": "การตลาด",
+      "text": "ช่วยเขียนโฆษณาลดราคา 20% แบบสั้น",
+      "expectedMode": "GENERAL",
+      "requiresProduct": false
+    },
+    {
+      "id": "customer-01",
+      "category": "customer",
+      "categoryLabel": "คุยกับลูกค้า",
+      "text": "ช่วยเขียนประโยคทักทายลูกค้าอย่างสุภาพ",
+      "expectedMode": "GENERAL",
+      "requiresProduct": false
+    },
+    {
+      "id": "customer-02",
+      "category": "customer",
+      "categoryLabel": "คุยกับลูกค้า",
+      "text": "ช่วยตอบลูกค้าที่ถามว่าสินค้ายังมีไหมแบบสุภาพ",
+      "expectedMode": "GENERAL",
+      "requiresProduct": false
+    },
+    {
+      "id": "customer-03",
+      "category": "customer",
+      "categoryLabel": "คุยกับลูกค้า",
+      "text": "ช่วยเขียนข้อความขอบคุณหลังลูกค้าสั่งซื้อ",
+      "expectedMode": "GENERAL",
+      "requiresProduct": false
+    },
+    {
+      "id": "customer-04",
+      "category": "customer",
+      "categoryLabel": "คุยกับลูกค้า",
+      "text": "ช่วยเขียนข้อความแจ้งลูกค้าว่าส่งของแล้ว",
+      "expectedMode": "GENERAL",
+      "requiresProduct": false
+    },
+    {
+      "id": "customer-05",
+      "category": "customer",
+      "categoryLabel": "คุยกับลูกค้า",
+      "text": "ช่วยร่างข้อความขอโทษเมื่อส่งสินค้าช้า",
+      "expectedMode": "GENERAL",
+      "requiresProduct": false
+    },
+    {
+      "id": "customer-06",
+      "category": "customer",
+      "categoryLabel": "คุยกับลูกค้า",
+      "text": "ช่วยตอบลูกค้าที่ขอส่วนลดอย่างสุภาพ",
+      "expectedMode": "GENERAL",
+      "requiresProduct": false
+    },
+    {
+      "id": "customer-07",
+      "category": "customer",
+      "categoryLabel": "คุยกับลูกค้า",
+      "text": "ช่วยร่างข้อความแจ้งนโยบายคืนสินค้า",
+      "expectedMode": "GENERAL",
+      "requiresProduct": false
+    },
+    {
+      "id": "customer-08",
+      "category": "customer",
+      "categoryLabel": "คุยกับลูกค้า",
+      "text": "แปลคำขอบคุณลูกค้าเป็นภาษาอังกฤษ",
+      "expectedMode": "GENERAL",
+      "requiresProduct": false
+    },
+    {
+      "id": "customer-09",
+      "category": "customer",
+      "categoryLabel": "คุยกับลูกค้า",
+      "text": "ช่วยเขียนข้อความขอรีวิวหลังได้รับสินค้า",
+      "expectedMode": "GENERAL",
+      "requiresProduct": false
+    },
+    {
+      "id": "customer-10",
+      "category": "customer",
+      "categoryLabel": "คุยกับลูกค้า",
+      "text": "ช่วยปรับข้อความตอบแชตให้เป็นกันเอง",
+      "expectedMode": "GENERAL",
+      "requiresProduct": false
+    }
+  ]
+}

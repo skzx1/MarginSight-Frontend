@@ -1,3 +1,4 @@
+import {isRankingQuestion,requestedRank} from './assistant-ranking.ts';
 import {catalogSummary} from './assistant-summary.ts';
 import { ApiError, request } from './auth.ts';
 import { monthContext } from './assistant-context.ts';
@@ -58,8 +59,9 @@ export async function answerQuestion({ base, question, context, products, locale
     const date = orderDateTime(r.orderAt);
     return date !== '—' && date.slice(0, 10) >= context.start && date.slice(0, 10) <= context.end;
   });
-  const selected = periodResults.filter(r => !context.sku || r.items?.some(item => item.sku === context.sku));
-  const mixed = !!context.sku && selected.some(r => r.items.some(i => i.sku !== context.sku));
+  const ranking=isRankingQuestion(question);
+  const selected = periodResults.filter(r => ranking || !context.sku || r.items?.some(item => item.sku === context.sku));
+  const mixed = !ranking && !!context.sku && selected.some(r => r.items.some(i => i.sku !== context.sku));
   if (mixed) return notice(th ? 'มีออเดอร์ที่รวมสินค้าหลายตัวครับ ข้อมูลที่ส่งมายังแยกกำไรของสินค้านี้ไม่ได้ จึงไม่ใช้กำไรทั้งออเดอร์แทนกำไรสินค้า ลองถามยอดรวมทุกสินค้าได้ครับ' : 'Some orders contain several products. The available results do not split their profit by product. Ask about all products to see recorded order totals.');
   const asOrders = (values: Calculation[]): OverviewOrder[] => values.map(r => ({
     orderId: r.orderId, platform: r.platform, orderAt: r.orderAt, revenueSatang: r.revenueSatang,
@@ -77,17 +79,19 @@ export async function answerQuestion({ base, question, context, products, locale
     ...(partial ? [th ? 'API ส่งรายละเอียดได้สูงสุด 50 ออเดอร์ต่อเดือน ผลนี้ครอบคลุมเฉพาะออเดอร์ที่โหลดมา' : 'The API returns up to 50 order details per month. This result covers loaded orders only.'] : []),
     results.some(r => !r.orderAt) ? (th ? 'มีรายการที่ไม่มีวันที่ จึงยังนำมารวมในช่วงนี้ไม่ได้' : 'Records without dates could not be included.') : ''
   ].filter(Boolean).join(' · ');
-  if (/สินค้าไหน|สินค้าตัวไหน|which product|most profit|least profit|best.?selling|กำไรดี|กำไรน้อย/i.test(question)) {
+  if (ranking) {
     const single = periodResults.filter(r => r.items?.length && new Set(r.items.map(i => i.sku)).size === 1);
     const groups = [...new Set(single.map(r => r.items[0].sku))].map(sku => ({ sku, stats: summarizeOrders(asOrders(single.filter(r => r.items[0].sku === sku))) }));
     const known = groups.filter(g => g.stats.profitSatang !== null);
     const low = /น้อย|ต่ำ|least|lowest/i.test(question);
-    known.sort((a, b) => low ? a.stats.profitSatang! - b.stats.profitSatang! : b.stats.profitSatang! - a.stats.profitSatang!);
+    known.sort((a, b) => (low ? a.stats.profitSatang! - b.stats.profitSatang! : b.stats.profitSatang! - a.stats.profitSatang!) || a.sku.localeCompare(b.sku,'en'));
+    const rank=requestedRank(question);
     if (!known.length) return notice(th ? 'ยังจัดอันดับกำไรสินค้าไม่ได้ครับ ต้องมีออเดอร์สินค้าเดียวที่มีต้นทุนและค่าบริการครบก่อน ออเดอร์รวมหลายสินค้ายังแยกกำไรต่อสินค้าไม่ได้' : 'There is not enough complete single-product order data to rank products yet. Mixed-product orders do not provide a product profit split.');
-    const top = known[0], product = products.find(p => p.sku === top.sku);
-    return { context, source: 'recorded', text: th ? `${product?.name ?? top.sku} มีกำไร${low ? 'น้อย' : 'มาก'}ที่สุดในกลุ่มที่ตรวจได้ครับ อันดับนี้รวมเฉพาะออเดอร์สินค้าเดียวที่มีข้อมูลครบ` : `${product?.name ?? top.sku} has the ${low ? 'lowest' : 'highest'} profit among the products we can check. Ranking uses complete single-product orders.`,
+    if(!Number.isSafeInteger(rank)||rank<1||rank>known.length)return notice(th?`มีสินค้าที่ข้อมูลครบสำหรับจัดอันดับ ${known.length} รายการ ยังไม่มีอันดับ ${rank} ในช่วงนี้ครับ`:`There are ${known.length} eligible products, so rank ${rank} is not available for this period.`);
+    const top = known[rank-1], product = products.find(p => p.sku === top.sku);
+    return { context:{...context,sku:null}, source: 'recorded', text: th ? `${product?.name ?? top.sku} อยู่ลำดับ ${rank} เมื่อเรียงกำไรจาก${low?'น้อยไปมาก':'มากไปน้อย'}ครับ รวมเฉพาะออเดอร์สินค้าเดียวที่ข้อมูลครบ กำไรเท่ากันเรียงตาม SKU` : `${product?.name ?? top.sku} is rank ${rank} by ${low?'ascending':'descending'} profit among complete single-product orders; equal profits are ordered by SKU.`,
       note: scope + (periodResults.length !== single.length || known.length !== groups.length ? (th ? ' · ยังไม่รวมออเดอร์หลายสินค้าและกลุ่มที่ข้อมูลไม่ครบ' : ' · Mixed orders and incomplete groups are excluded') : ''),
-      result: { label: product?.name ?? top.sku, profitSatang: top.stats.profitSatang, revenueSatang: top.stats.revenueSatang, marginPct: top.stats.marginPct, count: top.stats.totalOrders } };
+      result: { label: (th?`อันดับ ${rank} · `:`Rank ${rank} · `)+(product?.name ?? top.sku), profitSatang: top.stats.profitSatang, revenueSatang: top.stats.revenueSatang, marginPct: top.stats.marginPct, count: top.stats.totalOrders } };
   }
   const stats = summarizeOrders(orders);
   return { context, source: 'recorded', text: stats.profitSatang === null

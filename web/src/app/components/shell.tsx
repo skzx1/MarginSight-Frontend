@@ -88,6 +88,20 @@ export function AppShell({ screen, navigate, stores, store, changeStore, month, 
     document.addEventListener('keydown', onKey); media.addEventListener('change', onMedia);
     return () => { document.removeEventListener('keydown', onKey); media.removeEventListener('change', onMedia); };
   }, [drawerExpanded, drawer]);
+  // <768 the tab bar can grow past --nav-height (a label wraps, e.g. EN "Ask assistant"); keep --nav-height equal to its real
+  // height so the workspace padding, sticky composers and the store save dock never sit under it. >=768 the token applies.
+  useEffect(() => {
+    const nav = document.getElementById('main-navigation'), root = document.documentElement, mobile = window.matchMedia('(max-width:767px)');
+    if (!nav) return;
+    const sync = () => {
+      // Consumers add env(safe-area-inset-bottom) themselves, so measure the bar without its bottom padding beyond the top one.
+      const style = getComputedStyle(nav), height = nav.offsetHeight - parseFloat(style.paddingBottom) + parseFloat(style.paddingTop);
+      if (mobile.matches && height > 0) root.style.setProperty('--nav-height', Math.ceil(height) + 'px'); else root.style.removeProperty('--nav-height');
+    };
+    const observer = new ResizeObserver(() => requestAnimationFrame(sync));
+    observer.observe(nav); mobile.addEventListener('change', sync); sync();
+    return () => { observer.disconnect(); mobile.removeEventListener('change', sync); root.style.removeProperty('--nav-height'); };
+  }, []);
   const choose = (next: Screen) => { drawer('choose'); navigate(next); };
   return <ScreenActionsSlot.Provider value={actionsSlot}><div className={'app-shell' + (drawerExpanded ? ' drawer-expanded' : '') + (screen === 'overview' ? ' overview-shell' : '') + (screen === 'assistant' ? ' ' + assistantStyles.shell : '') + (screen === 'finance' ? ' ' + financeStyles.shell : '')}>
     <a href="#main-content" className="skip-link" onClick={e => { e.preventDefault(); document.getElementById('main-content')?.focus(); }}>{t('skip')}</a>

@@ -1,0 +1,19 @@
+MARGINSIGHT REDESIGN — RULES FOR EVERY SUBAGENT (lead = the main session; read fully before acting)
+
+Repo: <home>\Documents\Kasetsart\NTT DATA\MarginSight-Frontend  (branch feat/marginsight-redesign, HEAD c9b43a3, large UNCOMMITTED work tree = P2 + other agents' work; it is all intentional).
+Read first: AGENT.md (canonical project rules) and AGENTS.md.
+Master plan: <home>\AppData\Local\Temp\claude\<project>\69e03ab8-112e-474c-8b4c-bcda4eab83de\scratchpad\research\G5\plan.txt  (read REVISION 1-3 + your commit sections; [rev1]/[L2 rev1]/[P2-done] notes override the original text). Read-only for you.
+Research: same scratchpad\research\  G2 (signed money / indicators: G2-notes.txt), G3 (identity: assistant look), G4 (criteria.txt = acceptance criteria T/N/C/F/L/X ids, corrected-spec.txt), G6 (layout/IA wireframes), G7 (interaction-spec.html, inventory.txt, regression-checklist.txt R01-R47).
+
+HARD RULES
+1. Git: read-only commands only (status, diff, log, show, grep). NEVER commit, add, stash, reset, checkout, switch, restore, clean, merge, rebase, push. Never revert someone else's hunk.
+2. Edit ONLY the files your brief assigns to you. If you need a change in another file, do not make it: put it in your report under "REQUESTS FOR LEAD" with the exact change.
+   Other agents are editing other files at the same time. Before every Edit re-read the region; if an Edit fails because the file changed, re-read and retry—never overwrite whole files you did not create.
+3. Never change: web/src/lib/format.ts (money()), tests/frontend.test.mjs, web/src/lib/domain.generated.*, any financial formula, auth behaviour, AWS/Cognito files (web/branding/*, scripts/cloud-*), lib/types.ts Screen union (unless your brief says so).
+   Do not weaken, skip or delete existing tests or assertions. Add tests for new pure logic (node:test, tests/*.test.mjs; tests import .ts directly via Node type stripping, so testable logic goes in a pure .ts module under web/src/lib/, not .tsx).
+4. Policy that tests enforce: no colour literals outside web/src/app/tokens.css (use tokens); font-size >= 12px; no letter-spacing on Thai text; Thai line-height >= 1.5; targets >= 44px; focus ring 3px; weights <= 600; --font-display only on h1-h3; terracotta family (--color-action, -link, -indicator, -brand-bright, -focus, --chart-highlight, --color-accent) never colours financial values or statuses (criteria L2).
+   Copy: user-facing strings go in web/src/lib/copy.ts (TH+EN pairs; parity test) or assistant-copy.ts / product-catalog-copy.ts. Thai and English must both work.
+   Money display: amounts use the U+2212 minus and the label (System R), never "฿-" or ASCII hyphen for negative money.
+5. Checks you may run: `node node_modules/typescript/bin/tsc --noEmit -p web` and `node --test tests/<file>.test.mjs` (or all: node --test tests/*.test.mjs from the repo root using the file list). Do NOT run `npm run verify`, `next build` or package-deploy (the lead runs them; concurrent builds collide on web/.next and web/out). If you truly need a browser check, ask the lead in your report instead.
+6. Keep changes surgical and in the surrounding code style; no speculative abstractions; no unrelated refactors. If the plan text and the actual code disagree, follow the code reality + the plan's intent and say so in the report. If a genuine design decision is missing, do not invent one: implement everything else and list the decision.
+7. Final report (<= 400 words, English): files changed (one line each, purpose); tests added/run with actual results; deviations from the plan; open issues; REQUESTS FOR LEAD. Do not claim anything you did not run.

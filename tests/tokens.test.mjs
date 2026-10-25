@@ -91,3 +91,27 @@ test('info stays a status colour, far from every series (C9)', () => {
   const info = hex('--color-info').toLowerCase();
   for (const name of props.keys()) if (name.startsWith('--chart-')) assert.notEqual(hex(name).toLowerCase(), info, name);
 });
+
+// Shape and depth (P3d; criteria F4, F5, X4). Cards 12, controls and ordinary buttons 9, composer 20, dialogs 16.
+const px = name => {
+  const value = resolveProperty(props, name);
+  assert.match(value, /^\d+(\.\d+)?px$/, `${name} resolves to ${value}`);
+  return Number.parseFloat(value);
+};
+test('targets, buttons and inputs are at least 44px tall; the focus ring is 3px with a 3px offset (F4, F5)', () => {
+  for (const name of ['--target-min', '--control-height', '--input-height']) assert.ok(px(name) >= 44, `${name} = ${px(name)}px`);
+  assert.equal(px('--control-height'), 44);
+  assert.equal(px('--input-height'), 48);
+  assert.equal(px('--focus-width'), 3);
+  assert.ok(px('--focus-offset') >= 3);
+});
+test('radii follow the shape scale', () => {
+  assert.deepEqual(['--radius-md', '--radius-lg', '--radius-composer', '--radius-dialog'].map(px), [9, 12, 20, 16]);
+  assert.equal(resolveProperty(props, '--radius-card'), resolveProperty(props, '--radius-lg'));
+  assert.ok(px('--radius-pill') >= 999);
+});
+test('surfaces are flat; only floating layers and the composer keep a shadow', () => {
+  assert.equal(resolveProperty(props, '--shadow-sm'), 'none');
+  assert.equal(resolveProperty(props, '--shadow-md'), 'none');
+  for (const name of ['--shadow-lg', '--shadow-composer']) assert.match(resolveProperty(props, name), /rgb\(20 20 19\/\.\d+\)/, name);
+});

@@ -1,6 +1,7 @@
 'use client';
 import {useLanguage} from '../language';
 import {Field,Select,ErrorNotice} from './forms';
+import {Icon} from '../ui';
 import {initialMarketplaceDraft,type MarketplaceDraft,type MarketplaceOptions,type MarketplacePlatform} from '../../lib/marketplace-context';
 
 export function MarketplaceControls({draft:d,change,options,error,loading,reload,allowRecorded=true}:{draft:MarketplaceDraft;change:(d:MarketplaceDraft)=>void;options?:MarketplaceOptions;error?:unknown;loading:boolean;reload:()=>void;allowRecorded?:boolean}){
@@ -15,7 +16,7 @@ export function MarketplaceControls({draft:d,change,options,error,loading,reload
   {loading&&<p className="caption">{th?'กำลังโหลดรายการแพลตฟอร์ม…':'Loading platform options…'}</p>}
   <ErrorNotice error={error}/>{!!error&&<button type="button" className="secondary" onClick={reload}>{th?'โหลดตัวเลือกอีกครั้ง':'Reload options'}</button>}
   {p&&<>
-   <p className="notice marketplace-scope">{th?'ลองขายสินค้าที่เลือกบนแพลตฟอร์มนี้ ใช้ราคาและต้นทุนจากออเดอร์ล่าสุดในเดือนที่เลือก เป็นประมาณการ ไม่เปลี่ยนออเดอร์เดิมหรือสมัครโปรแกรมให้ร้าน':'Hypothetical sale using the latest single-SKU order in the selected month. This does not change orders or enroll your shop.'}</p>
+   <p className="notice marketplace-scope"><Icon name="warning" />{th?'ลองขายสินค้าที่เลือกบนแพลตฟอร์มนี้ ใช้ราคาและต้นทุนจากออเดอร์ล่าสุดในเดือนที่เลือก เป็นประมาณการ ไม่เปลี่ยนออเดอร์เดิมหรือสมัครโปรแกรมให้ร้าน':'Hypothetical sale using the latest single-SKU order in the selected month. This does not change orders or enroll your shop.'}</p>
    <div className="marketplace-fields"><Select label={th?'หมวดสินค้า / กลุ่มอัตรา':'Product category / rate group'} value={d.category} onChange={e=>update({category:e.target.value})}>{p.categories.map(c=><option key={c.id} value={c.id}>{c.name}</option>)}</Select>
     <Select label={th?'ประเภทร้าน':'Seller type'} value={d.sellerType} onChange={e=>update({sellerType:e.target.value as MarketplaceDraft['sellerType'],growthTier:'STANDARD'})}><option value="NON_MALL">Non-Mall / Marketplace</option><option value="MALL">Mall</option></Select></div>
    <fieldset className="marketplace-campaigns"><legend>{th?'แคมเปญ / โปรแกรมที่ต้องการลอง':'Campaigns / programs to simulate'}</legend><p className="caption">{th?'ไม่เลือก = ไม่รวมค่าบริการแคมเปญที่ระบุด้านล่าง; ค่าธรรมเนียมปกติยังคงมี':'None selected excludes these optional campaigns; normal fees still apply.'}</p>

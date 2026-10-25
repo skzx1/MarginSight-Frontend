@@ -11,7 +11,7 @@
   color: var(--color-text-inverse);
 }
 .sceneFooter { position: absolute; z-index: 6; right: max(32px, calc((100vw - 1320px) / 2)); bottom: 28px; text-align: right; pointer-events: none; }
-.sceneFooter p { color: var(--color-text-inverse); font-size: 18px; font-weight: 500; letter-spacing: -.025em; }
+.sceneFooter p { color: var(--color-text-inverse); font-size: 18px; font-weight: 500; }
 .sceneFooter > span { display: block; margin-top: 6px; color: var(--color-text-inverse-muted); font-size: var(--text-xs); letter-spacing: .025em; }
 .haze { position: absolute; inset: 0; background: radial-gradient(ellipse at 72% 48%, color-mix(in srgb, var(--color-text-inverse-muted) 36%, transparent), transparent 48%), radial-gradient(ellipse at 10% 85%, color-mix(in srgb, var(--color-brand-bright) 14%, transparent), transparent 60%); }
 .perspective { position: absolute; inset: 0; perspective: 850px; perspective-origin: 72% 48%; }

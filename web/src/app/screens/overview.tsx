@@ -9,6 +9,7 @@ import { Empty, ErrorNotice, Field, Loading } from '../components/forms';
 import { Icon } from '../ui';
 import { OverviewCharts } from '../components/overview-charts';
 import { ProfitAmount } from '../components/profit-amount';
+import { percent as formatPercent } from '../../lib/signed-money';
 import {
   channelSummaries, orderDateTime, ordersInPeriod, periodBounds, summarizeOrders,
   OVERVIEW_CHANNELS,
@@ -42,7 +43,7 @@ export default function Overview({ base, origin, period, navigate, onMissingCost
   const matches = orders.filter(order => (channel === 'all' || order.platform === channel) &&
     `${order.orderId} ${order.productName} ${order.skus.join(' ')}`.toLocaleLowerCase().includes(search.trim().toLocaleLowerCase()))
     .sort((a, b) => Date.parse(b.orderAt) - Date.parse(a.orderAt));
-  const percent = (value: number | null) => value == null ? '—' : new Intl.NumberFormat(locale === 'th' ? 'th-TH' : 'en-GB', { maximumFractionDigits: 1 }).format(value) + '%';
+  const percent = (value: number | null) => formatPercent(value, locale);
   const breakdown = [
     { label: t('costs'), value: stats.productCostSatang },
     { label: t('platformFees'), value: stats.platformFeeSatang },
@@ -58,8 +59,8 @@ export default function Overview({ base, origin, period, navigate, onMissingCost
 
   return <div className="overview-page" aria-busy={loading}>
     <ErrorNotice error={error} />{Boolean(error) && <button className="secondary" onClick={() => void reload()}>{t('retry')}</button>}
-    {!bounds && <p className="notice" role="alert">{t('invalidRange')}</p>}
-    {!loading && coverage?.partial && <p className="notice" role="alert">{locale==='th'?`API ส่งรายละเอียดมา ${coverage.loaded} จาก ${coverage.total} ออเดอร์ในเดือนที่เลือก ตัวเลขและกราฟด้านล่างรวมเฉพาะรายการที่โหลดได้ ไม่ใช่ยอดรวมทั้งร้าน`:`The API returned ${coverage.loaded} of ${coverage.total} orders in the selected months. Figures and charts cover loaded entries only, not the whole store.`}</p>}
+    {!bounds && <p className="notice" role="alert"><Icon name="warning" />{t('invalidRange')}</p>}
+    {!loading && coverage?.partial && <p className="notice" role="alert"><Icon name="warning" />{locale==='th'?`API ส่งรายละเอียดมา ${coverage.loaded} จาก ${coverage.total} ออเดอร์ในเดือนที่เลือก ตัวเลขและกราฟด้านล่างรวมเฉพาะรายการที่โหลดได้ ไม่ใช่ยอดรวมทั้งร้าน`:`The API returned ${coverage.loaded} of ${coverage.total} orders in the selected months. Figures and charts cover loaded entries only, not the whole store.`}</p>}
 
     {(loading || data) && <section className="summary-cards-container" aria-label={t('overviewSummary')}>
       <article className="summary-card profit-card">

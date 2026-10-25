@@ -52,16 +52,25 @@
  --chart-sales:var(--chart-revenue);
 
  /* Typography */
- --font-sans:'Anuphan','Inter',Tahoma,sans-serif;--font-numeric:'Inter','Anuphan',sans-serif;
+ /* IBM Plex Sans sets Latin and digits (equal-width figures, true minus); Noto Sans Thai sets Thai (web/public/fonts/fonts.css).
+    Leelawadee UI and Tahoma cover Thai on Windows if the web fonts fail. */
+ --font-sans:'IBM Plex Sans','Noto Sans Thai','Leelawadee UI',Tahoma,sans-serif;--font-numeric:var(--font-sans);
+ /* Headings. Temporarily the UI sans: the Noto Serif Thai heading face waits for its source and licence review. */
+ --font-display:var(--font-sans);
+ /* Page title: 26px on phones growing to 30px from about 1200px wide. */
+ --text-title:clamp(26px,calc(24px + .5vw),30px);
  --text-xs:12px;--text-sm:13px;--text-md:14px;--text-base:16px;--text-lg:18px;--text-xl:22px;--text-2xl:28px;--text-money-xl:clamp(32px,6vw,44px);
  --weight-regular:400;--weight-medium:500;--weight-semibold:600;
- --leading-body:1.6;--leading-heading:1.35;--leading-tight:1.2;
+ --leading-body:1.6;--leading-heading:1.5;--leading-tight:1.2;
 
  /* Shape, depth, space */
- --radius-sm:6px;--radius-md:10px;--radius-lg:16px;--radius-pill:999px;--radius-round:50%;
- --shadow-sm:0 1px 3px rgb(20 20 19/.06);--shadow-md:0 4px 16px rgb(20 20 19/.08);--shadow-lg:0 12px 32px rgb(20 20 19/.12);
+ /* Cards 12, controls and ordinary buttons 9; chips, badges, tags and toggles keep the pill; composer 20, dialogs 16. */
+ --radius-sm:6px;--radius-md:9px;--radius-lg:12px;--radius-pill:999px;--radius-round:50%;--radius-composer:20px;--radius-dialog:16px;
+ /* Flat by default: surface on canvas plus a hairline border separates. Only floating layers (dialogs, popovers, toasts)
+    and the composer keep elevation; --shadow-sm/-md stay as names that resolve to none. */
+ --shadow-sm:none;--shadow-md:none;--shadow-lg:0 12px 32px rgb(20 20 19/.12);--shadow-composer:0 1px 2px rgb(20 20 19/.04),0 4px 16px rgb(20 20 19/.06);
  --space-1:4px;--space-2:8px;--space-3:12px;--space-4:16px;--space-5:20px;--space-6:24px;--space-7:32px;--space-8:48px;
- --focus-width:3px;--focus-offset:3px;--target-min:44px;--control-height:48px;
+ --focus-width:3px;--focus-offset:3px;--target-min:44px;--control-height:44px;--input-height:48px;
  --nav-height:76px;--radius-card:var(--radius-lg);
 
  /* 3. Legacy aliases */

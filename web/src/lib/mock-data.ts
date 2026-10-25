@@ -1,5 +1,6 @@
 import type { Calculation, CatalogProduct } from './types';
 import { bangkokDate } from './format';
+import { percent, profitParts } from './signed-money';
 
 export const INITIAL_MOCK_PRODUCTS: CatalogProduct[] = [
   {
@@ -204,9 +205,9 @@ export function generateChatbotReply(question: string, products: CatalogProduct[
     const sorted = [...products].filter(p => p.profitSatang != null).sort((a, b) => (b.profitSatang ?? 0) - (a.profitSatang ?? 0));
     const top = sorted[0] || INITIAL_MOCK_PRODUCTS[1];
     if (locale === 'en') {
-      return `🏆 **Highest Profit Product:**\n- **${top.name}** (${top.sku})\n- Unit Profit: **฿${((top.profitSatang ?? 0) / 100).toFixed(2)}** per ${top.unit}\n- Margin: **${top.sellingPriceSatang ? (((top.profitSatang ?? 0) / top.sellingPriceSatang) * 100).toFixed(1) : '52.5'}%**\n\nThis item yields the highest net contribution per unit sold in your catalog.`;
+      return `🏆 **Highest Profit Product:**\n- **${top.name}** (${top.sku})\n- Unit profit / loss: **${profitParts(top.profitSatang ?? 0, 'en').phrase}** per ${top.unit}\n- Margin: **${top.sellingPriceSatang ? percent(((top.profitSatang ?? 0) / top.sellingPriceSatang) * 100, 'en') : '52.5%'}**\n\nThis item yields the highest net contribution per unit sold in your catalog.`;
     }
-    return `🏆 **สินค้าที่ทำกำไรสูงสุดในร้าน:**\n- **${top.name}** (รหัส ${top.sku})\n- กำไรต่อหน่วย: **฿${((top.profitSatang ?? 0) / 100).toFixed(2)}** ต่อ${top.unit}\n- อัตรากำไร: **${top.sellingPriceSatang ? (((top.profitSatang ?? 0) / top.sellingPriceSatang) * 100).toFixed(1) : '52.5'}%**\n\nสินค้านี้สร้างกำไรต่อชิ้นสูงที่สุด แนะนำให้จัดแคมเปญส่งเสริมการขายเพื่อเพิ่มยอดขายครับ`;
+    return `🏆 **สินค้าที่ทำกำไรสูงสุดในร้าน:**\n- **${top.name}** (รหัส ${top.sku})\n- กำไร/ขาดทุนต่อหน่วย: **${profitParts(top.profitSatang ?? 0, 'th').phrase}** ต่อ${top.unit}\n- อัตรากำไร: **${top.sellingPriceSatang ? percent(((top.profitSatang ?? 0) / top.sellingPriceSatang) * 100, 'th') : '52.5%'}**\n\nสินค้านี้สร้างกำไรต่อชิ้นสูงที่สุด แนะนำให้จัดแคมเปญส่งเสริมการขายเพื่อเพิ่มยอดขายครับ`;
   }
 
   if (q.includes('ลด') || q.includes('15%') || q.includes('discount')) {

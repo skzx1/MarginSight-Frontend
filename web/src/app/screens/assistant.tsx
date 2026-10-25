@@ -1,10 +1,14 @@
 'use client';
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import type { CatalogProduct, FeatureProps } from '../../lib/types';
-import { bangkokDate, money } from '../../lib/format';
+import { bangkokDate } from '../../lib/format';
+import { percent, profitParts } from '../../lib/signed-money';
 import { contextLabel, contextPreset, resolveChatContext } from '../../lib/assistant-context';
 import { answerQuestion } from '../../lib/assistant-service';
-import { createChat, sessionTitle, validContext, type ChatContext, type ChatTurn } from '../../lib/assistant-sessions';
+import { createChat, historyGroup, sessionTitle, validContext, type ChatContext, type ChatTurn } from '../../lib/assistant-sessions';
+import { recentChats, startAskChat } from '../../lib/assistant-arrival';
+import { enterAction } from '../../lib/composer-keys';
+import { bangkokDayLabel, greetingBucket } from '../../lib/greeting';
 import { useLanguage } from '../language';
 import { Icon } from '../ui';
 import { EvidencePanel, Money } from '../components/ledger';
@@ -48,7 +52,7 @@ export default function Assistant({ base, guest, origin, products, initialSku, d
   const t = (key: AssistantCopyKey) => assistantCopy[key][locale === 'th' ? 0 : 1];
   const {
     archive, setArchive, updateSession, ready, active, storageError, retrySave, canRetrySave,
-    deleteChat, renameChat, panel, setPanel, targetChat,
+    deleteChat, renameChat, selectChat, panel, setPanel, targetChat,
     openRenameModal, openDeleteModal, openSheet, closePanel, textareaRef
   } = useAssistantContext();
 
@@ -71,6 +75,26 @@ export default function Assistant({ base, guest, origin, products, initialSku, d
   const nearBottom = useRef(true), forceBottom = useRef(false), draftHandled = useRef(0);
   const pending = useRef(new Map<string, { turnId: string; controller: AbortController }>());
   const activePending = active?.turns.some(turn => turn.state === 'pending') ?? false;
+  // A1: compositionstart/end flag, for WebKit, which can deliver the committing Enter with isComposing=false.
+  const composing = useRef(false);
+  // A2/D4: on touch keyboards (pointer: coarse) Enter is a newline and the visible send button sends.
+  const [coarse, setCoarse] = useState(false);
+  useEffect(() => {
+    const query = matchMedia('(pointer:coarse)'), update = () => setCoarse(query.matches);
+    update(); query.addEventListener('change', update);
+    return () => query.removeEventListener('change', update);
+  }, []);
+  // A3: the greeting is computed on the client when the empty state shows (no build-time hour, no live ticking).
+  const emptyChat = !active?.turns.length;
+  const [greetingAt, setGreetingAt] = useState<Date | null>(null);
+  useEffect(() => { if (visible && emptyChat) setGreetingAt(new Date()); }, [visible, emptyChat, active?.id]);
+
+  const focusComposer = () => window.requestAnimationFrame(() => {
+    const node = textareaRef.current;
+    if (!node) return;
+    node.focus({ preventScroll: true });
+    node.setSelectionRange(node.value.length, node.value.length);
+  });
 
   useEffect(() => {
     const composer = composerWrap.current, host = root.current;
@@ -88,10 +112,14 @@ export default function Assistant({ base, guest, origin, products, initialSku, d
     draftHandled.current = draftRequest;
     const chat = createChat({ ...defaultContext, sku: initialSku });
     chat.draft = locale === 'th' ? 'สินค้านี้เหลือกำไรเท่าไร?' : 'How much profit does this product make?';
-    setArchive(old => old.sessions.length >= 100 ? old : { ...old, activeId: chat.id, sessions: [chat, ...old.sessions] });
     onDraftHandled();
+    // A12: at the 100-chat limit (and no empty chat to reuse) say so and open history, instead of dropping the ask.
+    if (!startAskChat(archive, chat)) { setNotice('askLimit'); setPanel('sheet'); return; }
+    setArchive(old => startAskChat(old, chat) ?? old);
+    // A11: this arrival focuses the composer (caret at the end of the prepared question), not the screen title.
     textareaRef.current?.focus({ preventScroll: true });
-  }, [ready, visible, draftRequest, initialSku, defaultContext, locale, setArchive, onDraftHandled, textareaRef]);
+    focusComposer();
+  }, [ready, visible, draftRequest, initialSku, defaultContext, locale, archive, setArchive, setPanel, onDraftHandled, textareaRef]);
 
   useEffect(() => {
     const node = textareaRef.current;
@@ -172,7 +200,7 @@ export default function Assistant({ base, guest, origin, products, initialSku, d
   const copy = async (turn: ChatTurn) => {
     if (!turn.reply) return;
     const reply = turn.reply, result = reply.result;
-    const text = [reply.text, result && `${result.label}: ${result.profitSatang == null ? t('missing') : '฿' + money(result.profitSatang, locale)}`, t('basedOn') + ': ' + contextLabel(reply.context, locale) + ' · ' + productLabel(reply.context.sku), reply.note].filter(Boolean).join('\n');
+    const text = [reply.text, result && `${result.label}: ${result.profitSatang == null ? t('missing') : profitParts(result.profitSatang, locale).text}`, t('basedOn') + ': ' + contextLabel(reply.context, locale) + ' · ' + productLabel(reply.context.sku), reply.note].filter(Boolean).join('\n');
     try { await navigator.clipboard.writeText(text); setCopied(turn.id); setTimeout(() => setCopied(''), 1800); } catch { setNotice('copyFailed'); }
   };
   const dateLabel = (context: ChatContext) => context.start === bangkokDate().slice(0, 7) + '-01' && context.end === bangkokDate() ? t('thisMonth') : contextLabel(context, locale);
@@ -195,7 +223,7 @@ export default function Assistant({ base, guest, origin, products, initialSku, d
       {turn.state === 'pending' ? <div className={s.typing} role="status"><span aria-hidden="true"><i /><i /><i /></span>{t('typing')}</div> : reply ? <>
         <AnswerText text={reply.text} />
         {reply.result && <div className={s.resultCard}><div className={s.resultMain}><span>{reply.result.label}</span><strong className={reply.result.profitSatang == null ? s.missing : reply.result.profitSatang < 0 ? s.loss : ''}>{reply.result.profitSatang == null ? t('missing') : <ProfitAmount value={reply.result.profitSatang} />}</strong></div>
-          <dl>{reply.result.revenueSatang !== undefined && <div><dt>{t('revenue')}</dt><dd><Money value={reply.result.revenueSatang} /></dd></div>}{reply.result.marginPct !== undefined && <div><dt>{t('margin')}</dt><dd>{reply.result.marginPct == null ? '—' : new Intl.NumberFormat(locale, { maximumFractionDigits: 1 }).format(reply.result.marginPct) + '%'}</dd></div>}{reply.result.count !== undefined && <div><dt>{locale === 'th' ? 'จากออเดอร์' : 'Recorded orders'}</dt><dd>{reply.result.count} {t('orders')}</dd></div>}{reply.result.beforeSatang !== undefined && <><div><dt>{t('before')}</dt><dd><Money value={reply.result.beforeSatang} /></dd></div><div><dt>{t('after')}</dt><dd><Money value={reply.result.afterSatang} /></dd></div></>}</dl>
+          <dl>{reply.result.revenueSatang !== undefined && <div><dt>{t('revenue')}</dt><dd><Money value={reply.result.revenueSatang} /></dd></div>}{reply.result.marginPct !== undefined && <div><dt>{t('margin')}</dt><dd>{percent(reply.result.marginPct, locale)}</dd></div>}{reply.result.count !== undefined && <div><dt>{locale === 'th' ? 'จากออเดอร์' : 'Recorded orders'}</dt><dd>{reply.result.count} {t('orders')}</dd></div>}{reply.result.beforeSatang !== undefined && <><div><dt>{t('before')}</dt><dd><Money value={reply.result.beforeSatang} /></dd></div><div><dt>{t('after')}</dt><dd><Money value={reply.result.afterSatang} /></dd></div></>}</dl>
         </div>}
         <div className={s.answerFootnote}>
           <ChatIcon name="calendar" />
@@ -213,6 +241,34 @@ export default function Assistant({ base, guest, origin, products, initialSku, d
         </div>
       </> : <div className={s.responseNotice} role={turn.state === 'failed' ? 'alert' : undefined}><p>{t(turn.state === 'stopped' ? 'stopped' : 'failed')}</p>{turn.state === 'stopped' && <small>{t('stopNote')}</small>}<button type="button" className={s.secondary} onClick={() => regenerate(turn)} disabled={activePending}><Icon name="refresh" />{t('retry')}</button></div>}
     </div></div>;
+  };
+
+  // Empty state (DA2 ledger layout + DC provenance): date line, time-of-day greeting, suggested questions as ledger
+  // lines that say which data they read, then recent chats. A suggestion fills the composer; the user sends (A4).
+  const prompts = [['profitPrompt', 'profitUses'], ['rankingPrompt', 'rankingUses'], ['discountPrompt', 'discountUses'], ['weekPrompt', 'weekUses']] as const;
+  const fillDraft = (text: string) => { if (!active) return; updateSession(active.id, chat => ({ ...chat, draft: text })); focusComposer(); };
+  const recentTime = (iso: string) => {
+    const group = historyGroup(iso, bangkokDate());
+    const time = new Intl.DateTimeFormat(locale === 'th' ? 'th-TH' : 'en-GB', { ...(group === 'today' ? { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' as const } : { day: 'numeric', month: 'short' as const }), timeZone: 'Asia/Bangkok' }).format(new Date(iso));
+    return group === 'today' ? `${t('today')} ${time}` : group === 'yesterday' ? t('yesterday') : time;
+  };
+  const renderWelcome = () => {
+    const bucket = greetingAt && greetingBucket(greetingAt);
+    const greet = bucket && t(bucket === 'morning' ? 'greetingMorning' : bucket === 'afternoon' ? 'greetingAfternoon' : bucket === 'evening' ? 'greetingEvening' : 'greetingLate');
+    const recent = recentChats(archive.sessions, active?.id);
+    // Each phrase is an unbreakable unit; lines break only between phrases (U+200B in the copy marks the Thai split).
+    const phrases = [greet, ...t('greetingAsk').split('\u200B')].filter((part): part is string => Boolean(part));
+    return <div className={s.welcome}>
+      <p className={s.day}><span className={s.welcomeMark} aria-hidden="true"><Icon name="assistant" /></span>{greetingAt && <span>{bangkokDayLabel(greetingAt, locale)}</span>}</p>
+      <h2>{phrases.map((part, i) => <span key={i}>{i === 1 && greet ? ' ' : i > 0 ? <wbr /> : null}<span className={s.phrase}>{part}</span></span>)}</h2>
+      <p className={s.intro}>{t('intro')}</p>
+      <div className={s.prompts} role="group" aria-label={t('prompts')}>{prompts.map(([key, uses]) => <button type="button" key={key} onClick={() => fillDraft(t(key))} disabled={!ready}>
+        <span className={s.promptText}>{t(key)}</span><span className={s.promptLeader} aria-hidden="true" /><small>{t(uses)}</small><Icon name="chevronRight" />
+      </button>)}</div>
+      {recent.length > 0 && <section className={s.recent} aria-labelledby="assistant-recent-title"><h3 id="assistant-recent-title">{t('recentChats')}</h3><ul>{recent.map(chat => <li key={chat.id}>
+        <button type="button" onClick={() => selectChat(chat.id)}><span>{chat.title || t('untitled')}</span><time dateTime={chat.updatedAt}>{recentTime(chat.updatedAt)}</time></button>
+      </li>)}</ul></section>}
+    </div>;
   };
 
   return <div className={s.root} ref={root}>
@@ -241,20 +297,23 @@ export default function Assistant({ base, guest, origin, products, initialSku, d
       {notice && <div className={s.warning} role="status">{t(notice)}</div>}
       <div className={s.messageScroll} ref={scroll} tabIndex={0} aria-label={t('assistant')} onScroll={e => { const el = e.currentTarget; const near = el.scrollHeight - el.scrollTop - el.clientHeight < 90; nearBottom.current = near; setAtBottom(near); }}>
         <div className={s.messageColumn}>
-          {!active?.turns.length ? <div className={s.welcome}><span className={s.welcomeMark} aria-hidden="true"><Icon name="assistant" /></span><h2>{t('greeting')}</h2><p>{t('intro')}</p><div className={s.prompts} aria-label={t('prompts')}>{(['profitPrompt','rankingPrompt','discountPrompt','weekPrompt'] as const).map((key, i) => <button type="button" key={key} onClick={() => send(t(key))} disabled={!ready}><Icon name={(['overview','products','simulation','orders'] as const)[i]} /><span>{t(key)}</span><Icon name="chevronRight" /></button>)}</div></div> : <div className={s.turns}>{active.turns.map(turn => <article className={s.turn} key={turn.id}><div className={s.userRow}><div className={s.userBubble}><span className="sr-only">{t('you')}: </span>{turn.question}</div></div>{renderAnswer(turn)}</article>)}</div>}
+          {!active?.turns.length ? renderWelcome() : <div className={s.turns}>{active.turns.map(turn => <article className={s.turn} key={turn.id}><div className={s.userRow}><div className={s.userBubble}><span className="sr-only">{t('you')}: </span>{turn.question}</div></div>{renderAnswer(turn)}</article>)}</div>}
         </div>
       </div>
       {!atBottom && !!active?.turns.length && <button type="button" className={s.jump} onClick={() => { if (scroll.current) scroll.current.scrollTo({ top: scroll.current.scrollHeight, behavior: matchMedia('(prefers-reduced-motion:reduce)').matches ? 'instant' : 'smooth' }); }}><ChatIcon name="down" />{t('latest')}</button>}
       <div className={s.composerWrap} ref={composerWrap}><div className={s.composerColumn}>
         <form className={s.composer} onSubmit={e => { e.preventDefault(); send(); }}>
           <label htmlFor="assistant-input" className="sr-only">{t('input')}</label>
-          <textarea ref={textareaRef} id="assistant-input" rows={1} maxLength={1500} value={active?.draft ?? ''} placeholder={t('placeholder')} title={t('hint')} disabled={!ready} onChange={e => { const draft = e.target.value; if (active) updateSession(active.id, chat => ({ ...chat, draft })); }} onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing) { e.preventDefault(); if (!activePending) send(); } }} aria-describedby="assistant-context" />
+          <textarea ref={textareaRef} id="assistant-input" rows={1} maxLength={1500} value={active?.draft ?? ''} placeholder={t('placeholder')} title={t(coarse ? 'hintTouch' : 'hint')} enterKeyHint={coarse ? 'enter' : 'send'} disabled={!ready} onChange={e => { const draft = e.target.value; if (active) updateSession(active.id, chat => ({ ...chat, draft })); }}
+            onCompositionStart={() => { composing.current = true; }} onCompositionEnd={() => { window.setTimeout(() => { composing.current = false; }, 0); }}
+            onKeyDown={e => { const action = enterAction({ key: e.key, shiftKey: e.shiftKey, isComposing: e.nativeEvent.isComposing, keyCode: e.keyCode }, { composing: composing.current, pending: activePending, coarse }); if (action === 'default') return; e.preventDefault(); if (action === 'send') send(); }} aria-describedby="assistant-context" />
           <div className={s.composerToolbar}>
             <div id="assistant-context" className={s.context} role="group" aria-label={t('using')}>
+              <span className={s.contextLabel} aria-hidden="true">{t('using')}</span>
               <button type="button" disabled={!ready} aria-label={t('editPeriod')} aria-haspopup="dialog" aria-expanded={panel === 'period'} onClick={() => { setPeriodDraft(active?.context ?? defaultContext); setPanel('period'); }}><ChatIcon name="calendar" /><span>{dateLabel(active?.context ?? defaultContext)}</span><span className={s.contextChevron} aria-hidden="true"><Icon name="chevronRight" /></span></button>
               <button type="button" disabled={!ready} aria-label={t('editProduct')} aria-haspopup="dialog" aria-expanded={panel === 'products'} onClick={() => { setProductSearch(''); setPanel('products'); }}><Icon name="products" /><span>{productLabel(active?.context.sku ?? null)}</span><span className={s.contextChevron} aria-hidden="true"><Icon name="chevronRight" /></span></button>
             </div>
-            {activePending ? <button type="button" className={s.send} onClick={stop} aria-label={t('stop')} title={t('stop')}><ChatIcon name="stop" /></button> : <button type="submit" className={s.send} disabled={!ready || !active?.draft.trim()} aria-label={t('send')} title={t('send')}><Icon name="arrow" /></button>}
+            {activePending ? <button type="button" className={s.send} onClick={stop} aria-label={t('stop')} title={t('stop')}><ChatIcon name="stop" /></button> : <button type="submit" className={s.send} disabled={!ready || !active?.draft.trim()} aria-label={t('send')} title={t('send')}><Icon name="arrow" /><span className={s.sendLabel} aria-hidden="true">{t('sendShort')}</span></button>}
           </div>
         </form>
       </div></div>

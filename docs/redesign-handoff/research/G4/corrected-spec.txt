@@ -1,0 +1,104 @@
+MarginShot - CORRECTED DESIGN SPEC: colour, typography, charts, shape (G4 proposal v2, 2026-10-25; v2 = challenger fix pass: lighter channel palette, profit series per gain variant, gain B reconciled with G2)
+Keeps the external spec's intent (warm cream/ink/terracotta, burgundy loss, muted navy info, serif headings) and fixes Gate-1 contradictions.
+Measurements: g4-audit-output.txt (0 FAIL). Criteria: criteria.txt. Specimen: specimen.html + specimen-*.png.
+
+=====================================================================
+1. TOKEN ARCHITECTURE (stays ONE :root in web/src/app/tokens.css; load order unchanged)
+=====================================================================
+Layer 1 primitives (raw hex, named by hue-step, never used by components):
+  --cream-0:#FFFFFF  --cream-50:#FAF9F5  --cream-100:#F4F2EC  --cream-150:#F0EEE6  --cream-175:#ECE9E1  --cream-200:#E8E5DC  --cream-250:#E6E2D8
+  --stone-500:#8C877D  --stone-600:#6E6A62  --stone-700:#66625A  --ink-700:#3B3833  --ink-800:#2B2A27  --ink-900:#141413
+  --ink-dark-900:#1F1E1C  --ink-dark-800:#2E2C29  --ink-dark-line:#5A564E  --cream-inverse-muted:#C9C4B8
+  --terracotta-400:#D97757  --terracotta-450:#E08A68  --terracotta-500:#C8643F  --terracotta-600:#B04F2C  --terracotta-650:#A2482A  --terracotta-700:#933F22
+  --burgundy-700:#8E1238  --burgundy-600:#A3284E  --burgundy-200:#F4A9BA  --burgundy-50:#F7E3E8
+  --mustard-700:#735C00  --mustard-300:#E3C35A  --mustard-50:#F5EDCF
+  --navy-700:#2F5784  --navy-200:#A9C2E3  --navy-50:#E5ECF4
+  --stone-650:#5C5852 (profit series, variant A)  --stone-450:#958F86 (channel Other)
+  --green-700:#145F4C --green-600:#17735C --green-200:#9ACBAE --green-50:#E3F1EC   (only if gain variant B; #17735C = G2/repo emerald #187B62 darkened so text passes 4.5 on every light surface)
+  channel primitives: --brown-700:#6B3D1C --blue-500:#556DC6 --plum-600:#61506D --leaf-500:#588E44 --slate-green-600:#56695C
+Layer 2 semantic (components use only these). Existing names KEPT so CSS modules keep working; values re-pointed:
+  --color-bg-canvas -> cream-50        --color-bg-surface -> cream-0      --color-bg-subtle -> cream-150 (hover row, user bubble, disabled)
+  NEW --color-bg-sidebar -> cream-100  NEW --color-nav-active-bg -> cream-200
+  --color-text -> ink-900  --color-text-muted -> stone-700  --color-border -> cream-250 (decorative)  --color-border-strong -> stone-500
+  --color-action -> terracotta-600  --color-action-hover -> terracotta-700  --color-on-action -> cream-0  --color-link -> terracotta-650
+  --color-focus -> terracotta-600   NEW --color-indicator -> terracotta-500 (nav bar + unread dot)  NEW --color-brand-bright -> terracotta-400 (decor only)
+  --color-selected -> ink-900 (selected chip fill; text white)  NEW --color-count-bg -> ink-900  NEW --color-count-fg -> cream-0
+  --color-accent / --color-accent-tint -> RETIRED as roles; alias to --color-action / --color-bg-subtle during migration
+  --color-negative -> burgundy-700  --color-negative-bg -> burgundy-50
+  --color-positive -> OPEN: variant A ink-900 / variant B green-600 #17735C ; NEW --color-positive-bg (A cream-175 / B green-50 #E3F1EC), NEW --color-positive-fg (A ink-700 / B green-700 #145F4C)
+  --color-warning -> mustard-700  --color-warning-bg -> mustard-50  --color-warning-border -> stone-500 (decorative; was amber-600)
+  --color-info -> navy-700  --color-info-bg -> navy-50
+  --color-disabled-bg -> cream-150  --color-disabled-text -> stone-600 (4.63:1; spec had #8C877D)
+  Dark-surface set (name stays; values are warm ink): --color-bg-dark -> ink-dark-900, --color-bg-dark-hover -> ink-dark-800, --color-border-on-dark -> ink-dark-line,
+     --color-text-inverse -> cream-50, --color-text-inverse-muted -> cream-inverse-muted, --color-focus-on-dark -> terracotta-450, NEW --color-indicator-on-dark -> terracotta-400,
+     --color-negative-on-dark -> burgundy-200, NEW --color-warning-on-dark -> mustard-300, NEW --color-info-on-dark -> navy-200, --color-positive-on-dark -> A cream-50 / B green-200
+  Charts (NEW explicit roles; --chart-1..5 become aliases only during migration):
+     --chart-revenue ink-800  --chart-cost stone-500  --chart-profit (A) stone-650 #5C5852 / (B) green-600 #17735C, both dotted 2-3 + triangle marker  --chart-loss burgundy-600  --chart-highlight terracotta-600 (ring only)
+     --chart-grid cream-250  --chart-axis stone-700
+     --chart-ch-shopee #6B3D1C  --chart-ch-lazada #556DC6  --chart-ch-tiktok #61506D  --chart-ch-line #588E44  --chart-ch-store #56695C  --chart-ch-other #958F86
+     (v1 #453421/#26245E/#1B575A/#5D6A33/#5E7BAA/#8C877D WITHDRAWN: too dark, lum ratio between them 1.18-1.71, Lazada vs ink 1.31)
+     v2 luminance ladder (contrast vs white): Shopee 9.09 > TikTok 7.30 > In-store 5.88 > Lazada 4.78 > LINE 3.91 > Other 3.21 ; every pair >= 1.22:1 ; each >= 2.03:1 vs ink text
+     --chart-sales -> --chart-revenue ; --chart-profit already named (re-pointed from orange to A #5C5852 or B #17735C)
+  Channel BADGES (text chips, not charts): neutral pill surfaceAlt + text + platform name; no status colours (fixes .channel-lazada using info and .channel-shopee using warning).
+Layer 3 legacy aliases: unchanged names (--ink, --muted, --green, --profit, --loss, --warning ...) re-resolve automatically. --green/--green-dark become misnomers -> mark deprecated, remove after migration.
+Dark-mode readiness (NOT implemented): every semantic token has a role name with no colour word; on-dark counterparts exist for each status role. A future [data-theme=dark] block would re-point Layer 2 only.
+
+DARK SURFACES - depends on P4 layout (G6):
+  Option L (recommended if P4 adopts the spec's light sidebar): sidebar = --color-bg-sidebar #F4F2EC, nav pill = #E8E5DC + 3px indicator bar; overview hero profit card = surface + borderStrong border (spec's KPI pattern); assistant history drawer = sidebar colour. Dark set stays defined but unused.
+  Option D (if P4 keeps dark nav/hero/drawers): use warm-ink dark set above (measured: onDark 15.81, onDarkMuted 9.58, lossOnDark 8.91, focusOnDark 6.35 on #1F1E1C). Warning: gain B on dark vs loss on dark under deutan dE2000 1.9 (#9ACBAE vs #F4A9BA, lum ratio 1.03) - on dark surfaces sign + label are the only reliable carriers.
+
+=====================================================================
+2. CONTRADICTIONS FIXED
+=====================================================================
+X1 Unread dot: brandBright (2.79 on sidebar) -> --color-indicator #C8643F (3.12-3.92 on all light surfaces). brandBright = logo + sparkle only.
+X2 "primary pill with white number" vs "brand never colours a number": count pill = ink #141413 + white number (18.43:1). Rule 2 rewritten: terracotta never colours a financial value, status or chart data fill.
+X3 "One loud colour" vs 3 terracotta buttons: criteria.txt L1 (<= 1 action-filled element per landmark region).
+X4 Button height 36 -> min 44 (--target-min 44px; --control-height 44px for buttons/chips, inputs keep 48px). Focus 2px -> 3px, offset 3px.
+X5 SKU 11.5px IBM Plex Mono (no Thai) -> 12px UI family, tabular-nums, muted; no mono family (a Thai SKU such as 'BG-ผ้า-02' would fall back mid-string).
+X6 Money: whole-baht rule removed; two decimals everywhere (owner standard; money() untouched).
+X7 Shopee == revenue hex: two separate palettes + channel map by name; Shopee #6B3D1C vs revenue #2B2A27 lum ratio 1.65 (they never share a chart anyway).
+X8 No 'other' channel: --chart-ch-other #958F86 (lightest step, 3.21 on white); In-store has its own colour.
+X9 info vs Lazada (dE 8.7 / repo badge uses info): Lazada series #556DC6 (search excluded any series within dE2000 12 of info, loss, action, warn, brandBright, ink); info never a series colour; channel badges neutral.
+X10 Highlight vs loss vs ch2 (1.01-1.74:1): highlight becomes a 3px ring/outline, never a fill; loss = bars below zero with signed label; chart-loss lightened to #A3284E so revenue vs loss under protan rises 5.3 -> 11.6.
+X11 Spec alert borders (30% mix, 1.52-1.74:1) are declared decorative; alert identity = icon + bold title (criteria N7).
+X12 Indicator glyphs must be SVG: ▲ ▼ ⚠ ⓘ missing from Anuphan, IBM Plex Sans, Noto Sans Thai (verified, fontinfo.mjs).
+X13 Indicator SYSTEM (+/▲/− etc.) not mandated here - G2 owns it. Tokens are neutral to that choice.
+
+=====================================================================
+3. GAIN COLOUR - OPEN (G2 decides); both variants measured
+=====================================================================
+                         Variant A (ink, spec)              Variant B (muted green)
+text on surface           #141413 18.43                      #17735C 5.76 (canvas 5.47, navActiveBg 4.58)
+badge                     #3B3833 on #ECE9E1 9.62            #145F4C on #E3F1EC 6.52
+vs loss #8E1238 dE2000    normal 30.6 / protan 11.4 /        normal 59.1 / protan 19.7 /
+  (normal/P/D/T), lum      deutan 22.9 / tritan 31.8 ; 2.01   deutan 12.2 / tritan 56.2 ; 1.59
+vs text (can user tell    identical (by design)              dE 34.7, lum 3.20
+  gain from neutral?)
+on dark (D option)        onDark #FAF9F5                      #9ACBAE 9.14; vs lossOnDark deutan 1.9 (!)
+B reconciliation: G2 mock uses #187B62 (= repo --emerald-700). Measured: #187B62 text 5.19 on surface but 4.47 on surfaceAlt (FAIL on hover rows); deutan vs loss 13.3. v1 #2F6B4F: deutan vs loss only 7.8. RECOMMEND #17735C: same hue family as #187B62, passes 4.5 on every light surface, deutan vs loss 12.2. Badge #145F4C on #E3F1EC = G2 values (6.52).
+Notes: B gives the 'green = profit' merchants expect but is the classic red/green CVD pair (deutan 12.2 light with #17735C, 1.9 on dark); A keeps "positive is quiet" and loss is the only hue. Either way the sign/label from G2 is mandatory. Chart profit series follows the choice: A #5C5852 (dark warm neutral; vs revenue dE 15.5 / lum 2.03, vs cost dE 18.5 / lum 1.98; dotted + triangle vs revenue solid + circle), B #17735C. Caution B: gain #17735C vs In-store #56695C protan 2.9 / deutan 2.0 - never colour a number with gain inside a channel chart.
+
+=====================================================================
+4. TYPOGRAPHY
+=====================================================================
+Families (proposal):
+  Headings/AI greeting: "Noto Serif Thai","Source Serif 4",Georgia,serif   weights 600 (+500 greeting)
+  UI/body/numbers: "IBM Plex Sans Thai","IBM Plex Sans",<fallback> ; numbers use tabular-nums (Plex has tnum - ASSUMPTION, verify on the actual file)
+  Mono: none (see X5). Code editor keeps generic monospace.
+Already in repo (verified with fontinfo.mjs, git log 69c9d27 2026-10-17): web/public/fonts/font-0..3.ttf = IBM Plex Sans 400/500/600/700 v3.201 Latin-only (Thai 1/87 codepoints), 205 KB each; font-4..7.ttf = Noto Sans Thai 400/500/600/700 v2.002, Thai 87/87, ~45.7 KB each; licence texts ibm-plex-sans-OFL.txt (RFN "Plex") and noto-sans-thai-OFL.txt present; referenced by NO css (orphans, ~1.0 MB). Current fonts: Anuphan variable (Thai 87/87, OFL) + Inter variable (876 KB, OFL).
+  => Zero-download alternative for the UI role: "IBM Plex Sans" (font-0..2) + "Noto Sans Thai" (font-4..6). IBM Plex Sans Thai is the designed companion but is not in the repo.
+Licence status: Noto Serif Thai, Noto Sans Thai, IBM Plex Sans / Sans Thai / Mono, Source Serif 4, Anuphan, Inter are all distributed under SIL OFL 1.1 [VERIFIED only for files present in repo; others ASSUMPTION from prior knowledge, no network]. Reserved Font Names: "Plex" (verified in repo licence file), "Source" (Source Serif 4 - ASSUMPTION). Subsetting/renaming obligations under RFN -> question for legal review, no conclusion here.
+Size estimates (ASSUMPTION, extrapolated from repo files; no subsetting tool installed): Thai+Latin static weight ~45-60 KB TTF (Noto Sans Thai measured 45.7 KB), ~20-30 KB WOFF2 each. Plex Sans Latin 205 KB TTF -> Latin-1 subset estimated 30-40 KB TTF / 15-20 KB WOFF2. Proposed set (serif 600 + 500, UI 400/500/600, Thai + Latin) ~ 8-10 files, est. 150-250 KB WOFF2 total vs ~1.1 MB TTF loaded today (Anuphan 232 KB + Inter 877 KB). Use unicode-range split (Thai U+0E01-0E5B,U+200B-200D,U+25CC ; Latin) and font-display:swap. Variable Noto Serif Thai (wght 100-900, wdth) - ASSUMPTION; prefer static 500/600 if smaller.
+Fallbacks: Windows has Leelawadee UI + Tahoma (Thai 87/87 verified); serif Thai fallback is poor on Windows (only Angsana) - acceptable because headings degrade to sans.
+Type scale (px / weight / line-height), min 12:
+  page title 30/600/1.35 (mobile 26) serif | card heading 18/600/1.4 serif | AI greeting 36-40/500/1.35 serif (mobile 28)
+  body 16/400/1.6 (mobile-first; spec's 14 allowed in dense desktop tables/side panels, 1.6) | UI 14/400/1.6
+  label 12/500/1.5 muted, letter-spacing 0 | table number 13-14/400 tabular-nums right | KPI 26/600/1.2 sans tabular-nums (money-xl clamp 32-44 kept for hero) | SKU 12/400/1.5 muted | chart axis 12/400.
+  Token mapping: --text-xs 12, --text-sm 13, --text-md 14, --text-base 16, --text-lg 18, NEW --text-title 30 (26 mobile), --text-2xl 28 -> greeting mobile, --leading-body 1.6, --leading-heading 1.35, --leading-tight 1.2 (numbers only).
+Rendering checks still needed (not possible offline): Noto Serif Thai at 18px heading (stacked tone marks, ascender clipping at 1.35), real Thai copy lengths in 44px buttons.
+
+=====================================================================
+5. SHAPE & DEPTH
+=====================================================================
+Radius: card 12 (repo 16 -> 12), control 9 (button/input/select), chip/badge pill 999, composer 20, dialog 16. Shadows: none except composer (spec value) and floating layers (dialog/popover need elevation: keep --shadow-lg recoloured to rgba(20,20,19,.12)). Separation = surface on canvas + hairline.
+Pill buttons in repo (--radius-pill) -> radius 9 per spec; this is a visible identity change (G3 to confirm).

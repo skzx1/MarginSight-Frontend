@@ -9,6 +9,7 @@ export const copy = {
   missingCostPrefix: ['มี', 'There are'], missingCostSuffix: ['ออเดอร์ที่ยังไม่ระบุต้นทุนสินค้า — กดเพื่อกรอกต้นทุน', 'orders missing product costs — enter costs'], missingProfitNote: ['ข้อมูลยังไม่ครบ จะแสดงกำไรเมื่อกรอกต้นทุนและตรวจเงินหักแล้ว', 'Profit becomes available after missing costs and deductions are reviewed.'],
   overviewLoaded: ['ออเดอร์ที่โหลดแล้วในช่วงนี้', 'Loaded orders in this period'], showMoreOrders: ['แสดงออเดอร์เพิ่ม', 'Show more orders'], noMatchingOrders: ['ไม่พบออเดอร์ที่ตรงกับตัวกรอง', 'No orders match these filters'], noChannelOrders: ['ไม่มีออเดอร์', 'No orders'], overviewMockDate: ['ข้อมูลตัวอย่าง ณ 17 ต.ค. 2026', 'Sample as of 17 Oct 2026'], overviewNoPrevious: ['ไม่มีข้อมูลช่วงก่อนหน้า จึงไม่แสดงเปอร์เซ็นต์เปรียบเทียบ', 'No previous-period data is available for comparison.'],
   mainNavigation: ['เมนูหลัก', 'Main navigation'], expandNavigation: ['ขยายเมนู', 'Expand navigation'], collapseNavigation: ['ย่อเมนู', 'Collapse navigation'],
+  navGroupProducts: ['สินค้า', 'Products'], navGroupMoney: ['เงิน', 'Money'], navGroupData: ['นำเข้าข้อมูล', 'Data import'], navGroupAssistant: ['ผู้ช่วย', 'Assistant'], navGroupStore: ['ร้าน', 'Store'], navAccount: ['บัญชี', 'Account'], screenContext: ['ร้านและช่วงเวลา', 'Store and period'],
   overview: ['ภาพรวม', 'Overview'], products: ['สินค้า', 'Products'], assistant: ['ถามผู้ช่วย', 'Ask assistant'], store: ['ข้อมูลร้าน', 'Store'],
   orders: ['ออเดอร์', 'Orders'], reconciliation: ['ตรวจยอดรับสินค้า', 'Check settlements'], imports: ['นำเข้ารายงาน', 'Import reports'], receipts: ['อ่านบิลซื้อ', 'Read receipts'], rules: ['กฎและแคมเปญ', 'Fees & programs'], line: ['เชื่อม LINE', 'Connect LINE'], simulation: ['ลองราคา', 'Try a price'],
   tagline: ['เห็นกำไร เข้าใจร้าน', 'Know your profit. Know your shop.'], language: ['ภาษา', 'Language'], back: ['กลับ', 'Back'], home: ['กลับหน้าแรก', 'Go home'], logout: ['ออกจากระบบ', 'Sign out'], refresh: ['รีเฟรช', 'Refresh'], loading: ['กำลังโหลดข้อมูล…', 'Loading…'], working: ['กำลังทำรายการ…', 'Working…'], retry: ['ลองอีกครั้ง', 'Try again'], save: ['บันทึก', 'Save'], saved: ['บันทึกแล้ว', 'Saved'], cancel: ['ยกเลิก', 'Cancel'], next: ['โหลดเพิ่ม', 'Load more'], close: ['ปิด', 'Close'], details: ['ดูรายละเอียด', 'Details'], choose: ['เลือกรายการ', 'Choose an item'],
@@ -70,6 +71,12 @@ export const copy = {
   rowWarnBadge: ['ตรวจสอบ', 'Review'],
   rowErrorBadge: ['ผิดพลาด', 'Error'],
   signedProfit: ['กำไร', 'Profit'], signedLoss: ['ขาดทุน', 'Loss'],
+  spokenProfit: ['กำไร', 'Profit of'], spokenLoss: ['ขาดทุน', 'Loss of'], bahtUnit: ['บาท', 'baht'],
+  phraseProfit: ['กำไร', 'Profit of'], phraseLoss: ['ขาดทุน', 'Loss of'],
+  deltaUp: ['เพิ่มขึ้น', 'up'], deltaDown: ['ลดลง', 'down'], deltaFlat: ['ไม่เปลี่ยนแปลง', 'no change'],
+  percentPoints: [' จุด', ' pp'], noBaseline: ['ไม่มีฐานเปรียบเทียบ', 'No comparison baseline'],
+  netProfitLoss: ['กำไร/ขาดทุนสุทธิ', 'Net profit / loss'], sellingAtLoss: ['ขายขาดทุน', 'Selling at a loss'],
+  profitUnavailable: ['ยังคำนวณกำไรไม่ได้', 'Profit not available'],
 } as const;
 export type CopyKey = keyof typeof copy;
 export type Locale = 'th' | 'en';

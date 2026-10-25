@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { useLanguage } from '../language';
 import { dailySummaries, channelSummaries, type OverviewOrder } from '../../lib/overview-data';
-import { money } from '../../lib/format';
+import { baht, profitParts } from '../../lib/signed-money';
 import { Money } from './ledger';
 import { ProfitAmount } from './profit-amount';
 import { SeriesMark, SeriesSwatch } from './chart-marks';
@@ -39,8 +39,8 @@ export function OverviewCharts({ orders }: { orders: OverviewOrder[] }) {
           {min < 0 && <line x1="64" x2="680" y1={y(0)} y2={y(0)} className="chart-zero" />}
           <path d={path('revenueSatang')} className="series-line series-revenue" /><path d={path('profitSatang')} className="series-line series-profit" />
           {days.map((day, i) => <g key={day.day}>
-            <SeriesMark series="revenue" x={x(i)} y={y(day.revenueSatang)}><title>{day.day}: {money(day.revenueSatang, locale)} THB</title></SeriesMark>
-            {day.profitSatang != null && <SeriesMark series="profit" x={x(i)} y={y(day.profitSatang)} loss={day.profitSatang < 0}><title>{day.day}: {money(day.profitSatang, locale)} THB</title></SeriesMark>}
+            <SeriesMark series="revenue" x={x(i)} y={y(day.revenueSatang)}><title>{day.day} · {t('salesCard')}: {baht(day.revenueSatang, locale)}</title></SeriesMark>
+            {day.profitSatang != null && <SeriesMark series="profit" x={x(i)} y={y(day.profitSatang)} loss={day.profitSatang < 0}><title>{day.day} · {t('netProfitLoss')}: {profitParts(day.profitSatang, locale).text}</title></SeriesMark>}
             {(i === 0 || i === days.length - 1 || (days.length > 4 && i === Math.floor(days.length / 2))) && <text x={x(i)} y="252" textAnchor="middle" className="chart-axis">{day.day.slice(8)}/{day.day.slice(5, 7)}</text>}
           </g>)}
         </svg>

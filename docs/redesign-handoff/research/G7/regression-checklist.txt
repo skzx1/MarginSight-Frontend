@@ -1,0 +1,62 @@
+G7 — INTERACTION REGRESSION CHECKLIST (must keep working through P1–P4)
+Harness: scratchpad\qa\serve.mjs <build> (static 4060 + mock API 4051) + a FLOWS entry in the scratchpad\qa\interact.mjs format
+  [name, hash, widths, steps]; step = ['click', expr] | ['key', key] | ['eval', expr] | ['shot', tag] | ['wait', ms]
+R\G7\probe.mjs is a working example (5 flows; results in probe-result.json). "PASS =" is the eval result to expect.
+Widths: 320, 390, 768, 900, 1024, 1440, 1920 unless stated. Run with --lang th and --lang en.
+
+NAVIGATION / SHELL
+R01 Title focus on screen change. Click each nav item; eval document.activeElement.id. PASS = "screen-title" and document.title = "<screen> · MarginShot".
+R02 Skip link. key Tab from top, key Enter; PASS = activeElement.id "main-content".
+R03 aria-current. On #orders (or G6's new parent) eval nav [aria-current=page] text; PASS = parentScreen() label.
+R04 Back/forward. navigate overview→products→finance; eval history.back() x2; PASS = hash #overview each step, screen renders.
+R05 Guard. On #store change a field, eval window.confirm=()=>false, click overview nav; PASS = hash stays #store. Then history.back() with confirm=false; PASS = hash #store (replaceState). confirm=()=>true → leaves.
+R06 Unknown hash → overview. Page.navigate /login/#nope; PASS = h1 overview.
+R07 Tablet drawer 768–1023 (900): click .drawer-toggle → aria-expanded true; key Escape → false and focus = toggle (existing). NEW after N3: click a nav item → false; click main → false.
+R08 Bottom bar <768 (390, 320): 5 tabs visible, each getBoundingClientRect().height ≥ 44, no horizontal overflow (scrollWidth ≤ clientWidth).
+R09 In-page anchors never change route: #finance click jump link; PASS = hash "#finance", focus on SECTION#finance-orders (probe f_hashAfterJump).
+
+PRODUCTS
+R10 Filter dialog: click first [aria-haspopup=dialog] → dialog[open]; key Tab repeatedly stays inside; key Escape → closed and activeElement aria-haspopup="dialog" (existing products-dialogs flow).
+R11 Sort dialog same as R10; choose an option → table aria-sort changes; result count role=status text updates.
+R12 Chips: set search + missing-cost; PASS = chip count 2, each remove button aria-label starts "ลบ"/"Remove"; Clear all → 0 chips.
+R13 Empty: search "zzzz" → empty state with clear-search button; click → rows back.
+R14 Row → detail → back: click row button; PASS = .product-detail-view; click .back-link → list. (After F2: activeElement = the row button.)
+R15 Cost form: detail → add cost → fill → submit; PASS = back on detail, new cost shown; fieldset disabled during request.
+
+ASK FLOW / ASSISTANT
+R16 Ask from product: detail → "ถามเรื่องสินค้านี้"; PASS = hash #assistant, #assistant-input value "สินค้านี้เหลือกำไรเท่าไร?", product chip shows product name, NO turn sent (article count 0 in new chat). After A11: activeElement.id = "assistant-input".
+R17 Enter sends: type text, key Enter; PASS = article count +1, typing role=status visible, send button aria-label = stop.
+R18 Shift+Enter: Input.insertText 'a', key Enter with modifiers 8; PASS = value contains "\n", no new article (probe c_shiftEnter).
+R19 IME: Input.imeSetComposition {text:'กำ'}, key Enter; PASS = keydown isComposing true, no new article (probe c_enterDuringIme). Manual check on Safari/iOS + Gboard Thai required (CDP cannot emulate WebKit ordering).
+R20 Stop: send, then click stop within 300ms; PASS = turn shows stopped notice + Retry; Retry → pending again.
+R21 Failed: make mock API return 500 for /assistant (serve.mjs hook) → role=alert + Retry.
+R22 Copy: click copy → button label "คัดลอกแล้ว/Copied", live region contains it; deny clipboard → notice.
+R23 Regenerate only on last turn and disabled while pending.
+R24 Period dialog: open, choose a preset, Apply → chip label changes, focus = textarea; invalid range (from > to) → Apply disabled + status message.
+R25 Product dialog: search filters, "all" option, choose → chip label, focus textarea.
+R26 History (<1024 sheet, ≥1024 nav list): open, ArrowDown/Up/Home/End move focus between rows, Delete opens delete dialog, Escape returns to history, Cancel autofocused.
+R27 Row menu popover: open with Enter, ArrowDown, Escape → focus back on ⋯ trigger.
+R28 Inline title rename: click title, type, Enter saves; Escape cancels.
+R29 Mobile sheet drag (390): pointerdown on handle, move 120px, pointerup → dialog closed.
+R30 Scroll: with many turns scroll up → "latest" button appears; click → at bottom; prefers-reduced-motion emulation → instant.
+R31 Drafts persist: type, navigate away and back, reload; PASS = same draft (probe showed persistence).
+R32 Pending survives navigation: send, navigate to overview, back to assistant; PASS = reply present (Assistant stays mounted). After A8 refactor: also send from dashboard panel, open full page mid-request.
+R33 Live region: after reply, the sr-only aria-live region text equals reply text (not empty, not doubled when panel exists).
+R34 Greeting (after A3): Emulation.setTimezoneOverride irrelevant — logic uses Asia/Bangkok explicitly; eval with Date stub at 06:00/13:00/18:00/23:00 Bangkok; PASS = 4 buckets.
+R35 Chips (after A4): click chip → value filled, no new article, activeElement = textarea.
+
+OVERVIEW / FINANCE / ORDERS
+R36 Overview order row → detail → back (existing overview-order flow) at 390/1440/1920.
+R37 Overview channel chips aria-pressed; show more +5; count caption updates (aria-live).
+R38 Period sync: change period on overview, open #finance; PASS = same range text; change on finance, back on overview; PASS = same.
+R39 KPI drill (after K1): click "ดูที่มา" on profit card → hash #finance, same period, h1 focused.
+R40 Finance compare checkbox disabled when previous period not covered; status chip toggles off on second click and syncs select.
+R41 Finance expense form: toggle aria-expanded; save → focus returns to Add button, status message.
+R42 Orders detail + settle: checkbox required before Confirm; list buttons disabled while loading.
+
+GLOBAL
+R43 Targets: on every screen eval visible button/a/input/select with height < 44 (exclude inline links in text); PASS = [] (extend qa PROBE).
+R44 Focus visible: key Tab through first 15 stops; eval getComputedStyle(activeElement).outlineWidth ≥ "3px" (or box-shadow ring).
+R45 No horizontal overflow at 320/390/768/1024/1440/1920 for all 15 screens (existing capture PROBE overflowX).
+R46 Reduced motion: Emulation.setEmulatedMedia prefers-reduced-motion: reduce; PASS = no element with running animations (document.getAnimations().length === 0 after load).
+R47 Language switch keeps assistant draft and open screen (not yet verified).

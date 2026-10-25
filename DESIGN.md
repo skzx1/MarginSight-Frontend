@@ -12,23 +12,24 @@ colors:
   soft-sage: "#f0f5ef"
 typography:
   display:
-    fontFamily: "Anuphan, Inter, Tahoma, sans-serif"
-    fontSize: "clamp(44px, 4.2vw, 60px)"
-    fontWeight: 700
-    lineHeight: 1.24
-    letterSpacing: "-0.025em"
+    fontFamily: "IBM Plex Sans, Noto Sans Thai, Leelawadee UI, Tahoma, sans-serif"
+    fontSize: "clamp(42px, 4.8vw, 72px)"
+    fontWeight: 600
+    lineHeight: 1.5
+    letterSpacing: "0"
   headline:
-    fontFamily: "Anuphan, Inter, Tahoma, sans-serif"
+    fontFamily: "IBM Plex Sans, Noto Sans Thai, Leelawadee UI, Tahoma, sans-serif"
     fontSize: "clamp(30px, 3.2vw, 44px)"
     fontWeight: 600
-    lineHeight: 1.35
+    lineHeight: 1.5
+    letterSpacing: "0"
   body:
-    fontFamily: "Anuphan, Inter, Tahoma, sans-serif"
+    fontFamily: "IBM Plex Sans, Noto Sans Thai, Leelawadee UI, Tahoma, sans-serif"
     fontSize: "16px"
     fontWeight: 400
     lineHeight: 1.75
   money:
-    fontFamily: "Inter, Anuphan, sans-serif"
+    fontFamily: "IBM Plex Sans, Noto Sans Thai, Leelawadee UI, Tahoma, sans-serif"
     fontSize: "26px"
     fontWeight: 600
     lineHeight: 1.5
@@ -73,7 +74,7 @@ Use `ink` and `muted` on light surfaces. Dark panels use light text (`#f8fcf9`, 
 
 ## Typography
 
-Anuphan leads Thai and English display/body copy. Inter remains the existing numeric companion; both are self-hosted. Keep synthetic amounts tabular and readable. Headlines use explicit two-part phrasing without gradient text. At phone widths, display copy is 30–44px; body remains 16px. Preview UI labels may be smaller because they are labelled examples rather than working app controls.
+IBM Plex Sans sets Latin text, figures, the minus sign and the baht sign (equal-width digits); Noto Sans Thai sets Thai letters, marks and Thai digits through a Thai-only unicode-range. Both are self-hosted unmodified TTF files in 400/500/600 with their OFL texts (web/public/fonts), shared with the app through --font-sans, --font-numeric and --font-display. Headings use --font-display, which is the same sans until a Thai serif passes its source and licence review. Thai text keeps letter-spacing 0 and a line height of at least 1.5; tighter tracking or line height is kept only for amounts, counts, codes and Latin-only labels (any Thai state of those elements resets both), and English-only display lines may set a tighter line height. Keep synthetic amounts tabular and readable. Headlines use explicit two-part phrasing without gradient text. At phone widths, display copy is 30–44px; body remains 16px. No rendered text, including preview labels, is smaller than 12px.
 
 ## Layout
 

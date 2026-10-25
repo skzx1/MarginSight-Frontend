@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>G7 Interaction Spec</title>
+<style>
+:root{--bg:#FAF9F5;--s:#fff;--t:#141413;--m:#66625A;--b:#E6E2D8;--alt:#F0EEE6;--new:#8E1238;--newbg:#F7E3E8;--chg:#735C00;--chgbg:#F5EDCF;--rs:#2F5784;--rsbg:#E5ECF4}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--t);font:15px/1.6 "Leelawadee UI",Tahoma,system-ui,sans-serif}
+main{max-width:1180px;margin:0 auto;padding:24px 16px 64px}
+h1{font-size:26px;margin:0 0 4px}h2{font-size:20px;margin:36px 0 8px;border-top:1px solid var(--b);padding-top:16px}h3{font-size:16px;margin:20px 0 6px}
+p,li{max-width:80ch}.m{color:var(--m);font-size:13px}
+.wrap{overflow-x:auto;border:1px solid var(--b);border-radius:10px;background:var(--s);margin:8px 0}
+table{border-collapse:collapse;width:100%;font-size:13.5px}th,td{text-align:left;vertical-align:top;padding:8px 10px;border-bottom:1px solid var(--b)}th{background:var(--alt);font-weight:600;white-space:nowrap}
+.k{display:inline-block;font-size:12px;font-weight:700;border-radius:999px;padding:0 8px;white-space:nowrap}
+.u{background:var(--alt)}.r{background:var(--rsbg);color:var(--rs)}.c{background:var(--chgbg);color:var(--chg)}.n{background:var(--newbg);color:var(--new)}
+pre{background:var(--s);border:1px solid var(--b);border-radius:10px;padding:12px;overflow-x:auto;font-size:13px;line-height:1.45}
+code{font-size:13px}
+nav.toc a{margin-right:12px;font-size:14px}
+</style>
+</head>
+<body><main>
+<h1>MarginShot — Interaction spec (G7)</h1>
+<p class="m">Research phase, read-only. Sources: web/src/app code at 795bf58 (== baseline 5eb4fe9 for every file cited here); external spec §6–§8; G6 wireframes R\G6\wf (breakpoints &lt;768 tabs · 768–1023 rail+overlay drawer · ≥1024 sidebar · ≥1280 right column). Probe evidence: R\G7\probe-result.json. Labels: <b>[V]</b> verified (method given) · <b>[A]</b> assumption · <b>[R]</b> recommendation.</p>
+<p><span class="k u">unchanged</span> <span class="k r">restyle only</span> <span class="k c">changed behaviour</span> <span class="k n">NEW capability · needs approval</span></p>
+<nav class="toc"><a href="#reg">1 Change register</a><a href="#nav">2 Navigation</a><a href="#hdr">3 Header actions</a><a href="#full">4 Assistant page</a><a href="#panel">5 Dashboard panel</a><a href="#f1">6 Product → ask</a><a href="#f2">7 KPI → finance</a><a href="#dlg">8 Dialogs</a><a href="#a11y">9 Cross-cutting</a></nav>
+
+<h2 id="reg">1. Change register</h2>
+<div class="wrap"><table>
+<tr><th>ID</th><th>Interaction</th><th>Class</th><th>Risk</th><th>Note / evidence</th></tr>
+<tr><td>N1</td><td>Hash routing, one history entry per screen, guard via registerGuard/canLeave</td><td><span class="k u">unchanged</span></td><td>—</td><td>[V code shell.tsx]. New sidebar items must call navigate() (button, or &lt;a href="#x"&gt; with preventDefault+navigate) so the store-settings confirm fires once.</td></tr>
+<tr><td>N2</td><td>Grouped sidebar 232px (G6 groups), sub-items visible ≥1024</td><td><span class="k r">restyle only</span></td><td>low</td><td>Same targets; parentScreen() changes if G6 moves orders/reconciliation under finance → <span class="k c">changed</span> (aria-current + "← parent" link change).</td></tr>
+<tr><td>N3</td><td>Tablet drawer closes on item choice, on scrim/outside click, and on Escape (focus → toggle)</td><td><span class="k c">changed behaviour</span></td><td>low</td><td>Today stays open after nav and outside click [V probe d_expandedAfterNav=true]. Escape+focus return already exists.</td></tr>
+<tr><td>N4</td><td>Sidebar search "Ctrl K"</td><td><span class="k n">NEW</span></td><td>med</td><td>No command palette/global search exists. Don't render the hint until approved.</td></tr>
+<tr><td>N5</td><td>Top-bar shop/channel switcher, notifications, balance chip</td><td><span class="k c">changed</span> / <span class="k n">NEW</span></td><td>med</td><td>Store switch exists (select in header) → move = changed. Channel as global context, notifications, balance = NEW (no data source).</td></tr>
+<tr><td>N6</td><td>Mobile tab bar "ภาพรวม/สินค้า/ถาม/ราคา" (spec)</td><td><span class="k c">changed</span></td><td>med</td><td>"ราคา" has no route; keep 5 existing tabs (G6 agrees) unless owner maps it to #simulation/#playground.</td></tr>
+<tr><td>N7</td><td>Detail views as routes (#products/SKU) so Back closes detail</td><td><span class="k c">changed behaviour</span></td><td>med</td><td>Today Back leaves the screen [V probe]. Optional; touches useNavigation's Screen parsing. Not required for P4.</td></tr>
+<tr><td>A1</td><td>Composer Enter / Shift+Enter / IME guard / Stop</td><td><span class="k u">unchanged</span> (+harden)</td><td>low</td><td>[V code + probe: composition Enter isComposing=true, no turn sent]. Add keyCode 229 + compositionstart/end flag for WebKit [R].</td></tr>
+<tr><td>A2</td><td>Enter inserts newline on touch keyboards (pointer:coarse); send by button</td><td><span class="k c">changed behaviour</span></td><td>low</td><td>Matches mobile chat convention; avoids accidental sends with Thai predictive keyboards [A]. Owner choice.</td></tr>
+<tr><td>A3</td><td>Time-of-day greeting (Asia/Bangkok)</td><td><span class="k c">changed</span></td><td>low</td><td>Copy only; computed client-side once per mount.</td></tr>
+<tr><td>A4</td><td>Suggestion chips fill the composer instead of sending</td><td><span class="k c">changed behaviour</span></td><td>low</td><td>Today they send immediately and spend demo quota (3/session) [V code]. Recommend fill + focus.</td></tr>
+<tr><td>A5</td><td>Attach button in composer</td><td><span class="k n">NEW</span></td><td>high</td><td>/assistant API takes message, sku, month only [V assistant-service.ts]. Omit. Receipt reading stays on #receipts.</td></tr>
+<tr><td>A6</td><td>Streaming / typewriter replies</td><td><span class="k n">NEW</span></td><td>med</td><td>Replies arrive whole [V]. Do not simulate streaming (would imply data that isn't there).</td></tr>
+<tr><td>A7</td><td>Recent conversations row under composer (full page)</td><td><span class="k c">changed</span></td><td>low</td><td>Data exists (archive). ≤6 cards, opens session = selectChat().</td></tr>
+<tr><td>A8</td><td>Dashboard AI panel sharing the active session</td><td><span class="k c">changed behaviour</span></td><td>med–high</td><td>Provider is app-wide [V], but send/run/pending and the single textareaRef live in the Assistant screen → refactor to provider; two textareas must not share one ref.</td></tr>
+<tr><td>A9</td><td>"Ask about this" from KPI (period context)</td><td><span class="k c">changed</span></td><td>low</td><td>Uses existing period context (defaultContext = overview period [V page.tsx]).</td></tr>
+<tr><td>A10</td><td>Ask with channel context</td><td><span class="k n">NEW</span></td><td>high</td><td>ChatContext = {start,end,sku}; no channel. Offering it would give unfiltered answers labelled as channel answers.</td></tr>
+<tr><td>A11</td><td>Ask-from-product focuses composer (fix)</td><td><span class="k c">changed</span></td><td>low</td><td>Code intends textarea focus; actual focus = h1 [V probe p1_focusAfterAsk]. Decide one (see §6).</td></tr>
+<tr><td>A12</td><td>Ask at 100-session limit shows a message instead of silently dropping</td><td><span class="k c">changed</span></td><td>low</td><td>[V code assistant.tsx:91].</td></tr>
+<tr><td>D1</td><td>Filter/sort dialogs (showModal, trap, Escape, focus return, live apply)</td><td><span class="k r">restyle only</span></td><td>low</td><td>Spec chips: selected = ink fill. Keep live apply + "Done".</td></tr>
+<tr><td>D2</td><td>Assistant dialogs + history sheet drag + row menu</td><td><span class="k r">restyle only</span></td><td>low</td><td>Keep all keyboard handling.</td></tr>
+<tr><td>K1</td><td>KPI cards link to Finance (same period)</td><td><span class="k c">changed behaviour</span></td><td>low</td><td>KPI cards not interactive today [V probe]. Period already shared.</td></tr>
+<tr><td>K2</td><td>Finance pre-filtered by channel from an overview channel row</td><td><span class="k c">changed</span></td><td>low–med</td><td>Finance channel is local state; needs an initialChannel prop (no API change).</td></tr>
+<tr><td>F1</td><td>Unsaved guards for cost form, add-product, finance expense</td><td><span class="k c">changed</span></td><td>low</td><td>Only store-settings guards today [V]. Optional.</td></tr>
+<tr><td>F2</td><td>Focus on detail open/close (detail h2 on open, originating row on back)</td><td><span class="k c">changed</span></td><td>low</td><td>No focus management today [V code].</td></tr>
+</table></div>
+
+<h2 id="nav">2. Global navigation per breakpoint</h2>
+<div class="wrap"><table>
+<tr><th>Width</th><th>Pattern</th><th>Open / close</th><th>Focus & keys</th><th>Notes</th></tr>
+<tr><td>320–639</td><td>Bottom tab bar, 5 existing tabs, 56px tall (≥44 target), safe-area padding</td><td>always visible; hidden while the on-screen keyboard is open on #assistant (existing data-keyboard-open)</td><td>Tab order: skip link → header → main → tab bar. aria-current=page on parent tab</td><td>320: 5×64px fits. Labels 12px min. Sub-screens reached from page content (as today)</td></tr>
+<tr><td>640–767</td><td>Same as above (G6). Spec's "&lt;640 collapses" is not adopted to avoid a fourth nav state</td><td>—</td><td>—</td><td>[R] Keep 768 as the only nav switch; flag to G6/owner</td></tr>
+<tr><td>768–1023</td><td>Icon rail (≥44px items) + overlay drawer with full grouped list</td><td>Toggle button (aria-expanded, aria-controls). Close on: item chosen, scrim click, Escape, toggle. <span class="k c">changed</span></td><td>On open focus stays on toggle (no trap; drawer is non-modal) [R] or move to first item; on Escape focus → toggle (existing). Tab order inside drawer follows visual groups</td><td>Use inert on main only if drawer is modal; recommend non-modal + scrim click closes</td></tr>
+<tr><td>1024–1279</td><td>Sidebar 232px, grouped, sub-items visible; assistant history nested under ถาม when on #assistant (existing)</td><td>persistent</td><td>Active item aria-current=page; group headings are plain text (not buttons)</td><td>Right column moves below main (G6)</td></tr>
+<tr><td>≥1280 (to 1920)</td><td>Sidebar + main + right column (summary card, AI panel)</td><td>persistent</td><td>Order: sidebar → page header → main → right column → footer</td><td>Main column max width per G6; nothing stretches beyond readable measure</td></tr>
+</table></div>
+<h3>Back behaviour with hash routes</h3>
+<ul>
+<li>[V] Back/Forward move between screens; guard refusal restores the hash with replaceState. Keep.</li>
+<li>[V] Sub-views (product detail, cost form, order detail, orders detail) are not history entries: Back leaves the screen and the list re-renders with detail closed (probe p1_detailStillOpen=false).</li>
+<li>[R] P4 keeps this, but the in-page "← back" control must return focus to the row that opened the detail (F2). Optional N7 makes details routable later.</li>
+<li>[V] In-page anchors must never write the hash (Finance jump links preventDefault; probe f_hashAfterJump=#finance). Any new "ดูทั้งหมด ›" link inside a page follows the same rule.</li>
+</ul>
+
+<h2 id="hdr">3. Contextual actions in page headers</h2>
+<div class="wrap"><table>
+<tr><th>Screen</th><th>Primary (one per page)</th><th>Secondary</th><th>Class</th></tr>
+<tr><td>Overview</td><td>＋ เพิ่มต้นทุน → #products with missing-cost filter (existing onMissingCosts) — or "เพิ่มสินค้า" if no missing costs [R]</td><td>Period control (existing), store switch</td><td><span class="k c">changed</span> (moves quick action into header)</td></tr>
+<tr><td>Products</td><td>เพิ่มสินค้า (existing)</td><td>Playground link (existing)</td><td><span class="k r">restyle</span></td></tr>
+<tr><td>Product detail</td><td>เพิ่ม/แก้ต้นทุน (existing)</td><td>จำลองราคา, ถามเรื่องสินค้านี้ (existing)</td><td><span class="k r">restyle</span></td></tr>
+<tr><td>Finance</td><td>ส่งออกรายงาน (existing)</td><td>Period, channel, compare (existing)</td><td><span class="k r">restyle</span></td></tr>
+<tr><td>Assistant</td><td>แชตใหม่ (existing newChat)</td><td>History (&lt;1024), rename via title</td><td><span class="k r">restyle</span></td></tr>
+</table></div>
+<p>Rule [R]: at &lt;768 the primary action is full width under the title (spec §7); disabled states keep their reason as visible text, not only a tooltip (title attributes are not reachable on touch).</p>
+
+<h2 id="full">4. Assistant full page (#assistant)</h2>
+<h3>4.1 States</h3>
+<div class="wrap"><table>
+<tr><th>State</th><th>Trigger</th><th>What shows</th><th>Composer</th><th>Announcement</th></tr>
+<tr><td>loading</td><td>archive not ready</td><td>history skeleton; welcome hidden</td><td>disabled</td><td>role=status "กำลังโหลด" (existing)</td></tr>
+<tr><td>empty (welcome)</td><td>active session has 0 turns</td><td>sparkle + time-of-day greeting + composer + 4 chips + recent conversations row (A7)</td><td>enabled, autofocus only when arrived via ask/new chat</td><td>none (h1 receives focus on navigation)</td></tr>
+<tr><td>composing</td><td>draft non-empty</td><td>send enabled; counter appears ≥1200 chars (of 1500) [R]</td><td>Enter sends (desktop), Shift+Enter newline, IME-safe</td><td>counter not live (avoid chatter); at 1500 a polite status once</td></tr>
+<tr><td>pending</td><td>send()</td><td>user bubble + typing indicator; send button becomes Stop</td><td>editable; Enter does nothing</td><td>role=status "กำลังตรวจข้อมูล…" (existing)</td></tr>
+<tr><td>complete</td><td>reply</td><td>answer, result card, "based on" footnote, evidence details, copy/regenerate</td><td>focus stays in composer</td><td>polite live region reads reply text (existing)</td></tr>
+<tr><td>notice</td><td>reply.source='notice' (e.g. pick a product)</td><td>answer with "notice" tag + context chips stay tappable</td><td>—</td><td>as complete</td></tr>
+<tr><td>failed</td><td>request error</td><td>notice + Retry (regenerate)</td><td>—</td><td>role=alert (existing)</td></tr>
+<tr><td>stopped</td><td>Stop</td><td>notice + explanation + Retry</td><td>focus moves to composer [R]</td><td>polite "หยุดคำตอบแล้ว" [R]</td></tr>
+<tr><td>storage error</td><td>localStorage fails</td><td>warning banner + retry save</td><td>works (unsaved)</td><td>role=status (existing)</td></tr>
+<tr><td>limits</td><td>200 turns / 100 sessions</td><td>notice text; new chat disabled with visible reason</td><td>send blocked</td><td>role=status</td></tr>
+<tr><td>streaming</td><td>—</td><td colspan="3"><span class="k n">NEW</span> not available; replies are atomic. Do not fake.</td></tr>
+</table></div>
+<h3>4.2 Composer rules</h3>
+<ul>
+<li>Enter (no Shift, not composing, desktop) → send. Guard: <code>e.nativeEvent.isComposing || e.keyCode === 229 || composingRef</code> (composingRef from compositionstart/compositionend). [V] current code checks isComposing only; Chrome passes (probe). [A] WebKit/Safari can deliver the committing Enter with isComposing=false → add 229 + flag. Thai keyboards on desktop usually type without composition; mobile predictive keyboards (Gboard/iOS) use composition [A].</li>
+<li>Touch (pointer:coarse): Enter = newline, send via button (A2, needs owner OK).</li>
+<li>Shift+Enter newline [V probe]. Textarea grows 48→160px then scrolls (existing).</li>
+<li>Send disabled when draft is whitespace or archive not ready; Stop replaces Send while pending (existing). Stop is a type=button so Enter in textarea can't trigger it.</li>
+<li>Context chips (period, product) sit inside the composer card, open dialogs, return focus to textarea after apply (existing).</li>
+<li>No attach button (A5). If the owner wants a bill path: a text link "อ่านบิลซื้อ ›" to #receipts beside the chips, not an attach affordance.</li>
+<li>Draft persists per session (localStorage) across navigation and reload [V probe] — so no unsaved guard is needed for the assistant.</li>
+</ul>
+<h3>4.3 Greeting (Asia/Bangkok)</h3>
+<pre>hour = Number(new Intl.DateTimeFormat('en-GB',{hour:'2-digit',hourCycle:'h23',timeZone:'Asia/Bangkok'}).format(now))
+05–11 สวัสดีตอนเช้า · 12–16 สวัสดีตอนบ่าย · 17–20 สวัสดีตอนเย็น · 21–04 neutral ("ดึกแล้ว…" or plain "สวัสดี")  + " วันนี้ร้านเป็นยังไงบ้าง?"
+EN: Good morning / Good afternoon / Good evening / plain "Hello"</pre>
+<p>Compute on the client once per mount of the empty state (no live ticking, no hydration of a build-time hour). No user name (no profile data). Copy is G3's call; logic is G7's. [R]</p>
+<h3>4.4 Suggestion chips</h3>
+<p>Same 4 existing prompts. Click → fills composer, places caret at end, focuses textarea; user sends (A4). Chips hide once the session has turns. Keyboard: normal buttons in DOM order, not a roving group. ≥44px tall, wrap on narrow widths.</p>
+<h3>4.5 Focus order and Escape</h3>
+<pre>Arrive via nav    → h1#screen-title (sr-only) — existing, keep for screen readers
+Arrive via ask    → textarea (A11) ; screen-title focus skipped for this arrival
+Tab order         → header (title rename · history[&lt;1024] · new chat) → message log (focusable region) → answer actions → "latest" button → composer textarea → period chip → product chip → send/stop → (empty state) chips → recent row
+Escape            → closes the topmost layer only: row menu → dialog → (dialog opened from history) back to history sheet → tablet drawer. Escape inside textarea does nothing (does NOT clear the draft) ; inside inline rename = cancel (existing)
+Dialog close      → focus returns to opener (existing)</pre>
+
+<h2 id="panel">5. Dashboard AI panel (≥1280 right column; below main at 1024–1279; entry card at &lt;1024)</h2>
+<pre>                      shared AssistantProvider (archive, activeId, draft per session)
+     ┌──────────────────────────────┬───────────────────────────────┐
+     │ Dashboard panel (overview)   │ Full page (#assistant)        │
+     │ shows ACTIVE session, last 3 │ shows ACTIVE session, all     │
+     │ turns; compact composer       │ turns; full composer          │
+     └─────────── "เปิดเต็มหน้า ›" → navigate('assistant') keeps same session + draft ─┘
+     pending request survives the switch (run/pending moved into provider)</pre>
+<div class="wrap"><table>
+<tr><th>Width</th><th>Panel behaviour</th></tr>
+<tr><td>≥1280</td><td>Inline chat: title "ถาม MarginShot", context line ("ใช้ข้อมูล: &lt;period&gt; · &lt;product&gt;"), last ≤3 turns in a scroll region, chips when empty, composer (Enter rules as §4.2), "เปิดเต็มหน้า ›". Result/evidence collapse to "ดูรายละเอียดในหน้าเต็ม ›".</td></tr>
+<tr><td>1024–1279</td><td>Same component below the main column (G6).</td></tr>
+<tr><td>&lt;1024</td><td>No inline composer (avoids a second keyboard/viewport handler). An entry card "ถาม MarginShot ›" navigates to #assistant; "ถามเรื่องนี้" buttons prefill and navigate.</td></tr>
+</table></div>
+<ul>
+<li>Context: the panel follows the overview period (defaultContext already does [V]); product = all. Changing the overview period does NOT rewrite an existing session's context (existing semantics: context stored per session); it applies to new sessions and is shown in the context line. [R] show a one-line hint "ช่วงเวลาของแชตนี้: …" when they differ.</li>
+<li>Implementation risk [V code]: <code>textareaRef</code> is a single provider ref; panel and page composers need their own refs; <code>pending</code> AbortController map must move into the provider so leaving overview doesn't orphan a request. Only one visible composer at a time (panel lives on overview only).</li>
+<li>Demo quota: panel sends count against the same 3-request demo limit; show the existing mock badge text in the panel.</li>
+<li>Live region: one app-level polite region for assistant replies (avoid double announcements when both components are mounted; the full page stays mounted hidden after first visit [V]).</li>
+</ul>
+
+<h2 id="f1">6. Flow: product row → detail → ask assistant</h2>
+<pre>Products list ──(row click / row button / card title)──▶ Product detail  [state, not route]
+   focus: today none [V] → R: focus detail h2 (tabIndex -1)
+Product detail ──"ถามเรื่องสินค้านี้"──▶ ask(sku)  [existing]
+   → new chat {period = overview period, sku}, draft "สินค้านี้เหลือกำไรเท่าไร?" (NOT sent)  [V probe]
+   → navigate('assistant')
+   → focus: today h1 [V probe] ; R: textarea, caret at end (A11). SR users hear the label + context chips via aria-describedby.
+   → if 100 sessions: show notice "ลบแชตเก่าก่อน" + open history (A12)
+Back (browser) ──▶ #products list, detail closed [V] ; R: restore focus to the originating row if possible
+"← สินค้า" (in-page) ──▶ list; focus → originating row (F2)</pre>
+<p>Auto-send stays OFF: the user confirms, and demo quota is not spent by a navigation tap.</p>
+
+<h2 id="f2">7. Flow: overview KPI → finance drill-down</h2>
+<pre>Overview KPI card (profit | sales)
+  ├─ "ดูที่มา ›" (link-styled button) → navigate('finance')        K1 changed
+  │     Finance opens with the SAME period (shared overviewPeriod [V]) and channel = all
+  │     focus: finance h1 (existing title focus) ; optional R: scroll + focus #finance-summary
+  └─ "ถามเรื่องนี้" → prefill composer (panel ≥1024 or full page &lt;1024) with
+        "กำไร&lt;period label&gt;เหลือเท่าไร?" ; context = period, sku null   A9 changed
+Overview channel row (insights) → finance with channel preselected                        K2 changed (needs initialChannel prop)
+Overview missing-cost banner → products, missing-cost filter  [existing]
+Finance → "ดูสินค้าทั้งหมด" → products [existing]; Back → finance (period kept, channel resets: local state)</pre>
+<p>The whole card must not be one big link containing a second button (nested interactive). Two explicit controls per card, each ≥44px. [R]</p>
+
+<h2 id="dlg">8. Filters / sort dialogs (products) and other dialogs</h2>
+<div class="wrap"><table>
+<tr><th>Step</th><th>Behaviour (keep)</th><th>Class</th></tr>
+<tr><td>Open</td><td>Trigger aria-haspopup=dialog, aria-expanded; showModal; anchored ≥768, sheet-like &lt;768; body scroll locked</td><td><span class="k u">unchanged</span></td></tr>
+<tr><td>Inside</td><td>Radio/checkbox fieldsets with legends; changes apply live; result count updates in aria-live region</td><td><span class="k u">unchanged</span></td></tr>
+<tr><td>Tab</td><td>Wraps first↔last (manual trap)</td><td><span class="k u">unchanged</span></td></tr>
+<tr><td>Close</td><td>Escape, ✕, Done, backdrop click → focus returns to the trigger</td><td><span class="k u">unchanged</span></td></tr>
+<tr><td>Chips</td><td>Active filter chips with remove buttons ("ลบ: …"), Clear all; selected chip = ink fill (spec)</td><td><span class="k r">restyle</span></td></tr>
+<tr><td>Finance/overview chips</td><td>aria-pressed toggle buttons (status click again = all) </td><td><span class="k r">restyle</span></td></tr>
+</table></div>
+<p>All dialogs: one level of modality at a time (assistant rename/delete opened from history returns to history on close — existing). Destructive confirm (delete chat) autofocuses Cancel (existing).</p>
+
+<h2 id="a11y">9. Cross-cutting rules</h2>
+<ul>
+<li><b>Targets</b>: every control ≥44×44 CSS px (repo standard; spec's 36px buttons rejected). Inline text links inside sentences exempt (WCAG 2.5.8 inline exception) [R].</li>
+<li><b>Focus ring</b>: 3px, visible on composer card via :focus-within.</li>
+<li><b>Reduced motion</b>: no arrive animation, no smooth scroll, no count-up (existing in assistant + finance); drawer/sheet open without slide; typing dots static text.</li>
+<li><b>Live regions</b>: one polite region per concern — catalog result count, overview order count, assistant reply, copy confirmation. Errors use role=alert once (not re-announced on re-render).</li>
+<li><b>Loading/empty/error</b>: skeletons are aria-hidden with a separate sr status; empty states always offer the one action that resolves them (clear filters, add product, change period).</li>
+<li><b>Unsaved changes</b>: keep store-settings guard; optional F1 guards use the same registerGuard (single slot — only the mounted form registers).</li>
+<li><b>Language</b>: switching language must not reset drafts or dialogs [A — not probed].</li>
+</ul>
+<p class="m">Prototype of composer + panel behaviour: R\G7\composer-proto.html (shots/proto-390.png, proto-1440.png). Regression checklist: R\G7\regression-checklist.txt.</p>
+</main></body></html>

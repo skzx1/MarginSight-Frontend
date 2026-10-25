@@ -283,7 +283,7 @@ export default function ProductCsvImport({
           </div>
         </div>
 
-        <p className="notice">{locale==='th'?'บันทึกสินค้า ราคาขาย จำนวนที่ระบุ และต้นทุน ช่องจำนวนที่เว้นว่างจะคงค่าเดิม จำนวนนี้เป็นค่าที่ร้านกรอก ไม่ปรับอัตโนมัติตามออเดอร์ และไม่ใช่กำไรสุทธิ':'Saves products, prices, entered quantities and costs. Blank quantity keeps the existing value. Quantity is merchant-entered, not automatically adjusted by orders. These are not net profit.'}</p>
+        <p className="notice"><Icon name="warning" />{locale==='th'?'บันทึกสินค้า ราคาขาย จำนวนที่ระบุ และต้นทุน ช่องจำนวนที่เว้นว่างจะคงค่าเดิม จำนวนนี้เป็นค่าที่ร้านกรอก ไม่ปรับอัตโนมัติตามออเดอร์ และไม่ใช่กำไรสุทธิ':'Saves products, prices, entered quantities and costs. Blank quantity keeps the existing value. Quantity is merchant-entered, not automatically adjusted by orders. These are not net profit.'}</p>
         <div className="csv-success-actions">
           <button type="button" onClick={onNavigateToProducts} className="primary-btn">
             <Icon name="products" />
@@ -300,7 +300,7 @@ export default function ProductCsvImport({
 
   return (
     <div className="csv-import-flow" role="region" aria-label={t('addCsvTab')}>
-      <p className="notice">{locale==='th'?'บันทึกสินค้า ราคาขาย จำนวนที่ระบุ และต้นทุน ช่องจำนวนที่เว้นว่างจะคงค่าเดิม จำนวนนี้เป็นค่าที่ร้านกรอก ไม่ปรับอัตโนมัติตามออเดอร์ และไม่ใช่กำไรสุทธิ':'Saves products, prices, entered quantities and costs. Blank quantity keeps the existing value. Quantity is merchant-entered, not automatically adjusted by orders. These are not net profit.'}</p>
+      <p className="notice"><Icon name="warning" />{locale==='th'?'บันทึกสินค้า ราคาขาย จำนวนที่ระบุ และต้นทุน ช่องจำนวนที่เว้นว่างจะคงค่าเดิม จำนวนนี้เป็นค่าที่ร้านกรอก ไม่ปรับอัตโนมัติตามออเดอร์ และไม่ใช่กำไรสุทธิ':'Saves products, prices, entered quantities and costs. Blank quantity keeps the existing value. Quantity is merchant-entered, not automatically adjusted by orders. These are not net profit.'}</p>
       {/* 3-Step Merchant Hint */}
       <ol className="steps" aria-label="ขั้นตอนการนำเข้าสินค้าจาก CSV">
         <li className={!file ? 'current' : ''}>
@@ -320,6 +320,7 @@ export default function ProductCsvImport({
       {/* Global Error Banner */}
       {importError && (
         <div className="notice error-notice" role="alert">
+          <Icon name="warning" />
           <strong>{t('errorTitle')}</strong>
           <p>{importError}</p>
         </div>
@@ -399,6 +400,7 @@ export default function ProductCsvImport({
       {/* File Parsing Error */}
       {parseResult?.fileError && (
         <div className="notice error-notice" role="alert">
+          <Icon name="warning" />
           <strong>{t('errorTitle')}</strong>
           <p>{parseResult.fileError}</p>
           <div className="actions" style={{ marginTop: '12px' }}>

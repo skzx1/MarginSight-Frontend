@@ -244,3 +244,7 @@ LOCAL_MERGED / VERIFIED_LOCAL / NOT_DEPLOYED: base d2f12d5 + preserved local rou
 ## Router release ready for deployment — 25 October 2026
 
 READY_FOR_DEPLOY: user explicitly requested commit/push/deploy. Source95ca8fb integrates all latestda63091 features with server routing;83tests/full build pass. Backend5f3c19f/108tests and compatibility path ready. Implementation pushed as a separate batch; final deployed acceptance is recorded after publication, not inferred from source.
+
+## Routed chat published and checked — 25 October 2026
+
+VERIFIED_AWS_API / VERIFIED_BROWSER_MOCK: clean Frontend release4c6880d live, CloudFront invalidationCompleted; Backend5f3c19f runtime with reviewed hash/config preserved.83Frontend/108Backend/9Python checks pass, API8/8plusauth/tenant401/403pass. Browser rank2andfollow-up rank3correct; latest100questions/campaign controls retained. See latest verification.md. Original project external blockers and research/classifier limitations remain distinct.

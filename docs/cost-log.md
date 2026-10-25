@@ -187,3 +187,7 @@ Local code merges/tests/builds only in Frontend; no new static publish/invalidat
 ## Router release preparation — 25 October 2026
 
 Commit/push/source verification and isolated clean npm-ci build only on Frontend so far;83tests/0npm audit vulnerabilities. AWS account/budget/live source readback is logged in Backend cost-log (lagged0.034USD, updated18:46:19.853+07;350team/25trial unchanged). Static publication, model/API verification and actual final spend remain separate evidence. No new auth/IAM/capacity/training changes are requested.
+
+## Committed router static publication — 25 October 2026
+
+One76file publication to existing privateS3 and7path invalidation, confirmedCompleted; no capacity/Cognito/IAM/backend infrastructure changes from Frontend. One isolated browserMOCK store and2assistant questions for real UI verification; API2MOCKstores/8requests and deployment costs logged in Backend cost-log. Final budget read12:24:40UTC lagged0.034USD updated18:46:19.853+07,350team/25trial unchanged; no current-credit/final-bill claim. No REALmerchant write/training/OCR/LINE action. Backups retained locally/ignored; only sanitized deployment metadata is committed.

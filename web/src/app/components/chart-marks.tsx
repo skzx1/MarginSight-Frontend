@@ -13,9 +13,11 @@ export function useChartWidth(fallback = 640) {
     const update = () => { const next = Math.floor(node.getBoundingClientRect().width); if (next > 0) setWidth(current => current === next ? current : next); };
     update();
     if (typeof ResizeObserver === 'undefined') return;
-    const observer = new ResizeObserver(update);
+    // A new width changes the SVG height, so the state update waits for the next frame (no ResizeObserver loop error).
+    let frame = 0;
+    const observer = new ResizeObserver(() => { cancelAnimationFrame(frame); frame = requestAnimationFrame(update); });
     observer.observe(node);
-    return () => observer.disconnect();
+    return () => { cancelAnimationFrame(frame); observer.disconnect(); };
   }, [node]);
   return [ref, width] as const;
 }

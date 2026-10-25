@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useLanguage } from '../language';
 import { useOverviewDashboard } from '../../lib/use-overview-dashboard';
 import { bangkokDate } from '../../lib/format';
@@ -26,6 +26,14 @@ export default function Overview({ base, origin, period, navigate, onMissingCost
   const [selected, setSelected] = useState<OverviewOrder>();
   const [search, setSearch] = useState(''), [channel, setChannel] = useState('all'), [visibleCount, setVisibleCount] = useState(5);
   useEffect(() => { setSelected(undefined); setVisibleCount(5); }, [period.type, period.start, period.end]);
+  // F2: opening an order focuses its heading; "← back" returns focus to the row that opened it (after the list re-renders).
+  const returnRow = useRef<string | null>(null);
+  const openOrder = (order: OverviewOrder) => { returnRow.current = order.platform + order.orderId; setSelected(order); };
+  useEffect(() => {
+    if (selected) { document.getElementById('detail-title')?.focus(); return; }
+    const key = returnRow.current; returnRow.current = null;
+    if (key) [...document.querySelectorAll<HTMLButtonElement>('.order-row-item[data-order-key]')].find(row => row.dataset.orderKey === key)?.focus();
+  }, [selected]);
 
   const allOrders: OverviewOrder[] = (data?.results ?? []).map(result => ({
     orderId: result.orderId, platform: result.platform, orderAt: result.orderAt,
@@ -64,7 +72,7 @@ export default function Overview({ base, origin, period, navigate, onMissingCost
 
   if (selected) {
     const calculation = data?.results.find(result => result.orderId === selected.orderId && result.platform === selected.platform);
-    return <div className="overview-page evidence-view">{headerActions}<button className="back-link ghost" onClick={() => setSelected(undefined)}>← {t('back')}</button><div className="section-heading"><h2>{selected.orderId}</h2><span className="badge">{selected.platform}</span></div>{calculation && <EvidencePanel result={calculation} />}</div>;
+    return <div className="overview-page evidence-view">{headerActions}<button className="back-link ghost" onClick={() => setSelected(undefined)}>← {t('back')}</button><div className="section-heading"><h2 id="detail-title" tabIndex={-1}>{selected.orderId}</h2><span className="badge">{selected.platform}</span></div>{calculation && <EvidencePanel result={calculation} />}</div>;
   }
 
   return <div className="overview-page" aria-busy={loading}>
@@ -99,7 +107,7 @@ export default function Overview({ base, origin, period, navigate, onMissingCost
       </div>
       {loading ? <Loading /> : !matches.length ? <Empty title={orders.length ? t('noMatchingOrders') : t('noOrdersInPeriod')} action={(search || channel !== 'all') ? <button className="secondary" onClick={() => { setSearch(''); setChannel('all'); }}>{t('clearFilters')}</button> : undefined} /> : <>
         <p className="caption" aria-live="polite">{Math.min(visibleCount, matches.length)} / {matches.length} · {t('overviewLoaded')}: {orders.length}</p>
-        <ul className="recent-orders-list">{matches.slice(0, visibleCount).map(order => <li key={order.platform + order.orderId}><button type="button" className="order-row-item" onClick={() => setSelected(order)}>
+        <ul className="recent-orders-list">{matches.slice(0, visibleCount).map(order => <li key={order.platform + order.orderId}><button type="button" className="order-row-item" data-order-key={order.platform + order.orderId} onClick={() => openOrder(order)}>
           <span className="order-col-id"><strong className="order-id-text">{order.orderId}</strong><span className="order-product-text">{order.productName}</span></span>
           <span className="order-col-channel"><span className="channel-badge">{order.platform}</span></span>
           <time className="order-col-time" dateTime={order.orderAt}>{orderDateTime(order.orderAt)}</time>

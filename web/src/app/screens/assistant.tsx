@@ -231,7 +231,7 @@ export default function Assistant({ base, guest, origin, products, initialSku, d
               <span className={s.editHintIcon} aria-hidden="true"><ChatIcon name="edit" /></span>
             </button>
           )}
-          {(guest || origin === 'MOCK') && <span className={s.mockBadge} title={locale === 'th' ? 'ร้านจำลอง · นำเข้าได้ 3 ไฟล์ · ผู้ช่วยและอ่านบิลรวม 3 ครั้งต่อรอบ' : 'Demo store · 3 imports · 3 assistant/receipt requests per session'} tabIndex={0} role="note" aria-label={t('mock')}>{t('mock')}</span>}
+          {(guest || origin === 'MOCK') && <span className={s.mockBadge} title={locale === 'th' ? 'นำเข้าได้ 3 ไฟล์ · ผู้ช่วยและอ่านบิลรวม 3 ครั้งต่อรอบ' : '3 imports · 3 assistant/receipt requests per session'} tabIndex={0} role="note" aria-label={t('mock')}>{t('mock')}</span>}
         </div>
         <div className={s.headerRight}>
           <button type="button" className={s.historyHeaderButton} onClick={openSheet} aria-label={t('history')} aria-expanded={panel === 'sheet'} aria-haspopup="dialog"><ChatIcon name="history" /><span>{t('historyShort')}</span></button>

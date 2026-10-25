@@ -119,3 +119,8 @@ Rollback HTML/config/release backups and logs are in ephemeral CloudShell /tmp/m
 Preflight2026-10-24T13:46:24.553347Z verified STS109991964227, Singapore stackmarginsight UPDATE_COMPLETE and BudgetHackathon-Team10 limit350USD / ActualSpend0.028USD, LastUpdated2026-10-24T11:22:14.710Z. Re-read before publish still0.028USD. Delayed snapshot is not current remaining credit; total cap350USD/trial target25USD unchanged.
 
 One clean CloudShell build/verified Node download, one static publish, thirteen S3 object checksum reads, one7-path CloudFront invalidation I4L4NPTRPCLXDFM1Y06XU9XHN7 (Completed), and one Cognito presentation-only CSS/logo update on existing resources. One new isolated MOCK demo tenant/session plus browser/data reads for five sections; no merchant writes/import, AI/OCR/LINE/training or Backend/IaC/IAM/auth-policy changes. Standard CloudShell/S3/CDN/API/DynamoDB traffic may accrue. No new paid capacity or infrastructure. Backups/logs under ephemeral /tmp/marginshot-emerald-20261024-lrumkmxb; prior runtimee9ef662 remains in Git for reviewed rollback. Existing retained resources still count toward team budget.
+
+
+## Store wording/catalog changes — 25 October 2026
+
+Local-only development, static build/tests and isolated local MOCK sessions. Local AI disabled. No AWS requests, resource creation, publish, inference or training in this slice; no new cloud spend from these operations. Existing retained AWS resources may continue accruing charges; no fresh budget/credit snapshot was taken.

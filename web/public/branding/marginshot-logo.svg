@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="520" height="128" viewBox="0 0 520 128" fill="none" role="img" aria-labelledby="title">
+  <title id="title">MarginShot</title>
+  <path d="M12 35h8l20 20-5 5Z" fill="#B5D99C"/>
+  <path d="m12 35 23 23-23 23Zm0 59 22-22v33H12Z" fill="#0D2923"/>
+  <path d="m78 82 22-26v49H78Z" fill="#B5D99C"/>
+  <path d="m12 96 31-31 16 16 44-47-5-5 18-13-6 30-6-6-45 53-16-16-31 31Z" fill="#0D2923"/>
+  <path d="m12 96 31-31 16 16 44-47-5-5 18-13-28 7 7 6-37 40-15-14-31 31Z" fill="#C7F564"/>
+  <text x="142" y="85" fill="#0D2923" font-family="Inter,Arial,sans-serif" font-size="56" font-weight="700" letter-spacing="-1.7">MarginShot</text>
+</svg>

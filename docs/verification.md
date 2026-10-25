@@ -1,3 +1,21 @@
+## Selected rising-chart logo and border cleanup — 25 October 2026
+
+VERIFIED_LOCAL เท่านั้น ไม่commit/push/deploy. ผู้ใช้เลือกแบบM+RisingLineจากGemini; วาดSVGตามภาพอ้างอิงในpublic/branding (mark, horizontalwordmark, dark/lighticons) และปรับsharedBrand/favicon/จุดกลางHeroDepthให้ใช้แบบใหม่. เป็นSVGที่ถอดแบบเอง ไม่ใช่vectorต้นฉบับที่Geminiexport. CognitoHostedUIและcognito-logo.pngเดิมยังไม่ได้เปลี่ยนบนAWS.
+
+ตามภาพแก้ขอบขาว: เอาสีพื้นwrapperโลโก้ในheader/topbarออก และลบborder/background/glowของcoreในanimation. Browserlocalอ่านกลับwrapper/core background rgba(0,0,0,0), coreBorder0px/coreShadownone; imagesโหลดครบ. `npm run verify` ผ่าน53tests/typecheck/staticexport/package และfinalCSS `npm run build` ผ่าน; XMLparseผ่านSVG5ไฟล์. ไม่มีสูตร/API/auth/ข้อมูลร้านเปลี่ยน. หลักฐานlocal-onlyใน `.local/landing-depth-20261025/logo-borderless-*`; โปรเจคทั้งระบบยังPARTIAL_WITH_EXTERNAL_BLOCKERS.
+
+## Full-viewport landing follow-up — 25 October 2026
+
+VERIFIED_LOCAL เท่านั้น ยังไม่commit/push/deploy. ตามคำขอให้ฉากโลโก้เต็มหน้า เปลี่ยนsceneเป็นabsolute/inset0ไม่มีกรอบหรือมุมโค้ง, heroสูงอย่างน้อย100svhลบheader, เมนูสีเดียวกับฉาก และcopy/CTAอยู่เหนือgradient; ย้ายการ์ดสมมติไปsectionถัดไป. ไม่เปลี่ยนสูตร/API/assetsหรือruntimeAWS.
+
+`npm run verify` รอบนี้ผ่าน53tests/typecheck/previewhash/policy/staticexport/package. Browserdesktop1570×930: sceneและheroleft0/width1555/height850ใต้header80 ตรงพื้นที่ที่เห็น; ไม่มีhorizontaloverflow. Mobile390×844: sceneเต็มcontentwidth375/height776ใต้header68 ทั้งไทยและอังกฤษ; CTAสองปุ่มอยู่ในจอ(bottom742/800), เมนูและlanguage switchอ่านได้. Animationยังrunning; browsererrorlogท้ายงานว่าง. คืนภาษาเดิมENและresetviewportoverrideแล้ว. หลักฐานเพิ่มใน `.local/landing-depth-20261025/fullscreen-*`; สถานะรวมโครงการยังPARTIAL_WITH_EXTERNAL_BLOCKERSเดิม.
+
+## Local landing depth study — 25 October 2026
+
+VERIFIED_LOCAL เฉพาะงานทดลอง landing ที่ยังไม่commit/push/deploy. `git fetch`/`git pull --ff-only origin main` ยืนยันmainตรงoriginที่5eb4fe9 (Already up to date); เก็บlocalanimationครบ. เปลี่ยนheroเป็นcopyคู่กับCSSperspective fly-through ของโลโก้Shopee/Lazada/TikTok/LINEจากassetsเดิม ไม่เพิ่มdependency/backend/formula/API changes. Motionปกติ24s; reduced-motionลดความเร็วเป็น48sและหยุดcamera drift แต่คงlogoเคลื่อนตามคำขอเดิมให้เล่นต่อเนื่อง. Intersection/visibilityหยุดanimationเมื่อพ้นจอหรือtabถูกซ่อน.
+
+`npm run verify` ผ่าน53tests/typecheck/previewhash/policy/staticexport/package; finalCSSแก้แล้วรัน `npm run build` ผ่านอีกครั้ง. รอบแรกsandboxปฏิเสธmkdirใน.next (EPERM); รันlocalbuildนอกsandboxแล้วผ่าน ไม่แก้authหรือสิทธิ์AWS. Browserlocalตรวจ1280pxและ390×844: ภาพโหลดครบ, scrollWidth1265/375ไม่เกินviewport, animationNameflyThroughและtransformเปลี่ยนจริง; sceneRunningfalseเมื่อไป#simulator. ปุ่มลองคำนวณไปsectionได้; ส่วนลด0%แสดงprofit20.00บาทตามfixture แล้วคืน15%. ไม่ใช้AWS/Bedrock/Cognitoหรือข้อมูลร้านจริง. หลักฐานlocal-only `.local/landing-depth-20261025/`; โปรเจคทั้งระบบยังPARTIAL_WITH_EXTERNAL_BLOCKERSตามscopeเดิม.
+
 ## Repository cleanup — 18 October 2026
 
 VERIFIED_LOCAL: staged tracked-only snapshot exported with `git checkout-index`; ไม่มี19ไฟล์อ้างอิงที่นำออก. `npm ci` และ `npm run verify` ผ่าน50tests, TypeScript, preview hash/policy, Next static exportและdeploy packaging. ตรวจ34ลิงก์เอกสารหลักรวมสองrepoผ่าน; ลิงก์ไปไฟล์local-onlyแปลงเป็นข้อความกำกับ ไม่ให้เป็นลิงก์เสีย. ต้นฉบับและbackup22ไฟล์รวมสองrepo hashตรงmanifest. ไม่มีruntime/source/fixtures/IaCเปลี่ยนและไม่ได้ทดสอบหรือdeployAWSใหม่. ดู [reference policy](reference-policy.md).
@@ -342,3 +360,15 @@ Published runtime34ec54d at2026-10-24T13:49:02.129579Z (20:49 Thai) using existi
 AGENT-OBSERVED AWS_BROWSER: shared Emerald action token/background loaded, unfinished pricing hidden, orbit running; sign-in visible at the inspected827px landing width with no horizontal overflow. Created one fresh isolated MOCK demo session and inspected Overview, Products, Finance, Ask assistant and Store. Overview baseline200THB sales/+9THB profit/4.5% unchanged. Products showed2 records and one missing cost without invented prices/profit. Finance clearly used its separate synthetic fixture (120orders for the selected month), not the backend demo order. Screenshot review passed for all five sections; assistant and store had no page overflow; app error log empty. No question, model/OCR/LINE call, import, real merchant write, signup or real-device acceptance test in this slice.
 
 Evidence excluded under .local/emerald-release-20261024 (public-readback.json and aws screenshots). CloudShell logs/hash evidence/pre-release files and Cognito CSS backup: /tmp/marginshot-emerald-20261024-lrumkmxb (ephemeral). Prior deployed sourcee9ef662 is the durable rollback source; restore its static build and appearance without deleting stores or weakening auth. Overall PARTIAL_WITH_EXTERNAL_BLOCKERS remains for prior real OCR/LINE/native marketplace/two-Cognito-user gates.
+
+
+## Store wording and five additional products — 25 October 2026 (local only)
+
+VERIFIED_LOCAL. Replaced visible Thai/English Demo wording in entry buttons, landing copy, usage descriptions, LINE guidance, finance availability notes and session error messages with ordinary store wording (เข้าสู่ร้าน / Open store). Kept explicit MOCK provenance. The one-click capability flow, expiry, quotas and merchant sign-in remain intact. Fresh guest tenants use Backend storefront labels and readable SKU/order/program identifiers. Existing personal stores and saved historical data are not rewritten.
+
+Frontend npm run verify passed 53 tests, TypeScript, generated-domain SHA-256 integrity, browser secret policy, static export and packaging. Backend verification passed 61 tests including expanded catalog, exact costs, idempotence, tenant isolation, imports and unchanged financial goldens. Browser observed local one-click entry, seven products with six known costs and one unknown, names/SKUs without Demo, and baseline 9 THB / 4.5%. Inspected all five main sections in English and the corresponding Thai entry/catalog/finance/assistant/store screens; no Demo/เดโม/สาธิต text in inspected views. Missing product price/stock/profit stays unknown. Browser automation briefly stalled after leaving unsaved language settings; closing that disposable test tab restored interaction and the fresh flow passed. No new cloud/model/OCR call, push, commit or deployment. Evidence: .local/storefront-20261025/products.png and checks.json. Overall PARTIAL_WITH_EXTERNAL_BLOCKERS remains.
+
+
+## Assistant storefront data repair — 25 October 2026
+
+Supersedes the catalog-only limitation in the earlier local entry: added five linked, settled single-SKU MOCK orders with posted fees/payouts so every newly added product can use assistant discount scenarios. Existing local MOCK guest sessions are upgraded at local API startup, preserving chat/session history; personal/REAL data is excluded. Browser retried the existing CAP-005 chat successfully: discounted revenue135.15THB, fees27.03THB, profit28.12THB, margin20.81% (card20.8%); console errors empty. Local AI remains disabled, so this verifies deterministic fallback rather than a new Bedrock invocation. Evidence: .local/storefront-20261025/assistant-fixed.png. Backend62 tests and6 Python parameter tests passed; Frontend code unchanged since its53-test verification. Both heuristic secret audits reported0 candidates; that is not a guarantee covering every secret format. User authorized pushing all changes after the local verification; no AWS deployment is included.

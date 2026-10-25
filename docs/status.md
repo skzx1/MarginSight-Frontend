@@ -135,3 +135,13 @@ VERIFIED_LOCAL / VERIFIED_AWS for this UI slice: runtimee9ef662 is live. Desktop
 ## Emerald Unified release - 24 October 2026, 20:49 Bangkok
 
 VERIFIED_LOCAL / VERIFIED_AWS for this UI slice: latest feature claude/design-tokens fast-forwarded to main34ec54d and deployed. Shared Emerald tokens, signed profit/loss, cards/charts, landing/login/workspace, favicon and Cognito presentation are live. Local/CloudShell53 tests and static build pass;13-file S3 hashes, completed CloudFront invalidation, public protections and five MOCK workspace sections checked. Backend/formula/auth policies unchanged. See verification.md/cost-log.md for exact boundaries; overall PARTIAL_WITH_EXTERNAL_BLOCKERS remains.
+
+
+## Local store wording/catalog — 25 October 2026
+
+VERIFIED_LOCAL only: ordinary Thai/English store wording replaces visible Demo text; entry still opens an isolated MOCK store in one click. Five more products and costs are supplied by Backend for fresh guest sessions (seven products total). Frontend 53 / Backend 61 tests and builds passed. Not committed, pushed or deployed; AWS is unchanged. See verification.md. Overall PARTIAL_WITH_EXTERNAL_BLOCKERS remains.
+
+
+## Assistant data repair and source publication — 25 October 2026
+
+VERIFIED_LOCAL: linked sales now let all five new products use assistant scenarios. Existing CAP-005 chat retry returned28.12THB profit after15% discount. Backend62 tests plus6 Python tests pass; Frontend53 tests pass. User authorized commit/push of the current landing/logo/store wording and catalog/assistant changes. AWS remains unchanged; overall PARTIAL_WITH_EXTERNAL_BLOCKERS. See latest verification entry.

@@ -1,0 +1,13 @@
+{"note":"G4 corrected palette (proposal). Hex sRGB. Keys = semantic role names (CSS: --color-<kebab> / --chart-<kebab>).",
+"tokens":{
+"canvas":"#FAF9F5","surface":"#FFFFFF","surfaceAlt":"#F0EEE6","sidebar":"#F4F2EC","navActiveBg":"#E8E5DC",
+"text":"#141413","muted":"#66625A","border":"#E6E2D8","borderStrong":"#8C877D","onAction":"#FFFFFF",
+"action":"#B04F2C","actionHover":"#933F22","link":"#A2482A","focus":"#B04F2C","indicator":"#C8643F","brandBright":"#D97757",
+"countBg":"#141413","countFg":"#FFFFFF","selectedBg":"#141413","selectedFg":"#FFFFFF",
+"disabledBg":"#F0EEE6","disabledFg":"#6E6A62",
+"loss":"#8E1238","lossBg":"#F7E3E8","warn":"#735C00","warnBg":"#F5EDCF","info":"#2F5784","infoBg":"#E5ECF4",
+"gainA":"#141413","gainBgA":"#ECE9E1","gainFgA":"#3B3833",
+"gainB":"#17735C","gainBgB":"#E3F1EC","gainFgB":"#145F4C",
+"darkBg":"#1F1E1C","darkHover":"#2E2C29","darkBorder":"#5A564E","onDark":"#FAF9F5","onDarkMuted":"#C9C4B8","focusOnDark":"#E08A68","indicatorOnDark":"#D97757","lossOnDark":"#F4A9BA","warnOnDark":"#E3C35A","infoOnDark":"#A9C2E3","gainOnDarkB":"#9ACBAE",
+"chartRevenue":"#2B2A27","chartCost":"#8C877D","chartProfitA":"#5C5852","chartProfitB":"#17735C","chartLoss":"#A3284E","chartHighlight":"#B04F2C","chartGrid":"#E6E2D8","chartAxis":"#66625A",
+"chShopee":"#6B3D1C","chLazada":"#556DC6","chTiktok":"#61506D","chLine":"#588E44","chStore":"#56695C","chOther":"#958F86"}}

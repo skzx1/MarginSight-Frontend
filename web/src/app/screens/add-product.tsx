@@ -2,7 +2,8 @@
 import { useId, useState } from 'react';
 import { request } from '../../lib/auth';
 import { useAction } from '../../lib/use-resource';
-import { bangkokDate, dateAt, money, parseBaht } from '../../lib/format';
+import { bangkokDate, dateAt, parseBaht } from '../../lib/format';
+import { baht, percent, signedBaht } from '../../lib/signed-money';
 import type { CatalogProduct, FeatureProps } from '../../lib/types';
 import { useLanguage } from '../language';
 import { ErrorNotice, Submit } from '../components/forms';
@@ -145,12 +146,12 @@ export default function AddProductPage({
             <form onSubmit={handleSubmit} noValidate>
               <fieldset disabled={action.busy}>
                 {validationError && (
-                  <div className="notice error-notice" role="alert">
+                  <div className="notice error-notice" role="alert"><Icon name="warning" />
                     <strong>{t('errorTitle')}</strong>
                     <p>{validationError}</p>
                   </div>
                 )}
-                <ErrorNotice error={action.error} />{createdProduct && !success && <p className="notice">{t('partialProductSave')}</p>}
+                <ErrorNotice error={action.error} />{createdProduct && !success && <p className="notice"><Icon name="warning" />{t('partialProductSave')}</p>}
 
                 {/* Product Name */}
                 <div className="form-field-group">
@@ -297,7 +298,7 @@ export default function AddProductPage({
                 </span>
                 <div>
                   <h2 className="preview-title">{t('livePreview')}</h2>
-                  <p className="caption">{t('livePreviewNote')}</p><p className="notice">{t('draftPriceNote')}</p>
+                  <p className="caption">{t('livePreviewNote')}</p><p className="notice"><Icon name="warning" />{t('draftPriceNote')}</p>
                 </div>
               </div>
 
@@ -312,10 +313,10 @@ export default function AddProductPage({
                     (unitProfit != null && unitProfit < 0 ? 'negative' : 'positive')
                   }
                 >
-                  {draft.differenceSatang != null ? (draft.differenceSatang < 0 ? '−' : draft.differenceSatang > 0 ? '+' : '') + '฿' + money(Math.abs(draft.differenceSatang), locale) : '—'}
+                  {signedBaht(draft.differenceSatang, locale)}
                 </strong>
                 <span className="metric-margin-pct tabular-num">
-                  {marginPct != null ? `${t('preFeeMargin')}: ${marginPct}%` : '—'}
+                  {marginPct != null ? `${t('preFeeMargin')}: ${percent(marginPct, locale)}` : '—'}
                 </span>
               </div>
 
@@ -324,21 +325,21 @@ export default function AddProductPage({
                 <div className="formula-item">
                   <small>{t('sellingPrice')}</small>
                   <strong className="tabular-num">
-                    {draft.priceSatang != null ? '฿' + money(draft.priceSatang, locale) : '—'}
+                    {baht(draft.priceSatang, locale)}
                   </strong>
                 </div>
                 <span className="formula-operator" aria-hidden="true">−</span>
                 <div className="formula-item">
                   <small>{t('costPrice')}</small>
                   <strong className="tabular-num">
-                    {draft.costSatang != null ? '฿' + money(draft.costSatang, locale) : '—'}
+                    {baht(draft.costSatang, locale)}
                   </strong>
                 </div>
                 <span className="formula-operator" aria-hidden="true">=</span>
                 <div className="formula-item highlight-result">
                   <small>{t('preFeeDifference')}</small>
                   <strong className="tabular-num">
-                    {draft.differenceSatang != null ? '฿' + money(draft.differenceSatang, locale) : '—'}
+                    {signedBaht(draft.differenceSatang, locale)}
                   </strong>
                 </div>
               </div>
@@ -348,7 +349,7 @@ export default function AddProductPage({
                 <div className="preview-total-row">
                   <dt>{t('totalStockValue')} ({qtyVal || 0} {unit || 'ชิ้น'})</dt>
                   <dd className="tabular-num">
-                    {draft.totalValueSatang != null ? '฿' + money(draft.totalValueSatang, locale) : '—'}
+                    {baht(draft.totalValueSatang, locale)}
                   </dd>
                 </div>
                 <div className="preview-total-row">
@@ -359,7 +360,7 @@ export default function AddProductPage({
                       (draft.totalDifferenceSatang != null && draft.totalDifferenceSatang < 0 ? 'negative' : 'positive')
                     }
                   >
-                    {draft.totalDifferenceSatang != null ? '฿' + money(draft.totalDifferenceSatang, locale) : '—'}
+                    {signedBaht(draft.totalDifferenceSatang, locale)}
                   </dd>
                 </div>
               </dl>

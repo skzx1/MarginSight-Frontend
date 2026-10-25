@@ -1,0 +1,89 @@
+<!doctype html><html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>G3 DC ชิ้นกำไร (Margin Slice)</title><style>
+@font-face{font-family:'Anuphan';src:url(fonts/anuphan-variable.ttf) format('truetype');font-weight:100 700}
+@font-face{font-family:'PlexProxy';src:url(fonts/font-0.ttf);font-weight:400}
+@font-face{font-family:'PlexProxy';src:url(fonts/font-2.ttf);font-weight:600}
+@font-face{font-family:'NotoSansThaiLocal';src:url(fonts/font-4.ttf);font-weight:400}
+@font-face{font-family:'NotoSansThaiLocal';src:url(fonts/font-6.ttf);font-weight:600}
+@font-face{font-family:'Inter';src:url(fonts/inter-variable.ttf);font-weight:100 900}
+/* Offline proxy for a looped Thai serif (Noto Serif Thai / Trirong are NOT available offline). Angsana New = Windows system font, x-height small -> size-adjust. */
+@font-face{font-family:'SerifProxy';src:local('Angsana New');size-adjust:150%}
+:root{--canvas:#FAF9F5;--surface:#FFFFFF;--alt:#F0EEE6;--sidebar:#F4F2EC;--text:#141413;--muted:#66625A;--border:#E6E2D8;--strong:#8C877D;
+--navbg:#E8E5DC;--navind:#C8643F;--primary:#B04F2C;--primaryH:#933F22;--bright:#D97757;--link:#A2482A;--loss:#8E1238;--lossBg:#F7E3E8;--gainBg:#ECE9E1;--gainFg:#3B3833;--info:#2F5784;--infoBg:#E5ECF4;
+--sans:'PlexProxy','NotoSansThaiLocal','IBM Plex Sans Thai',sans-serif;--num:'PlexProxy','Inter',sans-serif;--serif:'Noto Serif Thai','Trirong','SerifProxy',serif;--mono:'IBM Plex Mono',Consolas,'NotoSansThaiLocal',monospace}
+*{box-sizing:border-box}html,body{margin:0}body{background:var(--canvas);color:var(--text);font:400 14px/1.5 var(--sans)}
+button{font:inherit;color:inherit;cursor:pointer;min-height:44px}
+:focus-visible{outline:3px solid var(--primary);outline-offset:3px}
+.app{display:grid;grid-template-columns:232px 1fr;min-height:900px}
+.side{background:var(--sidebar);border-right:1px solid var(--border);padding:20px 16px;display:flex;flex-direction:column;gap:6px}
+.brand{display:flex;align-items:center;gap:10px;font:600 17px var(--sans);margin-bottom:18px}
+.brand .bm{width:32px;height:32px;display:grid;place-items:center}
+.nav{display:flex;align-items:center;gap:10px;min-height:44px;padding:0 12px;border-radius:9px;color:var(--text)}
+.nav.on{background:var(--navbg);font-weight:600;box-shadow:inset 3px 0 0 var(--navind)}
+.nav i{width:18px;height:18px;border:1.5px solid var(--muted);border-radius:5px;display:inline-block}
+.main{min-width:0}
+.topm{display:none}
+.note{font:400 12px/1.5 var(--sans);color:var(--muted);padding:12px 32px;border-top:1px dashed var(--strong);background:var(--surface)}
+.sec{font:600 12px var(--sans);letter-spacing:0;color:var(--muted);padding:10px 32px;background:var(--alt);border-block:1px solid var(--border)}
+/* dashboard skeleton (only context for the AI panel) */
+.dash{display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:24px;padding:28px 32px 40px;align-items:start}
+.dh{display:flex;justify-content:space-between;align-items:center;grid-column:1/-1}
+.dh h1{font:600 30px/1.3 var(--serif);margin:0}
+.kpis{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.kpi{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px}
+.kpi span{display:block;font-size:12px;color:var(--muted);font-weight:500}.kpi b{font:600 24px/1.4 var(--num);font-variant-numeric:tabular-nums}
+.chartph{grid-column:1/-1;height:200px;border:1px solid var(--border);border-radius:12px;background:var(--surface);display:grid;place-items:center;color:var(--muted);font-size:12px}
+.result{border:1px solid var(--border);border-radius:12px;background:var(--canvas);padding:12px 14px;margin:10px 0;font-variant-numeric:tabular-nums}
+.result .rm{display:flex;justify-content:space-between;gap:12px;align-items:baseline}.result .rm strong{font:600 18px var(--num);color:var(--loss)}
+.result dl{margin:8px 0 0;font-size:13px}.result dl div{display:flex;justify-content:space-between;border-top:1px solid var(--border);padding:6px 0}.result dt{color:var(--muted)}.result dd{margin:0;font-family:var(--num)}
+.foot{font-size:12px;color:var(--muted);margin-top:6px}
+.ev{color:var(--link);font-size:13px;text-decoration:underline;text-underline-offset:3px;display:inline-flex;align-items:center;min-height:44px}
+.ububble{background:var(--alt);border-radius:16px 16px 4px 16px;padding:10px 14px;margin-left:auto;max-width:85%;width:fit-content}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+@media (max-width:700px){
+ .app{grid-template-columns:1fr}.side{display:none}
+ .topm{display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid var(--border);background:var(--sidebar);font:600 16px var(--sans);min-height:56px}
+ .dash{grid-template-columns:1fr;padding:20px 16px 32px;gap:16px}.dh h1{font-size:26px}
+ .note,.sec{padding-inline:16px}
+}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+.lc{max-width:880px;margin:0 auto;padding:72px 32px 40px}
+.lc .hd{display:flex;gap:16px;align-items:flex-start}.lc h2{font:600 30px/1.4 var(--sans);margin:0}
+.lc .bar{height:6px;border-radius:3px;background:var(--alt);overflow:hidden;width:220px;margin:10px 0 6px;display:flex;gap:2px}
+.lc .bar i{display:block;background:var(--strong);width:81%}.lc .bar b{display:block;background:var(--text);flex:1;animation:grow .6s ease-out both;transform-origin:left}
+@keyframes grow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+.prov{font-size:13px;color:var(--muted);margin:0}
+.cc{margin-top:24px;background:var(--surface);border:1px solid var(--strong);border-radius:16px;padding:6px}
+.cc .ctxbar{display:flex;gap:6px;flex-wrap:wrap;padding:6px;background:var(--canvas);border-radius:11px}
+.cc .ctxbar span.l{font-size:12px;color:var(--muted);align-self:center;padding:0 6px}
+.cc .ctxbar button{display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--strong);border-radius:9px;padding:0 12px;font-size:13px;font-weight:600}
+.cc .row{display:flex;align-items:flex-end;gap:8px;padding:6px 6px 4px 10px}.cc textarea{flex:1;border:0;resize:none;font:400 16px/1.6 var(--sans);min-height:56px;padding:10px 0;outline:none;background:none}
+.snc{width:48px;height:48px;border-radius:12px;border:0;background:var(--primary);color:#fff;display:grid;place-items:center;flex-shrink:0}
+.qc{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:16px}
+.qc button{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 14px;text-align:left;display:flex;flex-direction:column;gap:4px;min-height:72px}
+.qc button small{font-size:12px;color:var(--muted);display:flex;gap:6px;align-items:center}
+.rl{margin-top:28px}.rl h3{font:600 13px var(--sans);color:var(--muted);margin:0 0 6px}
+.rl div{display:flex;justify-content:space-between;gap:12px;border-bottom:1px solid var(--border);padding:12px 2px;min-height:48px}.rl small{color:var(--muted);font-size:12px;white-space:nowrap}
+.pc{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px}
+.pc h3{display:flex;align-items:center;gap:10px;margin:0;font:600 16px var(--sans)}.pc .prov{font-size:12px;margin:4px 0 12px}
+.pc .pi{display:flex;gap:8px;margin-top:8px}.pc .pi input{flex:1;min-width:0;min-height:48px;border:1px solid var(--strong);border-radius:12px;padding:0 12px;font:inherit}
+.pc .ctxbar{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px}.pc .ctxbar button{display:inline-flex;gap:6px;align-items:center;background:var(--canvas);border:1px solid var(--strong);border-radius:9px;padding:0 10px;font-size:13px}
+@media(max-width:700px){.lc{padding:24px 16px}.lc .hd{flex-direction:column;gap:10px}.lc h2{font-size:24px}.qc{grid-template-columns:1fr}.qc button{min-height:60px}}</style></head><body>
+<div style="background:#141413;color:#FAF9F5;font:600 13px/1.5 var(--sans);padding:8px 16px">⚠ ฟอนต์ตัวแทน ไม่ใช่ฟอนต์จริง — serif ไทยในภาพคือ Angsana New ขยาย 150% แทน Noto Serif Thai/Trirong; Thai sans = Noto Sans Thai แทน IBM Plex Sans Thai</div>
+<div class="sec">G3 · DC ชิ้นกำไร (Margin Slice) · ① หน้าผู้ช่วย (assistant landing)</div>
+<div class="app"><aside class="side" aria-label="เมนู"><div class="brand"><span class="bm"><svg width="28" height="28" viewBox="0 0 32 32" aria-hidden="true"><rect x="2" y="2" width="28" height="28" rx="8" fill="var(--text)"/><rect x="7" y="13" width="11" height="6" rx="1.5" fill="#FAF9F5"/><rect x="20" y="13" width="5" height="6" rx="1.5" fill="var(--bright)"/></svg></span>MarginShot</div><div class="nav"><i></i>ภาพรวม</div><div class="nav"><i></i>สินค้า</div><div class="nav"><i></i>การเงิน</div><div class="nav on"><i></i>ถามผู้ช่วย</div><div class="nav"><i></i>ร้านค้า</div></aside><main class="main"><div class="topm"><span class="bm" style="width:28px;height:28px;display:grid;place-items:center"><svg width="28" height="28" viewBox="0 0 32 32" aria-hidden="true"><rect x="2" y="2" width="28" height="28" rx="8" fill="var(--text)"/><rect x="7" y="13" width="11" height="6" rx="1.5" fill="#FAF9F5"/><rect x="20" y="13" width="5" height="6" rx="1.5" fill="var(--bright)"/></svg></span>MarginShot</div><section class="lc"><div class="hd"><svg width="44" height="44" viewBox="0 0 32 32" aria-hidden="true"><rect x="2" y="2" width="28" height="28" rx="8" fill="var(--text)"/><rect x="7" y="13" width="11" height="6" rx="1.5" fill="#FAF9F5"/><rect x="20" y="13" width="5" height="6" rx="1.5" fill="var(--bright)"/></svg><div><h2>คุณมะลิ วันนี้อยากรู้เรื่องกำไรตรงไหน?</h2>
+<div class="bar" role="img" aria-label="ต้นทุน 81.1% กำไร 18.9% ของยอดขายเดือนนี้"><i></i><b></b></div>
+<p class="prov">เดือนนี้ขายได้ ฿48,250.00 เหลือกำไร 18.9% · จาก 412 ออเดอร์ที่บันทึก · อัปเดต 19:32</p></div></div>
+<form class="cc"><div class="ctxbar" role="group" aria-label="ใช้ข้อมูล"><span class="l">ใช้ข้อมูล</span><button type="button"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>เดือนนี้<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button><button type="button"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M21 8 12 3 3 8v8l9 5 9-5V8ZM3 8l9 5 9-5M12 13v8"/></svg>ทุกสินค้า<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button></div>
+<div class="row"><label class="sr" for="qc">คำถามของคุณ</label><textarea id="qc" placeholder="ถามเรื่องกำไรของร้าน…"></textarea><button class="snc" aria-label="ส่งคำถาม"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button></div></form>
+<div class="qc"><button type="button"><span>กำไรเดือนนี้เหลือเท่าไร?</span><small><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>ใช้: ออเดอร์เดือนนี้</small></button><button type="button"><span>สินค้าไหนกำไรน้อยที่สุด?</span><small><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>ใช้: ทุกสินค้า เดือนนี้</small></button><button type="button"><span>ถ้าลดราคา 15% จะเหลือเท่าไร?</span><small><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>ใช้: ราคาและต้นทุนปัจจุบัน</small></button><button type="button"><span>กำไรสัปดาห์นี้เท่าไร?</span><small><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>ใช้: ออเดอร์สัปดาห์นี้</small></button></div>
+<div class="rl"><h3>แชตล่าสุด</h3><div><span>สินค้าไหนขาดทุนบ้าง</span><small>วันนี้ 18:12</small></div><div><span>ลดราคาเซรั่มวิตซี 15%</span><small>เมื่อวาน</small></div><div><span>กำไรเดือนกันยายน</span><small>21 ต.ค.</small></div></div></section></main></div>
+<div class="sec">② แผงผู้ช่วยบนหน้าภาพรวม — ข้อเสนอ (PROPOSED, ยังไม่มีในแอปปัจจุบัน)</div>
+<div class="app"><aside class="side" aria-label="เมนู"><div class="brand"><span class="bm"><svg width="28" height="28" viewBox="0 0 32 32" aria-hidden="true"><rect x="2" y="2" width="28" height="28" rx="8" fill="var(--text)"/><rect x="7" y="13" width="11" height="6" rx="1.5" fill="#FAF9F5"/><rect x="20" y="13" width="5" height="6" rx="1.5" fill="var(--bright)"/></svg></span>MarginShot</div><div class="nav on"><i></i>ภาพรวม</div><div class="nav"><i></i>สินค้า</div><div class="nav"><i></i>การเงิน</div><div class="nav"><i></i>ถามผู้ช่วย</div><div class="nav"><i></i>ร้านค้า</div></aside><main class="main"><div class="topm"><span class="bm" style="width:28px;height:28px;display:grid;place-items:center"><svg width="28" height="28" viewBox="0 0 32 32" aria-hidden="true"><rect x="2" y="2" width="28" height="28" rx="8" fill="var(--text)"/><rect x="7" y="13" width="11" height="6" rx="1.5" fill="#FAF9F5"/><rect x="20" y="13" width="5" height="6" rx="1.5" fill="var(--bright)"/></svg></span>MarginShot</div><div class="dash"><div class="dh"><h1>ภาพรวม</h1></div>
+<div><div class="kpis"><div class="kpi"><span>ยอดขาย</span><b>฿48,250.00</b></div><div class="kpi"><span>กำไรสุทธิ</span><b>฿9,120.00</b></div><div class="kpi"><span>สัดส่วนกำไร</span><b>18.9%</b></div><div class="kpi"><span>ออเดอร์</span><b>412</b></div><div class="chartph">[กราฟรายได้และต้นทุน — นอกขอบเขต G3]</div></div></div>
+<aside class="pc" aria-label="ถาม MarginShot"><h3><svg width="28" height="28" viewBox="0 0 32 32" aria-hidden="true"><rect x="2" y="2" width="28" height="28" rx="8" fill="var(--text)"/><rect x="7" y="13" width="11" height="6" rx="1.5" fill="#FAF9F5"/><rect x="20" y="13" width="5" height="6" rx="1.5" fill="var(--bright)"/></svg>ถาม MarginShot</h3><p class="prov">ตอบจาก 412 ออเดอร์ที่บันทึก · อัปเดต 19:32</p><div class="ububble">สินค้าไหนกำไรน้อยที่สุด?</div><p style="margin:10px 0 0">เดือนนี้ <strong>เคสใส iPhone 15</strong> กำไรน้อยที่สุด ขายได้ 38 ชิ้น แต่ค่าธรรมเนียมและค่าส่งรวมสูงกว่าราคาขายเล็กน้อย</p>
+<div class="result"><div class="rm"><span>กำไร</span><strong>ขาดทุน −฿53.00</strong></div><dl><div><dt>ยอดขาย</dt><dd>฿3,382.00</dd></div><div><dt>สัดส่วนกำไร</dt><dd>−1.6%</dd></div></dl></div>
+<div class="foot">อ้างอิงข้อมูล: 1 ต.ค. 2569 – 24 ต.ค. 2569 · เคสใส iPhone 15</div><a class="ev" href="#">ดูผลคำนวณและหลักฐาน</a>
+<div class="ctxbar"><button type="button"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>เดือนนี้<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button><button type="button"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M21 8 12 3 3 8v8l9 5 9-5V8ZM3 8l9 5 9-5M12 13v8"/></svg>ทุกสินค้า<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button></div>
+<div class="pi"><input aria-label="คำถามของคุณ" placeholder="ถามต่อ…"><button class="snc" aria-label="ส่งคำถาม"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button></div></aside></div></main></div>
+<div class="note">DC: เครื่องหมาย "ชิ้นกำไร" (แท่งต้นทุน+ชิ้นกำไร บนพื้น ink) แทน sparkle · หัวข้อ sans ไม่ใช้ serif · ใต้คำทักทายมีบรรทัดที่มาของข้อมูล + แถบสัดส่วน (ข้อเสนอ: ต้องดึงจากข้อมูลจริงที่มีในหน้าภาพรวม) · composer มุม 16 มีแถบบริบท "ใช้ข้อมูล" ด้านบน · การ์ดคำถามบอกว่าจะใช้ข้อมูลอะไร · ฟอนต์ในภาพ: Thai sans = Noto Sans Thai (proxy ของ IBM Plex Sans Thai), Latin/ตัวเลข = IBM Plex Sans, serif ไทย = Angsana New (proxy ออฟไลน์ ไม่ใช่ Noto Serif Thai/Trirong จริง). ตัวเลขเป็นข้อมูลจำลอง.</div>
+</body></html>

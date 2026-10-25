@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { request } from '../../lib/auth';
 import { useAction } from '../../lib/use-resource';
 import { bangkokDate, dateAt, parseBaht } from '../../lib/format';
@@ -7,9 +7,12 @@ import type { CatalogProduct, FeatureProps, Scenario } from '../../lib/types';
 import { useLanguage } from '../language';
 import { ErrorNotice, Field, ProductSelect, Select, Submit } from '../components/forms';
 import { EvidencePanel, Money } from '../components/ledger';
-import ProductCatalog, { useProductCatalog } from '../components/product-catalog';
+import ProductCatalog, { focusProductRow, useProductCatalog } from '../components/product-catalog';
 import { ProfitAmount } from '../components/profit-amount';
 import {saveProductListing} from '../../lib/catalog-actions';
+import { SCREEN_TITLE_ID } from '../../lib/navigation';
+import { DETAIL_TITLE_ID, detailMayTakeFocus } from '../../lib/routes';
+import { Icon } from '../ui';
 
 type CatalogProps = {
   products: CatalogProduct[];
@@ -21,6 +24,14 @@ type CatalogProps = {
   onAddProduct?: () => void;
   initialMissingCostsOnly?: boolean;
   loading?: boolean;
+  /** The open product (#products/<sku>, P4-G3) or null for the list; owned by the hash route. */
+  detail: string | null;
+  /** Open (sku) or close (null) the detail through the route; replace = no new history entry. */
+  onDetail: (sku: string | null, options?: { replace?: boolean }) => void;
+  /** The catalog request failed: an unresolved deep link is kept (retry may find it) instead of being reported as not found. */
+  catalogFailed?: boolean;
+  /** The SKU the last finished catalog search looked for (login/page.tsx refresh(targetSku)); a link is judged only after that search. */
+  searchedSku?: string | null;
 };
 
 export default function Products({
@@ -34,10 +45,13 @@ export default function Products({
   simulate,
   onAddProduct,
   initialMissingCostsOnly = false,
-  loading = false
+  loading = false,
+  detail,
+  onDetail,
+  catalogFailed = false,
+  searchedSku = null
 }: FeatureProps & CatalogProps) {
   const { t, locale } = useLanguage();
-  const [selectedSku, setSelectedSku] = useState('');
 
   // Cost modal/form state
   const [costFormOpen, setCostFormOpen] = useState(false);
@@ -51,7 +65,29 @@ export default function Products({
 
   const catalog = useProductCatalog(rawProducts, initialMissingCostsOnly, locale);
   const products = catalog.products;
-  const product = products.find(p => p.sku === selectedSku);
+  const product = detail ? products.find(p => p.sku === detail) : undefined;
+  // The cost and listing forms belong to one open product: a route change (link, Back/Forward) closes them.
+  const [formsFor, setFormsFor] = useState(detail);
+  if (formsFor !== detail) { setFormsFor(detail); setCostFormOpen(false); setListingOpen(false); }
+  // A deep link is judged only after the catalog search for that SKU has finished (the list may be stale on arrival).
+  const [linkMissing, setLinkMissing] = useState(false);
+  useEffect(() => {
+    if (!detail || product || loading || catalogFailed || searchedSku !== detail) return;
+    setLinkMissing(true); onDetail(null, { replace: true });
+  }, [detail, product, loading, catalogFailed, searchedSku, onDetail]);
+  // Focus (G7 F2): opening a detail focuses its heading; closing it returns focus to the row that opened it.
+  const showingDetail = !!product && !costFormOpen && !listingOpen;
+  const openedSku = useRef<string | null>(null);
+  useEffect(() => {
+    if (showingDetail) {
+      openedSku.current = product!.sku; setLinkMissing(false);
+      if (detailMayTakeFocus(document.activeElement as HTMLElement | null, product!.sku)) document.getElementById(DETAIL_TITLE_ID)?.focus();
+      return;
+    }
+    if (detail || !openedSku.current) return;
+    const sku = openedSku.current; openedSku.current = null;
+    if (!focusProductRow(sku)) document.getElementById(SCREEN_TITLE_ID)?.focus();
+  }, [showingDetail, product?.sku, detail]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if(listingOpen&&product)return <div className="product-cost-view">
     <button className="ghost back-link" disabled={action.busy} onClick={()=>{setListingOpen(false);action.clearError();}}>← {t('back')}</button>
@@ -135,66 +171,39 @@ export default function Products({
   }
 
   if (product) {
+    const unitProfit = product.profitSatang;
     return (
       <div className="product-detail-view">
-        <button className="ghost back-link" onClick={() => setSelectedSku('')}>
+        <button className="ghost back-link" onClick={() => onDetail(null)}>
           ← {t('products')}
         </button>
-        <section className="panel">
-          <div className="product-detail-header">
-            <div>
+        <div className="product-detail-layout">
+          <section className="panel product-detail-main" aria-labelledby={DETAIL_TITLE_ID}>
+            <div className="product-detail-header">
               <span className="eyebrow">{product.sku}</span>
-              <h2>{product.name}</h2>
+              <h2 id={DETAIL_TITLE_ID} tabIndex={-1}>{product.name}</h2>
               <p className="caption">{t('unit')}: {product.unit} · {t('dateAdded')}: {product.dateAdded}</p>
             </div>
-            <div>
-              {product.sellingPriceSatang != null ? (
-                <span className="product-price-highlight">
-                  <Money value={product.sellingPriceSatang} />
-                </span>
-              ) : (
-                <span className="badge warn">{t('priceNotListed')}</span>
-              )}
-            </div>
-          </div>
-
-          <dl className="ledger-lines">
-            <div>
-              <dt>{t('sellingPrice')}</dt>
-              <dd>
-                {product.sellingPriceSatang != null ? (
-                  <Money value={product.sellingPriceSatang} />
-                ) : (
-                  <span className="badge warn">{t('priceNotListed')}</span>
-                )}
-              </dd>
-            </div>
-            <div>
-              <dt>{t('costPrice')}</dt>
-              <dd>
-                {product.cost ? (
-                  <Money value={product.cost.unitCostSatang} />
-                ) : (
-                  <span className="badge warn">{t('missingCost')}</span>
-                )}
-              </dd>
-            </div>
-            <div>
-              <dt>{t('stockQty')}</dt>
-              <dd>{product.quantity ?? '—'} {product.unit}</dd>
-            </div>
-            <div>
-              <dt>{t('unitProfit')}</dt>
-              <dd className={(product.profitSatang ?? 0) >= 0 ? 'positive' : 'negative'}>
-                {product.profitSatang != null ? (
-                  <ProfitAmount value={product.profitSatang} />
-                ) : (
-                  '—'
-                )}
-              </dd>
-            </div>
+            <dl className="product-detail-kpis">
+              <div>
+                <dt>{t('sellingPrice')}</dt>
+                <dd>{product.sellingPriceSatang != null ? <Money value={product.sellingPriceSatang} /> : <span className="badge warn">{t('priceNotListed')}</span>}</dd>
+              </div>
+              <div>
+                <dt>{t('costPrice')}</dt>
+                <dd>{product.cost ? <Money value={product.cost.unitCostSatang} /> : <span className="badge warn">{t('missingCost')}</span>}</dd>
+              </div>
+              <div>
+                <dt>{t('stockQty')}</dt>
+                <dd>{product.quantity ?? '—'} <small>{product.unit}</small></dd>
+              </div>
+              <div>
+                <dt>{t('unitProfit')}</dt>
+                <dd className={unitProfit == null ? undefined : unitProfit < 0 ? 'negative' : 'positive'}>{unitProfit != null ? <ProfitAmount value={unitProfit} /> : '—'}</dd>
+              </div>
+            </dl>
             {product.cost && (
-              <>
+              <dl className="ledger-lines">
                 <div>
                   <dt>{t('effective')}</dt>
                   <dd>{bangkokDate(product.cost.effectiveFrom)}</dd>
@@ -207,37 +216,43 @@ export default function Products({
                   <dt>{t('source')}</dt>
                   <dd className="wrap">{product.cost.sourceRef}</dd>
                 </div>
-              </>
+              </dl>
             )}
-          </dl>
-
-          <div className="actions">
-            <button className="secondary" onClick={()=>{setListingPrice(product.sellingPriceSatang==null?'':String(product.sellingPriceSatang/100));setListingQuantity(product.quantity==null?'':String(product.quantity));action.clearError();setListingOpen(true);}}>{t('editListing')}</button>
-            <button
-              onClick={() => {
-                setCost(product.cost ? String(product.cost.unitCostSatang / 100) : '');
-                setSource(product.cost ? product.cost.sourceRef : '');
-                setCostFormOpen(true);
-              }}
-            >
-              {t('addCost')}
-            </button>
+            <div className="actions">
+              <button className="secondary" onClick={()=>{setListingPrice(product.sellingPriceSatang==null?'':String(product.sellingPriceSatang/100));setListingQuantity(product.quantity==null?'':String(product.quantity));action.clearError();setListingOpen(true);}}>{t('editListing')}</button>
+              <button
+                onClick={() => {
+                  setCost(product.cost ? String(product.cost.unitCostSatang / 100) : '');
+                  setSource(product.cost ? product.cost.sourceRef : '');
+                  setCostFormOpen(true);
+                }}
+              >
+                {t('addCost')}
+              </button>
+            </div>
+          </section>
+          <aside className="panel product-detail-aside" aria-labelledby="product-detail-tools">
+            <h3 id="product-detail-tools">{t('productDetailTools')}</h3>
             <button className="secondary" onClick={() => simulate(product.sku)}>
-              {t('simulation')}
+              <Icon name="simulation" />{t('simulation')}
             </button>
             <button className="secondary" onClick={() => ask(product.sku)}>
-              {t('askProduct')}
+              <Icon name="assistant" />{t('askProduct')}
             </button>
-          </div>
-        </section>
+          </aside>
+        </div>
       </div>
     );
   }
 
-  return <ProductCatalog controls={catalog} loading={loading} more={more} loadMore={loadMore} onSelect={setSelectedSku} onAdd={() => {
-    if (onAddProduct) onAddProduct();
-    else location.hash = 'addProduct';
-  }} />;
+  return <>
+    {/* Persistent live region: the notice is inserted into it after mount, so it is announced. */}
+    <div role="status" aria-live="polite">{linkMissing && <p className="notice info"><Icon name="info" />{t('productLinkMissing')}</p>}</div>
+    <ProductCatalog controls={catalog} loading={loading} more={more} loadMore={loadMore} onSelect={sku => onDetail(sku)} onAdd={() => {
+      if (onAddProduct) onAddProduct();
+      else location.hash = 'addProduct';
+    }} />
+  </>;
 }
 
 export function Simulation({

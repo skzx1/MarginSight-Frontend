@@ -105,7 +105,7 @@ export default function Playground({
 
   return (
     <div className="modern-chat-container">
-      <p className="notice">{locale==='th'?'พื้นที่ทดลองแพลตฟอร์มและแคมเปญ ผลเป็นประมาณการ ไม่เปลี่ยนออเดอร์หรือสมัครแคมเปญให้ร้าน':'Try platform and campaign assumptions. Estimates do not change orders or enroll your shop.'}</p>
+      <p className="notice"><Icon name="warning" />{locale==='th'?'พื้นที่ทดลองแพลตฟอร์มและแคมเปญ ผลเป็นประมาณการ ไม่เปลี่ยนออเดอร์หรือสมัครแคมเปญให้ร้าน':'Try platform and campaign assumptions. Estimates do not change orders or enroll your shop.'}</p>
       {/* Centered Readable Column Container */}
       <div className="modern-chat-column">
         {/* Chat Context Header */}
@@ -204,7 +204,7 @@ export default function Playground({
                             })}
                           </div>
 
-                          {msg.answer.scenarioContext&&<><p className="notice">{locale==='th'?'ผลลองคำนวณ ไม่ใช่ออเดอร์ที่เกิดขึ้นจริงหรือการสมัครแคมเปญ':'Hypothetical calculation, not an actual platform order or enrollment'} · {msg.answer.scenarioContext.platform} · {msg.answer.scenarioContext.sourceOrderId}</p>{!!msg.answer.result?.feeLines.length&&<details className="scenario-fee-lines"><summary>{locale==='th'?'ค่าธรรมเนียมแยกตามรายการที่คำนวณได้':'Calculated fee components'}</summary><p className="caption">{locale==='th'?'หากข้อมูลขาด รายการนี้ยังไม่ใช่ค่าธรรมเนียมทั้งหมด':'When inputs are incomplete, these are only the known components.'}</p><dl className="ledger-lines">{msg.answer.result.feeLines.map(f=><div key={f.id}><dt className="wrap">{f.type} · {f.id.replace('scenario-','').split('@')[0]}</dt><dd><Money value={f.amountSatang}/></dd></div>)}</dl></details>}</>}
+                          {msg.answer.scenarioContext&&<><p className="notice"><Icon name="warning" />{locale==='th'?'ผลลองคำนวณ ไม่ใช่ออเดอร์ที่เกิดขึ้นจริงหรือการสมัครแคมเปญ':'Hypothetical calculation, not an actual platform order or enrollment'} · {msg.answer.scenarioContext.platform} · {msg.answer.scenarioContext.sourceOrderId}</p>{!!msg.answer.result?.feeLines.length&&<details className="scenario-fee-lines"><summary>{locale==='th'?'ค่าธรรมเนียมแยกตามรายการที่คำนวณได้':'Calculated fee components'}</summary><p className="caption">{locale==='th'?'หากข้อมูลขาด รายการนี้ยังไม่ใช่ค่าธรรมเนียมทั้งหมด':'When inputs are incomplete, these are only the known components.'}</p><dl className="ledger-lines">{msg.answer.result.feeLines.map(f=><div key={f.id}><dt className="wrap">{f.type} · {f.id.replace('scenario-','').split('@')[0]}</dt><dd><Money value={f.amountSatang}/></dd></div>)}</dl></details>}</>}
 
                           {msg.answer.result?.profitSatang !== undefined && (
                             <details className="assistant-evidence-accordion">
@@ -214,10 +214,7 @@ export default function Playground({
                           )}
                         </div>
                       ) : msg.error ? (
-                        <div className="notice error-notice">
-                          <strong>{t('errorTitle')}</strong>
-                          <ErrorNotice error={msg.error}/>
-                        </div>
+                        <ErrorNotice error={msg.error}/>
                       ) : null}
                     </div>
                   </div>

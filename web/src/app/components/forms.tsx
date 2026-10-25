@@ -1,6 +1,7 @@
 'use client';
 import { useId, type InputHTMLAttributes, type ReactNode, type SelectHTMLAttributes } from 'react';
 import { useLanguage } from '../language';
+import { Icon } from '../ui';
 import type { CopyKey } from '../../lib/copy';
 import type { CatalogProduct } from '../../lib/types';
 export function Field({ label, hint, ...props }: InputHTMLAttributes<HTMLInputElement> & { label: string; hint?: string }) {
@@ -22,7 +23,7 @@ export function ErrorNotice({ error }: { error: unknown }) {
   else if (/FORBIDDEN/.test(code)) key = 'forbidden';
   else if (/FILE_INPUT|INVALID_FILE/.test(code)) key = 'fileError';
   else if (/INVALID_INPUT|ACKNOWLEDGEMENT|UNIT_MISMATCH|VERSION_ALREADY/.test(code)) key = 'invalid';
-  return <div className="notice error-notice" role="alert"><strong>{t('errorTitle')}</strong><p>{t(key)}</p>{code && <details><summary>{t('details')}</summary><p className="wrap">{code}</p></details>}</div>;
+  return <div className="notice error-notice" role="alert"><Icon name="warning" /><strong>{t('errorTitle')}</strong><p>{t(key)}</p>{code && <details><summary>{t('details')}</summary><p className="wrap">{code}</p></details>}</div>;
 }
 export function Loading() { const { t } = useLanguage(); return <div className="loading-state" role="status"><span className="spinner" />{t('loading')}</div>; }
 export function Empty({ title, children, action }: { title: string; children?: ReactNode; action?: ReactNode }) { return <section className="empty-state"><span className="empty-mark" aria-hidden="true">—</span><h2>{title}</h2>{children && <p>{children}</p>}{action}</section>; }

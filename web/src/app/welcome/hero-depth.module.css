@@ -11,8 +11,8 @@
   color: var(--color-hero-text);
 }
 .sceneFooter { position: absolute; z-index: 6; right: max(32px, calc((100vw - 1320px) / 2)); bottom: 28px; text-align: right; pointer-events: none; }
-.sceneFooter p { color: var(--color-hero-text); font-size: 18px; font-weight: 500; letter-spacing: -.025em; }
-.sceneFooter > span { display: block; margin-top: 6px; color: var(--color-hero-muted); font-size: 10px; letter-spacing: .025em; }
+.sceneFooter p { color: var(--color-hero-text); font-size: 18px; font-weight: 500; }
+.sceneFooter > span { display: block; margin-top: 6px; color: var(--color-hero-muted); font-size: var(--text-xs); letter-spacing: .025em; }
 .haze { position: absolute; inset: 0; background: radial-gradient(ellipse at 72% 48%, color-mix(in srgb,var(--color-hero-glow) 24%,transparent), transparent 48%), radial-gradient(ellipse at 10% 85%, color-mix(in srgb,var(--chart-cost) 12%,transparent), transparent 60%); }
 .perspective { position: absolute; inset: 0; perspective: 850px; perspective-origin: 72% 48%; }
 .camera, .world { position: absolute; inset: 0; transform-style: preserve-3d; }

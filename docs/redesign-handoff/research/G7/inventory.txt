@@ -1,0 +1,75 @@
+G7 — CURRENT INTERACTION INVENTORY (read-only; checkout claude/design-tokens @795bf58, code == baseline 5eb4fe9 except finance-chart/add-product sign hunks, irrelevant here)
+Paths relative to web/src/app. [V:code] = read in source; [V:probe] = observed with R\G7\probe.mjs against qa\serve.mjs + scratchpad\out-final build (build dated 2026-10-24 19:26; mock data); results in probe-result.json.
+
+=== SHELL / NAVIGATION (components/shell.tsx, login/page.tsx) ===
+- Routing: hash routes on /login/#<screen>; 14 screens; unknown hash -> overview. navigate() sets location.hash (=> one history entry per screen). [V:code]
+- Guards: registerGuard(check)/canLeave(); single guard slot. On hashchange that is refused, replaceState restores old hash (Back is "eaten", no forward entry). Only store-settings registers a guard (window.confirm + beforeunload). changeStore also asks canLeave(). [V:code]
+- No guard on: add-product form, product cost form, finance expense form, assistant drafts (drafts persist per session in localStorage instead). [V:code]
+- Title focus: on every screen change AppShell focuses #screen-title (h1 tabIndex=-1, preventScroll) and scrollTo(0,0); document.title = "<screen> · MarginShot"; skipped when re-rendering store. [V:code][V:probe o_focusOnLoad]
+- Skip link -> focuses main#main-content (tabIndex -1). [V:code]
+- Primary nav: 5 buttons (overview, products, finance, assistant, store), aria-current=page on parent of sub-screens (parentScreen). Assistant history list (AssistantDrawerNav, 8 recent) is nested in nav only when screen=assistant and hidden <1024. [V:code]
+- Breakpoints: <768 bottom bar; 768–1023 icon rail + expandable drawer (toggle aria-expanded/aria-controls); >=1024 sidebar. Escape closes drawer only at 768–1023 and returns focus to toggle. [V:code]
+- Drawer stays EXPANDED after choosing a nav item and after clicking outside (main). [V:probe d_expandedAfterNav=true, d_afterOutsideClick=true]
+- Sub-screen header: "← parent" back-link button (not history.back). Store <select> + month field or overview period control in header (not on assistant/finance). [V:code]
+
+=== SUB-VIEWS ARE COMPONENT STATE, NOT ROUTES ===
+- Product detail, product cost form (products.tsx), overview order detail (overview.tsx), orders detail + settle (orders.tsx) are local state. Browser Back from them leaves the whole screen; returning re-renders the list (detail closed). [V:code][V:probe p1_hashOnDetail=#products, p1_detailStillOpen=false after Back]
+- Opening a detail does not move focus (no focus call); clicked button unmounts => focus falls to body in a real click. [V:code] (probe used el.click(), focus stayed on h1 — inconclusive for real pointer)
+- Back-link "← back" returns to list; focus not restored to the row. [V:code]
+
+=== PRODUCTS (components/product-catalog.tsx, screens/products.tsx) ===
+- Search input (clear button returns focus to search), summary buttons (aria-pressed toggles: missing price / missing cost), filter + sort open ONE <dialog> (showModal) anchored to trigger; body scroll locked; manual Tab trap; Escape via native cancel; backdrop click closes; focus returns to trigger on close (rAF). Filters apply LIVE (Done just closes). [V:code; Escape->trigger previously verified in qa interact products-dialogs]
+- Active filter chips with per-chip remove (aria-label "remove: X") + Clear all. Result count role=status aria-live=polite. Sortable column headers with aria-sort. Row click and explicit row button both open detail; mobile = card list with title button. Empty states: no products vs no matches (clear search / clear filters). Skeleton while initial loading. Load more (cursor). [V:code]
+- Detail actions: addCost (opens form view), simulation (navigates #simulation with sku), askProduct -> ask(sku). [V:code]
+- Cost form: back, fieldset disabled while busy, ErrorNotice role=alert, on save refresh(sku) and return to detail. No dirty guard. [V:code]
+
+=== ASK FROM PRODUCT -> ASSISTANT (login/page.tsx ask(), screens/assistant.tsx) ===
+- ask(sku): sets selectedSku + draftRequest++ + navigate('assistant'). Assistant creates a NEW chat {defaultContext(period from overview), sku}, pre-fills draft "สินค้านี้เหลือกำไรเท่าไร?" (NOT auto-sent), tries to focus textarea. [V:code][V:probe p1_draft, p1_productChip shows product]
+- Actual focus after ask = h1#screen-title (shell focus runs after child effect), not the textarea. [V:probe p1_focusAfterAsk]
+- If 100 sessions already exist the request is silently dropped (archive unchanged, onDraftHandled still called). [V:code line 91]
+- Back from assistant returns to #products list (detail closed). [V:probe]
+
+=== ASSISTANT (screens/assistant.tsx, components/assistant-*.tsx) ===
+- Provider (AssistantProvider) wraps the whole StoreWorkspace: archive, active session, panel state, textareaRef are app-level. Send/run/stop/pending map live in the Assistant screen component. [V:code]
+- Assistant stays mounted (hidden) once opened, so a pending reply continues while the user is on other screens; unmount aborts all pending. [V:code]
+- Sessions: localStorage per hashed store key; max 100 sessions, 200 turns; drafts stored per session (persist across reload). [V:code][V:probe draft persisted across page loads]
+- Composer: textarea maxLength 1500, auto-height 48–160px, Enter=send, Shift+Enter=newline, Enter ignored when nativeEvent.isComposing, Enter ignored while pending. Send disabled when empty/not ready. While pending the send button becomes Stop (aborts, turn state 'stopped'). [V:code][V:probe c_shiftEnter newline; c_enterDuringIme isComposing=true -> no turn sent]
+- Context toolbar: period chip -> period dialog (presets today/week/lastWeek/month/lastMonth + from/to, invalid/ >366 days blocked, role=status message); product chip -> product dialog (search, "all", catalog loading/error/retry/load more). Applying returns focus to textarea. resolveChatContext also infers period/product from question text. [V:code]
+- Replies are NOT streamed (single awaited response). States per turn: pending (typing indicator role=status), complete, failed (role=alert + Retry), stopped (+ note + Retry). Source tags: AI / fallback / notice. [V:code]
+- Per-answer: copy (clipboard; "copied" 1.8s; failure -> notice), regenerate (last turn only, disabled while pending), evidence <details>, footnote "based on period · product". [V:code]
+- Live region: sr-only aria-live=polite announces full text of last complete reply + "copied". [V:code]
+- Scroll: auto-stick when near bottom (<90px); "latest" jump button when scrolled up; smooth unless reduced motion. [V:code]
+- Header: inline title rename (Enter saves, Escape cancels, blur saves); history button (<1024) opens bottom sheet dialog; mock badge. [V:code]
+- Dialogs: one <dialog> (showModal) for sheet/allHistory/period/products/rename/delete; Escape closes (returns to previous panel when opened from history); manual Tab trap; backdrop click closes; focus restored to opener; mobile sheet drag handle (<768) closes when dragged >90px. [V:code]
+- History list: roving tabindex rows, ArrowUp/Down/Home/End, Delete key opens delete dialog; row menu = popover role=menu with arrow keys and Escape (returns focus to trigger); groups today/yesterday/week/older in Asia/Bangkok; search + empty + clear; skeleton while loading; new chat reuses an empty session; limit messages. [V:code]
+- Welcome: static greeting 'วันนี้อยากรู้เรื่องกำไรอะไร?' (no time of day), intro, 4 prompt buttons that SEND immediately (consume demo quota: 3 assistant/receipt requests per session in demo). [V:code]
+- Mobile keyboard: useAssistantViewport sets --assistant-height from visualViewport (<768) and data-keyboard-open. [V:code]
+- Reduced motion: assistant module disables animations/smooth scroll. [V:code]
+
+=== OVERVIEW (screens/overview.tsx) ===
+- Period control in header (shared overviewPeriod state with Finance and assistant defaultContext). [V:code]
+- KPI cards (profit, sales) are NOT interactive. [V:probe o_kpiInteractive=none,none]
+- Missing-cost banner button -> products filtered to missing cost. Quick actions -> assistant / addProduct / imports. Insights in <details>. [V:code]
+- Recent orders: search + channel aria-pressed chips (reset visible count to 5), "show more" +5, count caption aria-live, row -> order detail (evidence) with back. Empty with clear filters. [V:code]
+
+=== FINANCE (screens/finance.tsx) ===
+- Own h1 + LanguageSwitch + Export. Period control (writes shared overviewPeriod), channel <select> (local state), compare checkbox (disabled when previous period not covered). [V:code]
+- Jump links use preventDefault + scrollIntoView + focus section (tabIndex -1) so the hash route stays #finance. [V:code][V:probe f_hashAfterJump=#finance, focus=SECTION#finance-orders]
+- Status chips aria-pressed toggle (click again = all) synced with status <select>; search; limit 10 + more; tables in focusable scroll regions; daily table in <details>; expense form toggle (aria-expanded/aria-controls) with focus return to Add button on save. Count-up animation skipped under reduced motion. [V:code]
+
+=== ORDERS / SETTLEMENT (screens/orders.tsx) ===
+- List buttons disabled while loading a calculation; detail with evidence; settle requires checkbox then submit (no modal confirm); refresh; cursor "next". Settlement exports CSV/XLSX. [V:code]
+
+=== STORE / ADD PRODUCT / IMPORTS / RECEIPTS ===
+- Store settings: guard via registerGuard + confirm + beforeunload; success toast role=status; field errors role=alert. [V:code]
+- Add product: manual/CSV tabs (role=tablist), success banner role=status, onCancel -> products, no dirty guard. [V:code]
+- Imports/receipts: submit disabled until file (+ acknowledgement for real store); conflict resolution needs reason >=10 chars. [V:code]
+
+=== GAPS FOUND (behaviour today) ===
+G1 Tablet drawer does not close on navigation or outside click. [V:probe]
+G2 Ask-from-product intends to focus composer but focus ends on h1. [V:probe]
+G3 Ask silently dropped at 100 sessions. [V:code]
+G4 Detail views are not routable; Back leaves the screen. [V:probe]
+G5 Detail open/close does not manage focus. [V:code]
+G6 Welcome prompts send immediately (quota cost in demo). [V:code]
+G7 No unsaved-change guard on cost/add-product/expense forms. [V:code]

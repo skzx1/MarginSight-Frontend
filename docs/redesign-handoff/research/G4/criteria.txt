@@ -1,0 +1,92 @@
+MarginShot redesign - MEASURABLE ACCESSIBILITY / TOKEN CRITERIA (G4 proposal v2, 2026-10-25)
+Status: proposal for owner review. Values = palette.json. Reference checker = g4-audit.mjs (exit 0 = all pass; current result: 0 FAIL, see g4-audit-output.txt).
+
+=====================================================================
+0. METHODS (fixed, so results are reproducible)
+=====================================================================
+M1 Contrast: WCAG 2.x relative luminance, sRGB linearisation threshold 0.04045 (0.03928 gives identical 2-dp results for 8-bit values, proven in SR/B/audit-output.md). Ratio compared unrounded.
+M2 Colour difference: CIEDE2000 (kL=kC=kH=1) on CIELAB D65/2deg, sRGB->XYZ IEC matrix. Self-test: Sharma 2005 pair 1 = 2.0425.
+M3 CVD simulation: Machado, Oliveira & Fernandes 2009, severity 1.0 matrices for protan, deutan, tritan, applied in LINEAR RGB, clipped to [0,1], re-encoded to sRGB, then M2. (Visual check additionally uses Chrome DevTools Emulation.setEmulatedVisionDeficiency: protanopia, deuteranopia, tritanopia, achromatopsia.)
+M4 Grayscale: |dL*| (CIELAB L*) between two colours; equivalently luminance ratio. Achromatopsia screenshots for visual check.
+M5 Alpha / color-mix: composite in sRGB (what color-mix(in srgb) and alpha blending do) before M1.
+
+=====================================================================
+1. TEXT PAIRS  (min 4.5:1; all text in this product is treated as normal-size, even 18px+ headings)
+=====================================================================
+LIGHT = surface #FFFFFF, canvas #FAF9F5, surfaceAlt #F0EEE6, sidebar #F4F2EC, navActiveBg #E8E5DC
+T1  text #141413          on LIGHT                                   min 4.5 (lowest measured 14.64 on navActiveBg)
+T2  muted #66625A         on LIGHT + lossBg/warnBg/infoBg/gainBgA/gainBgB  min 4.5 (lowest 4.82 on navActiveBg)
+T3  link #A2482A          on LIGHT + tints                           min 4.5 (lowest 4.77 navActiveBg; links must also be underlined or chevron-marked)
+T4  loss #8E1238          on LIGHT + lossBg                          min 4.5
+T5  warn #735C00          on LIGHT + warnBg                          min 4.5
+T6  info #2F5784          on LIGHT + infoBg                          min 4.5
+T7  gain variant A text #141413 / badge gainFgA #3B3833 on gainBgA #ECE9E1    min 4.5 (18.43 / 9.62)
+T8  gain variant B text #17735C on LIGHT / badge gainFgB #145F4C on gainBgB #E3F1EC   min 4.5 (lowest 4.58 on navActiveBg / 6.52)
+T9  onAction #FFFFFF on action #B04F2C and actionHover #933F22        min 4.5 (5.25 / 7.06)
+T10 white on ink #141413 (selected chip, count pill)                  min 4.5 (18.43)
+T11 axis labels chartAxis #66625A on surface/canvas                   min 4.5
+T12 ON DARK (only if P4 keeps dark nav/hero/drawers): onDark #FAF9F5, onDarkMuted #C9C4B8, lossOnDark #F4A9BA, warnOnDark #E3C35A, infoOnDark #A9C2E3, gainOnDarkB #9ACBAE on darkBg #1F1E1C and darkHover #2E2C29   min 4.5
+T13 Disabled controls (disabledFg #6E6A62 on #F0EEE6 = 4.63) are WCAG-exempt; we still require >= 4.5 because Thai at 12-14px degrades fast.
+T14 brandBright #D97757 never carries text or state (measured 2.48-3.12 on light surfaces). Allowed: logo mark, AI sparkle when paired with a text label.
+
+=====================================================================
+2. NON-TEXT PAIRS  (min 3:1, WCAG 1.4.11)
+=====================================================================
+N1 borderStrong #8C877D (input/secondary-button/chip outline) on surface, canvas, surfaceAlt, sidebar. NOT allowed on navActiveBg (2.84).
+N2 action #B04F2C button fill vs LIGHT (button boundary).
+N3 indicator #C8643F (active-nav 3px bar, unread dot; REPLACES brandBright for the dot) on LIGHT: 3.12-3.92.
+N4 focus ring #B04F2C, width 3px, offset 3px: vs every background it is drawn on = LIGHT + all tints (lowest 4.17). Because of the 3px offset the ring never touches the component, so ring-vs-component contrast (e.g. vs action fill = 1.00) is not a requirement.
+N5 focusOnDark #E08A68 on darkBg/darkHover (6.35/5.31); indicatorOnDark #D97757 (5.34/4.46).
+N6 count pill ink #141413 and selected chip ink on LIGHT (>= 14.6).
+N7 DECORATIVE (no requirement; must not be the only boundary of a control): border #E6E2D8 hairline (1.29), alert borders (color-mix 30%: 1.52-1.74), status tint pill backgrounds vs surface (1.17-1.23), navActiveBg pill vs sidebar (1.13; active state is carried by N3 bar + semibold + aria-current), darkBorder #5A564E on darkBg (2.28).
+N8 Every chart series colour vs plot background (surface and canvas) >= 3:1 (lowest: Other #958F86 3.04 on canvas, 3.21 on surface).
+
+=====================================================================
+3. CHART SERIES RULES
+=====================================================================
+C1 Two palettes, never mixed in one chart:
+   measure = revenue #2B2A27, cost #8C877D, profit (A) #5C5852 or (B) #17735C, loss #A3284E, highlight #B04F2C (ring only)
+   channel = Shopee #6B3D1C, Lazada #556DC6, TikTok Shop #61506D, LINE Shop #588E44, In-store #56695C, Other #958F86
+C2 Channel colour is assigned BY PLATFORM NAME (map), never by index (current code uses i % 5). Unknown platform -> Other.
+C3 Pairwise within one palette: CIEDE2000 normal >= 15; protan, deutan, tritan (M3) each >= 10.
+   Luminance step: measure palette |dL*| >= 5; CHANNEL palette pairwise luminance ratio >= 1.20 for ANY two channels (donut order follows share) - achieved minimum 1.22; ladder vs white 9.09/7.30/5.88/4.78/3.91/3.21.
+   Physical limit: every colour >= 3:1 on white and >= 2:1 vs ink leaves a ~3.1x luminance range, so 6 colours cannot exceed ~1.25 per step (search: no solution at 1.25).
+   Exception 'shape-separated': profit vs chartLoss (one series split at the zero baseline; position + sign + label) needs only normal >= 15 (A 26.4 with deutan 7.2, lum 1.00; B 59.4 with deutan 8.2).
+   Measured minima v2: measure A normal 15.5 (profit A vs revenue), CVD 11.6, dL* 18.9; measure B normal 26.2, CVD 11.4, dL* 13.4; channel normal 19.8, CVD 13.0, lum ratio 1.22.
+C3b Ink separation: every channel colour >= 2:1 vs ink #141413 so a 10px legend swatch does not read as a text glyph (lowest Shopee 2.03). Legend swatch: square >= 10px, 4px gap before label.
+C4 Adjacent filled marks (donut segments, stacked bars) are separated by a gap of plot background >= 2px rendered (or 1 pathLength unit when that is >= 2px). Adjacent-mark luminance contrast is therefore NOT required (it is impossible for > 2 colours that each keep 3:1 vs white).
+C5 Lines: each series has a distinct dash pattern (revenue solid 2.5px, cost dash 7-4 2px, profit dot 2-3 2.5px) AND a distinct marker (circle, square, triangle) AND a direct end label (or a legend in the same order as stacking). Colour is never the only key.
+C6 Loss in measure charts = bars/segments below the zero line, with a signed label (U+2212); never a colour-only change of a line.
+C7 Highlight (selected period) = terracotta ring 3px around the point / outline around the bar; it never changes a fill colour. Max one highlight per chart. Therefore highlight-vs-loss fill confusion cannot occur (fill tritan dE 7.4 is irrelevant).
+C8 Any chart must have a text alternative listing the same values (existing pattern: details 'ดูตัวเลขทั้งหมด').
+C9 info #2F5784 is a text/status colour only, never a series colour (series search excluded colours within dE2000 12 of info, loss, action, warn, brandBright, ink).
+C10 Grayscale: in achromatopsia screenshots each series must be identifiable by C4/C5 cues; |dL*| >= 5 is the colour floor, not the identification mechanism.
+
+=====================================================================
+4. TYPOGRAPHY / TARGET / FOCUS / NUMBER RULES
+=====================================================================
+F1 No rendered text below 12px (computed font-size >= 12px), including SKU, chart axis, badges, legends.
+F2 Thai-containing text that can wrap: line-height >= 1.5 (body 1.6). Headings in Noto Serif Thai: >= 1.35. Single-line numeric KPI may use 1.2.
+F3 No letter-spacing other than 0 on elements whose text contains Thai (U+0E00-U+0E7F).
+F4 Interactive targets: rendered box >= 44x44 CSS px (buttons, chips, nav items, icon buttons, select, links that are standalone controls). Inline text links in sentences are exempt (WCAG 2.5.8 inline exception) but must be >= 12px.
+F5 Focus: :focus-visible outline 3px solid, offset 3px (inputs may use offset 1px when border changes colour too); colour = focus or focusOnDark per surface.
+F6 Money shown with two decimals everywhere (owner standard; overrides the external spec's whole-baht rule). Negative sign U+2212 or the existing ProfitAmount label+sign component; money() and its tests are not changed.
+F7 Serif family only on headings (h1-h3, AI greeting). Never on numbers, tables, buttons, inputs.
+F8 No monospace family for SKU unless it covers Thai; recommended: UI family with tabular-nums.
+F9 Indicator glyphs (triangle, check, warning, info) are SVG icons, not font characters: verified that Anuphan, IBM Plex Sans and Noto Sans Thai lack U+25B2/U+25BC/U+26A0/U+24D8 (fontinfo.mjs).
+
+=====================================================================
+5. "ONE LOUD COLOUR" - testable rewrite
+=====================================================================
+L1 Per landmark region (page header, main section card, dialog, composer form, nav), at most ONE element whose computed background-color equals --color-action (filled primary button). Composer send button counts inside the composer only.
+L2 Terracotta family (action, actionHover, link, indicator, brandBright, focus, chartHighlight) never colours a financial number, status badge, delta or chart data fill.
+L3 Financial numbers use only: text, loss, (gain B if chosen), muted (for '—').
+L4 Saturated colours (OKLCH chroma >= 0.10) on a screen come only from: loss, action/link/indicator/focus, brandBright decoration, chart series. (Advisory; checked visually.)
+
+=====================================================================
+6. WHAT IS AUTOMATABLE AND HOW
+=====================================================================
+A. Palette-level, pure node test (no browser, no build): parse web/src/app/tokens.css, resolve var() chains at :root, assert sections 1, 2 (pair values), 3 C3 (dE / CVD / dL*), using the maths in colorlib.mjs. Fast, deterministic, belongs in tests/ (node:test). Covers T1-T14, N1-N6, N8, C3.
+B. Built-CSS static scan, pure node (after build, reads web/out/_next/static/css/*.css): assert no font-size declaration < 12px (px/rem resolved at 16px), no letter-spacing on Thai-text selectors list, :focus-visible rules declare 3px, button/.chip/.nav min-height >= 44px or var(--target-min)/var(--control-height) that resolves >= 44px, no font-family containing 'Mono' unless Thai-capable, serif family referenced only by heading selectors, channel colour classes keyed by name (.channel-shopee etc.) and no .channel-color-N. Partial coverage: CSS alone cannot know DOM nesting.
+C. Computed-style checks, headless Chrome via CDP (like scratchpad/qa capture.mjs against the static export + mock API): for every text node, getComputedStyle color + effective background (walk ancestors, composite alpha) -> contrast >= 4.5; font-size >= 12; Thai text line-height >= 1.5; every focusable element: bounding box >= 44x44 (minus inline-link exemption), focus ring width 3px after .focus(); count of action-filled elements per landmark (L1); chart SVG: marks have distinct stroke-dasharray/marker and an adjacent text label; channel fill matches the name map. Screenshots under the 4 emulated vision modes for human review (not auto-pass).
+D. Human review only: L4, overall 'quiet positive' feel, Thai rendering quality of Noto Serif Thai at 18px, brand resemblance questions.

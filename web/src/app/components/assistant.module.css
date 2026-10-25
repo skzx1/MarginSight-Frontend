@@ -9,7 +9,7 @@
 .root,.dialog{--chat-pill:var(--color-bg-subtle);--chat-pill-hover:var(--color-accent-tint);--chat-pill-border:var(--color-border-strong);--chat-pill-text:var(--color-text);caret-color:var(--color-accent);scrollbar-color:var(--color-border-strong) var(--color-bg-canvas);scrollbar-width:thin;font-family:var(--font-sans)}
 .root{background:var(--color-bg-canvas);color:var(--color-text)}
 .root ::selection,.dialog ::selection{background:var(--color-accent-tint);color:var(--color-text)}
-.root button,.dialog button{min-height:44px;font-size:var(--text-md);line-height:1.5;border-radius:var(--radius-pill);transition:background 150ms ease,border-color 150ms ease;touch-action:manipulation}
+.root button,.dialog button{min-height:44px;font-size:var(--text-md);line-height:1.5;border-radius:var(--radius-md);transition:background 150ms ease,border-color 150ms ease;touch-action:manipulation}
 .root button:active:not(:disabled),.dialog button:active:not(:disabled){transform:translateY(1px)}
 .root :focus-visible,.dialog :focus-visible{outline:3px solid var(--color-focus);outline-offset:3px}
 .root button:disabled,.dialog button:disabled{opacity:1;background:var(--color-disabled-bg);color:var(--color-disabled-text);border-color:transparent;cursor:not-allowed}
@@ -19,8 +19,11 @@
  .shell :global(.topbar){height:100dvh;min-height:0;overflow:hidden;gap:16px;padding-top:20px;padding-bottom:20px}
  .shell :global(.topbar .brand),.shell :global(.desktop-store),.shell :global(.drawer-toggle){flex-shrink:0}
  .shell :global(.primary-nav){flex:1;flex-shrink:1;min-height:0;overflow:visible}
+ .shell :global(.sidebar-account){flex-shrink:0} /* language + logout stay on screen below a long history list */
  .shell :global(.primary-nav)>button{flex-shrink:0}
 }
+/* >=1024 the history list sits in the sidebar nav: the nav scrolls (room + scroll padding for the 3px+3px focus ring). */
+@media(min-width:1024px){.shell :global(.primary-nav){overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;padding:6px;margin:-6px;scroll-padding-block:8px}}
 @media(max-width:767px){
  .shell{position:fixed;inset-inline:0;top:var(--assistant-top,0px)}
  .shell :global(.primary-nav){position:absolute;bottom:0}
@@ -33,7 +36,7 @@
 .conversation{flex:1;min-width:0;min-height:0;display:flex;flex-direction:column;position:relative;width:100%}
 .chatHeader{height:56px;min-height:56px;max-height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;border-bottom:1px solid var(--color-border);background:var(--color-bg-canvas);color:var(--color-text);flex-shrink:0;gap:12px}
 .headerLeft{display:flex;align-items:center;gap:10px;min-width:0;flex:1}
-.headerTitleBtn{display:inline-flex;align-items:center;gap:8px;background:transparent;border:0;padding:6px 12px;border-radius:var(--radius-pill);cursor:pointer;min-width:0;max-width:100%;text-align:left;transition:background 150ms ease}
+.headerTitleBtn{display:inline-flex;align-items:center;gap:8px;background:transparent;border:0;padding:6px 12px;border-radius:var(--radius-md);cursor:pointer;min-width:0;max-width:100%;text-align:left;transition:background 150ms ease}
 .headerTitleBtn:hover{background:var(--color-bg-subtle)}
 .headerTitleText{font-size:var(--text-base);font-weight:600;color:var(--color-text);margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.4}
 .editHintIcon{display:inline-flex;color:var(--color-text-muted);flex-shrink:0}
@@ -41,11 +44,11 @@
 .inlineTitleForm{display:flex;align-items:center;gap:6px;min-width:0;flex:1;max-width:480px}
 .inlineTitleInput{flex:1;font-size:var(--text-base);font-weight:600;padding:6px 12px;border:1px solid var(--color-border-strong);border-radius:var(--radius-md);background:var(--color-bg-surface);color:var(--color-text);min-width:0;min-height:44px}
 .inlineTitleInput:focus-visible{border-color:var(--color-focus);outline:3px solid var(--color-focus);outline-offset:2px}
-.inlineTitleCheck{min-width:44px;width:44px;height:44px;padding:0;border-radius:var(--radius-pill);display:grid;place-items:center;background:var(--color-action);color:var(--color-on-action);border:0;flex-shrink:0;cursor:pointer}
+.inlineTitleCheck{min-width:44px;width:44px;height:44px;padding:0;border-radius:var(--radius-md);display:grid;place-items:center;background:var(--color-action);color:var(--color-on-action);border:0;flex-shrink:0;cursor:pointer}
 .root .inlineTitleCheck:hover:not(:disabled){background:var(--color-action-hover);color:var(--color-on-action)}
 .mockBadge{display:inline-flex;align-items:center;font-size:var(--text-xs);font-weight:500;color:var(--color-text);background:var(--color-accent-tint);border:1px solid var(--color-border);border-radius:var(--radius-sm);padding:2px 8px;line-height:1.5;flex-shrink:0;cursor:help}
 .headerRight{display:flex;align-items:center;gap:8px;flex-shrink:0}
-.historyHeaderButton{display:none;align-items:center;gap:6px;padding:6px 14px;font-size:var(--text-sm);font-weight:500;color:var(--color-text);background:var(--color-bg-surface);border:1px solid var(--color-border-strong);border-radius:var(--radius-pill);min-height:44px;cursor:pointer}
+.historyHeaderButton{display:none;align-items:center;gap:6px;padding:6px 14px;font-size:var(--text-sm);font-weight:500;color:var(--color-text);background:var(--color-bg-surface);border:1px solid var(--color-border-strong);border-radius:var(--radius-md);min-height:44px;cursor:pointer}
 @media(max-width:1023px){.historyHeaderButton{display:inline-flex}}
 .root .inlineTitleCheck,.root .historyHeaderButton{min-height:44px;min-width:44px}
 .root .historyHeaderButton:hover{background:var(--color-bg-subtle);color:var(--color-text)}
@@ -57,17 +60,29 @@
 .messageScroll{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;scrollbar-gutter:stable both-edges;padding:0}
 .messageColumn,.composerColumn{width:100%;max-width:48rem;margin-inline:auto;padding-inline:16px;box-sizing:border-box}
 .messageColumn{min-height:100%;display:flex;flex-direction:column}
+/* Empty state (D3 = DA2 ledger + DC provenance): a quiet date line, a small greeting heading, suggested questions as
+   ledger lines that say which data they read, then recent chats. No page stripe (it would read as a loss row). */
 .welcome{margin:auto 0;padding:32px 0}
-.welcomeMark{display:block;color:var(--color-accent);margin-bottom:16px}
-.welcomeMark svg{width:32px;height:32px}
-.welcome h2{font-size:var(--text-xl);line-height:1.35;letter-spacing:-.01em;margin:0 0 12px;max-width:560px;text-wrap:balance}
-.welcome>p{font-size:var(--text-md);color:var(--color-text-muted);line-height:1.6;max-width:510px;margin:0 0 24px}
-.prompts{display:grid;gap:8px}
-.prompts button{justify-content:flex-start;gap:12px;background:var(--color-bg-surface);border:1px solid var(--color-border);border-radius:var(--radius-md);color:var(--color-text);text-align:left;font-weight:400;padding:12px 16px;line-height:1.55;box-shadow:var(--shadow-sm)}
-.prompts button>span{flex:1}
-.prompts button>svg{color:var(--color-text-muted);flex-shrink:0}
-.prompts button:hover{background:var(--color-bg-subtle);border-color:var(--color-border-strong)}
-.prompts button>svg:last-child{width:16px}
+.day{display:flex;align-items:center;gap:10px;margin:0 0 6px;font-size:var(--text-sm);font-weight:500;line-height:1.5;color:var(--color-text-muted)}
+.welcomeMark{display:grid;place-items:center;width:32px;height:32px;border-radius:var(--radius-md);background:var(--color-bg-subtle);color:var(--color-accent);flex-shrink:0}
+.welcomeMark svg{width:18px;height:18px}
+.welcome h2{font-family:var(--font-display);font-size:var(--text-xl);font-weight:600;line-height:var(--leading-heading);margin:0 0 8px;max-width:600px}
+/* A greeting phrase never breaks inside itself (Thai "ยัง|ไงบ้าง"); a phrase wider than the column still wraps. */
+.phrase{display:inline-block}
+.intro{font-size:var(--text-md);color:var(--color-text-muted);line-height:1.6;max-width:540px;margin:0 0 20px}
+.prompts{display:flex;flex-direction:column;border-top:1px solid var(--color-border)}
+.prompts button{display:grid;grid-template-columns:minmax(0,auto) minmax(16px,1fr) auto 16px;align-items:center;gap:10px;width:100%;min-height:48px;padding:8px 4px;border:0;border-bottom:1px solid var(--color-border);border-radius:0;background:transparent;color:var(--color-text);text-align:left;font-weight:400;line-height:1.5}
+.prompts button:hover:not(:disabled){background:var(--color-bg-subtle)}
+.promptLeader{border-bottom:2px dotted var(--color-border-strong);transform:translateY(5px)}
+.prompts small{font-size:var(--text-xs);line-height:1.5;color:var(--color-text-muted);white-space:nowrap}
+.prompts button>svg{width:16px;height:16px;color:var(--color-text-muted)}
+.recent{margin-top:28px}
+.recent h3{font-family:var(--font-display);font-size:var(--text-base);font-weight:600;line-height:var(--leading-heading);margin:0 0 4px}
+.recent ul{list-style:none;margin:0;padding:0}
+.recent button{display:flex;align-items:baseline;justify-content:space-between;gap:12px;width:100%;min-height:48px;padding:10px 4px;border:0;border-bottom:1px solid var(--color-border);border-radius:0;background:transparent;color:var(--color-text);text-align:left;font-weight:400;font-size:var(--text-md);line-height:1.5}
+.recent button:hover{background:var(--color-bg-subtle)}
+.recent button>span{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.recent time{flex-shrink:0;font-size:var(--text-xs);line-height:1.5;color:var(--color-text-muted);font-family:var(--font-numeric);font-variant-numeric:tabular-nums}
 .turns{padding:24px 0 32px;display:flex;flex-direction:column;gap:28px;width:100%}
 .turn{margin:0;padding:0;border:0;background:transparent;width:100%}
 .userRow{display:flex;justify-content:flex-end;width:100%;margin-bottom:20px}
@@ -81,7 +96,7 @@
 .sourceTag{font-size:var(--text-xs);font-weight:500;line-height:1.5;color:var(--chat-pill-text);background:var(--chat-pill);border:1px solid var(--color-border);border-radius:var(--radius-sm);padding:2px 8px}
 .answerText{font-size:var(--text-base);line-height:1.65;color:var(--color-text);overflow-wrap:anywhere}
 .answerText p{margin:0 0 12px;white-space:pre-wrap;color:inherit}
-.resultCard{border:1px solid var(--color-border);border-radius:var(--radius-lg);background:var(--color-bg-surface);padding:16px 20px;margin:12px 0 8px;width:100%;max-width:100%;box-sizing:border-box;font-variant-numeric:tabular-nums;box-shadow:var(--shadow-sm)}
+.resultCard{border:1px solid var(--color-border);border-radius:var(--radius-lg);background:var(--color-bg-surface);padding:16px 20px;margin:12px 0 8px;width:100%;max-width:100%;box-sizing:border-box;font-variant-numeric:tabular-nums;box-shadow:none}
 .resultMain{display:flex;flex-direction:column;gap:4px}
 .resultMain>span{font-size:var(--text-xs);color:var(--color-text-muted)}
 .resultMain>strong{font-family:var(--font-numeric);font-size:var(--text-2xl);font-weight:600;line-height:1.3;letter-spacing:-.01em;color:var(--color-positive)}
@@ -89,7 +104,7 @@
 .resultCard dl>div{display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:8px 0;border-top:1px solid var(--color-border)}
 .resultCard dl>div:last-child{padding-bottom:0}
 .resultCard dd{max-width:58%;font-weight:500;color:var(--color-text);font-family:var(--font-numeric)}
-.resultMain>.missing,.missing{color:var(--color-warning);font-size:var(--text-base)}
+.resultMain>.missing,.missing{color:var(--color-warning);font-size:var(--text-base);line-height:1.5;letter-spacing:0}
 .resultMain>.loss{color:var(--color-negative)}
 .answerFootnote{display:flex;align-items:flex-start;gap:6px;font-size:var(--text-xs);line-height:1.6;color:var(--color-text-muted);margin:8px 0 2px;overflow-wrap:anywhere}
 .answerFootnote>svg{width:14px;height:14px;flex-shrink:0;margin-top:3px}
@@ -100,7 +115,7 @@
 .messageActions{display:flex;align-items:center;gap:6px;margin-top:6px;opacity:0;transition:opacity 150ms ease}
 .turn:hover .messageActions,.turn:focus-within .messageActions{opacity:1}
 @media(hover:none){.messageActions{opacity:1}}
-.quietAction{min-height:44px;padding:6px 10px;border-radius:var(--radius-pill);background:transparent;border:1px solid transparent;color:var(--color-text-muted);font-size:var(--text-xs);font-weight:500;display:inline-flex;align-items:center;gap:6px;cursor:pointer}
+.quietAction{min-height:44px;padding:6px 10px;border-radius:var(--radius-md);background:transparent;border:1px solid transparent;color:var(--color-text-muted);font-size:var(--text-xs);font-weight:500;display:inline-flex;align-items:center;gap:6px;cursor:pointer}
 .quietAction:hover{background:var(--color-bg-subtle);color:var(--color-text)}
 .quietAction svg{width:14px;height:14px}
 .root .quietAction{min-height:44px;min-width:44px}
@@ -116,16 +131,18 @@
 
 /* Input area */
 .composerWrap{flex-shrink:0;background:var(--color-bg-canvas);color:var(--color-text);padding:8px 0 max(24px,env(safe-area-inset-bottom));overflow:hidden;scrollbar-gutter:stable both-edges}
-.composer{display:flex;flex-direction:column;gap:8px;border:1px solid var(--color-border-strong);border-radius:var(--radius-lg);background:var(--color-bg-surface);color:var(--color-text);padding:10px;box-shadow:var(--shadow-sm);transition:box-shadow 150ms ease,border-color 150ms ease}
+.composer{display:flex;flex-direction:column;gap:6px;border:1px solid var(--color-border-strong);border-radius:var(--radius-composer);background:var(--color-bg-surface);color:var(--color-text);padding:6px;box-shadow:var(--shadow-composer);transition:box-shadow 150ms ease,border-color 150ms ease}
 /* The textarea draws no outline itself; the whole composer shows a 3px focus ring instead. */
-.composer:focus-within{border-color:var(--color-focus);box-shadow:var(--shadow-md)}
+.composer:focus-within{border-color:var(--color-focus);box-shadow:var(--shadow-composer)}
 .composer:has(textarea:focus-visible){outline:3px solid var(--color-focus);outline-offset:3px}
 .composer textarea{width:100%;min-height:44px;max-height:160px;line-height:1.6;border:0;border-radius:var(--radius-md);resize:none;outline:none;padding:8px 6px;overflow-y:auto;scrollbar-width:thin;background:transparent}
 .composer textarea:focus-visible{outline:none}
 .composer textarea{font-size:var(--text-base);color:var(--color-text)}
 .composer textarea::placeholder{color:var(--color-text-muted);opacity:1}
-.composerToolbar{display:flex;align-items:flex-end;justify-content:space-between;gap:8px;width:100%}
-.send{padding:10px;border:0;border-radius:50%;display:grid;place-items:center;flex-shrink:0;cursor:pointer}
+/* DC context bar: what the answer will use, inside the composer card, beside the send button. */
+.composerToolbar{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;padding:4px;border-radius:calc(var(--radius-composer) - 6px);background:var(--color-bg-canvas)}
+.contextLabel{font-size:var(--text-xs);line-height:1.5;color:var(--color-text-muted);padding:0 4px}
+.send{padding:10px;border:0;border-radius:var(--radius-md);display:grid;place-items:center;flex-shrink:0;cursor:pointer}
 .send[type=submit] svg{transform:rotate(-90deg)}
 .context{display:flex;align-items:center;flex-wrap:wrap;flex:1;gap:6px;min-width:0}
 .root .context button{padding:6px 12px;gap:6px;background:var(--chat-pill);border:1px solid var(--chat-pill-border);color:var(--chat-pill-text);font-weight:500;font-size:var(--text-xs);line-height:1.5;display:inline-flex;align-items:center;border-radius:var(--radius-pill);cursor:pointer;max-width:100%;min-height:44px;min-width:44px}
@@ -134,13 +151,16 @@
 .context .contextChevron{display:flex;align-items:center;flex-shrink:0;width:12px;height:12px}
 .contextChevron svg{width:12px;height:12px;transform:rotate(90deg)}
 .context button>span{overflow-wrap:anywhere;white-space:normal}
-.root .send{width:44px;min-width:44px;height:44px;min-height:44px;border-radius:50%;background:var(--color-action);color:var(--color-on-action)}
+.root .send{width:48px;min-width:48px;height:48px;min-height:48px;border-radius:var(--radius-md);background:var(--color-action);color:var(--color-on-action)}
+/* Touch keyboards: Enter is a newline (D4), so the send button carries a visible label as well as the icon. */
+.sendLabel{display:none}
+@media(pointer:coarse){.root .send[type=submit]{width:auto;display:inline-flex;align-items:center;gap:6px;padding:0 16px}.sendLabel{display:inline;font-size:var(--text-md);font-weight:600;line-height:1.5}}
 .root .send:hover:not(:disabled){background:var(--color-action-hover);color:var(--color-on-action)}
 .root .send:disabled{opacity:1;background:var(--color-disabled-bg);color:var(--color-disabled-text);cursor:not-allowed}
 .resultCard :global(.money){white-space:normal;overflow-wrap:anywhere}
 .answerByline{flex-wrap:wrap}
 
-.jump{align-self:center;position:absolute;bottom:calc(var(--composer-height,160px) + 8px);z-index:2;border:1px solid var(--color-border-strong);border-radius:var(--radius-pill);background:var(--color-bg-surface);color:var(--color-text);font-size:var(--text-xs)!important;padding:8px 14px;box-shadow:var(--shadow-md)}
+.jump{align-self:center;position:absolute;bottom:calc(var(--composer-height,160px) + 8px);z-index:2;border:1px solid var(--color-border-strong);border-radius:var(--radius-md);background:var(--color-bg-surface);color:var(--color-text);font-size:var(--text-xs)!important;padding:8px 14px;box-shadow:var(--shadow-lg)}
 .jump:hover{background:var(--color-bg-subtle)}
 .warning{flex-shrink:0;font-size:var(--text-xs);line-height:1.6;padding:10px 16px;background:var(--color-warning-bg);color:var(--color-warning);overflow-wrap:anywhere}
 .warning button{background:transparent;border-color:transparent;color:var(--color-warning);text-decoration:underline;text-underline-offset:3px;padding:4px 8px;font-size:var(--text-xs)}
@@ -150,7 +170,7 @@
 .campaignPlatforms legend,.campaignChoices legend{font-weight:600;margin-bottom:12px}
 .campaignPlatforms>div{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
 .campaignPlatforms button{padding:12px 4px;font-size:var(--text-sm);background:var(--color-bg-surface);color:var(--color-text);border-color:var(--color-border)}
-.campaignPlatforms button[aria-pressed=true]{border-color:var(--color-action);color:var(--color-action);background:var(--color-bg-subtle);box-shadow:inset 0 0 0 1px var(--color-action)}
+.campaignPlatforms button[aria-pressed=true]{border-color:var(--color-action);color:var(--color-action);background:var(--color-bg-subtle)}
 .campaignChoices>label{border:1px solid var(--color-border);border-radius:var(--radius-md);padding:14px;margin-top:8px;cursor:pointer}
 .campaignChoices>label>span,.campaignCheck{display:flex!important;align-items:center;gap:10px}
 .campaignChoices input,.campaignCheck input{width:20px;height:20px;flex-shrink:0;margin:0;accent-color:var(--color-action)}
@@ -166,10 +186,10 @@
 .dialogBody .campaignPresets label{display:flex;align-items:center;gap:8px;min-height:44px;padding:8px;font-size:var(--text-sm);cursor:pointer}
 .campaignPresets input{width:18px;height:18px;flex-shrink:0;accent-color:var(--color-action)}
 .campaignPresets p{font-size:var(--text-sm);margin:12px 0 4px;color:var(--color-text-muted)}
-.dialog{position:fixed;inset:auto 0 0;max-width:none;width:100%;max-height:90dvh;margin:0;padding:0;border:1px solid var(--color-border);border-radius:var(--radius-lg) var(--radius-lg) 0 0;background:var(--color-bg-surface);color:var(--color-text);overflow:auto;overscroll-behavior:contain;box-shadow:var(--shadow-lg)}
+.dialog{position:fixed;inset:auto 0 0;max-width:none;width:100%;max-height:90dvh;margin:0;padding:0;border:1px solid var(--color-border);border-radius:var(--radius-dialog) var(--radius-dialog) 0 0;background:var(--color-bg-surface);color:var(--color-text);overflow:auto;overscroll-behavior:contain;box-shadow:var(--shadow-lg)}
 .dialog::backdrop{background:color-mix(in srgb,var(--color-text) 35%,transparent)}
 .dialogHeader{position:sticky;top:0;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px 20px;border-bottom:1px solid var(--color-border);background:var(--color-bg-surface);z-index:1}
-.dialogHeader h2{font-size:var(--text-lg);line-height:1.35;margin:0}
+.dialogHeader h2{font-size:var(--text-lg);line-height:var(--leading-heading);margin:0}
 .iconButton{background:transparent;color:var(--color-text-muted);border:1px solid transparent;padding:10px;min-width:44px;min-height:44px;border-radius:50%;flex-shrink:0;display:grid;place-items:center;cursor:pointer}
 .iconButton:hover{background:var(--color-bg-subtle);color:var(--color-text)}
 .dialogBody{padding:20px 20px max(24px,env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:16px}
@@ -213,8 +233,8 @@
  @keyframes sheetArrive{from{opacity:.75;transform:translateY(12px)}to{opacity:1;transform:none}}
 }
 
-@media(max-width:599px){.welcome{padding:16px 0}.welcomeMark{display:none}.welcome h2{font-size:var(--text-xl)}.welcome>p{font-size:var(--text-sm);line-height:1.6;margin-bottom:16px}.prompts button{padding:10px 12px;font-size:var(--text-sm);line-height:1.5}.userBubble{max-width:88%}}
-@media(min-width:600px){.prompts{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.welcome h2{font-size:var(--text-2xl)}.dateFields{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.dialog{inset:0;margin:auto;width:min(540px,calc(100vw - 48px));max-height:85dvh;height:fit-content;border-radius:var(--radius-lg)}}
+@media(max-width:599px){.welcome{padding:16px 0}.intro{font-size:var(--text-sm);margin-bottom:16px}.prompts button{grid-template-columns:minmax(0,1fr) 16px;row-gap:2px;padding:10px 4px;font-size:var(--text-sm)}.promptLeader{display:none}.prompts small{grid-column:1;grid-row:2;white-space:normal}.prompts button>svg{grid-column:2;grid-row:1/span 2}.userBubble{max-width:88%}}
+@media(min-width:600px){.dateFields{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.dialog{inset:0;margin:auto;width:min(540px,calc(100vw - 48px));max-height:85dvh;height:fit-content;border-radius:var(--radius-dialog)}}
 @media(min-width:768px){.shell{display:grid;grid-template-rows:minmax(0,1fr)}.shell :global(.workspace){height:var(--assistant-height,100dvh);padding:0;align-self:stretch}.chatHeader{padding:0 24px}.welcome{padding:48px 0}}
 @media(min-width:1024px){.chatHeader{padding:0 28px}}
 @media(prefers-reduced-motion:no-preference){.turn{animation:arrive 180ms ease-out}.typing i{animation:breathe 1.2s ease-in-out infinite}.typing i:nth-child(2){animation-delay:150ms}.typing i:nth-child(3){animation-delay:300ms}@keyframes arrive{from{opacity:.6;transform:translateY(4px)}to{opacity:1;transform:none}}@keyframes breathe{50%{opacity:.4}}}

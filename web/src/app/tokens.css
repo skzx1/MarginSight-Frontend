@@ -2,7 +2,8 @@
    1. Primitives hold raw values. 2. Semantic tokens name a role and reference primitives; components use these.
    3. Legacy aliases keep older var() names working and resolve to the current semantics.
    Aliases resolve at :root, so a CSS module that re-declares a primitive does NOT change a semantic token; override semantic names instead.
-   Colour roles follow theme-palette.json; imported contrast claims are checked independently during verification. */
+   Contrast pairs are asserted in tests/tokens.test.mjs; colour literals outside this file are rejected by tests/style-policy.test.mjs.
+   theme-palette.json is the upstream source palette; where it differs (gain, chart roles, disabled text) the approved redesign decisions apply. */
 :root{
  /* 1. Primitives */
  --cream-0:#ffffff;--cream-50:#faf9f5;--cream-100:#f4f2ec;--cream-150:#f0eee6;--cream-175:#ece9e1;--cream-200:#e8e5dc;--cream-250:#e6e2d8;
@@ -13,8 +14,8 @@
  --mustard-700:#735c00;--mustard-300:#e3c35a;--mustard-50:#f5edcf;
  --navy-700:#2f5784;--navy-200:#a9c2e3;--navy-50:#e5ecf4;
  --green-700:#145f4c;--green-600:#17735c;--green-200:#9acbae;--green-50:#e3f1ec;
- /* Chart channel roles from the supplied JSON palette. */
- --series-slate:#4e6e8e;--series-sand:#9a7b3e;
+ /* Channel series: a luminance ladder, each >= 3:1 on surface and canvas and >= 2:1 against ink text. */
+ --brown-700:#6b3d1c;--blue-500:#556dc6;--plum-600:#61506d;--leaf-500:#588e44;--slate-green-600:#56695c;--stone-450:#958f86;
 
  /* 2. Semantic roles */
  --color-action:var(--terracotta-600);--color-action-hover:var(--terracotta-700);--color-on-action:var(--cream-0);
@@ -23,41 +24,56 @@
  --color-link:var(--terracotta-650);--color-selected:var(--ink-900);
  --color-focus:var(--terracotta-600);--color-indicator:var(--terracotta-500);--color-brand-bright:var(--terracotta-400);
  --color-count-bg:var(--ink-900);--color-count-fg:var(--cream-0);
- --color-positive:var(--ink-900);--color-positive-bg:var(--cream-175);--color-positive-fg:var(--ink-700);
+ --color-positive:var(--green-600);--color-positive-bg:var(--green-50);--color-positive-fg:var(--green-700);
  --color-negative:var(--burgundy-700);--color-negative-bg:var(--burgundy-50);
  --color-bg-canvas:var(--cream-50);--color-bg-surface:var(--cream-0);--color-bg-subtle:var(--cream-150);
  --color-bg-sidebar:var(--cream-100);--color-nav-active-bg:var(--cream-200);
  --color-border:var(--cream-250);--color-border-strong:var(--stone-500);
  --color-warning:var(--mustard-700);--color-warning-bg:var(--mustard-50);--color-warning-border:var(--stone-500);
  --color-info:var(--navy-700);--color-info-bg:var(--navy-50);
- --color-disabled-bg:var(--cream-150);--color-disabled-text:var(--stone-500);
+ --color-disabled-bg:var(--cream-150);--color-disabled-text:var(--stone-600);
  --color-shadow:var(--ink-900);
  --color-sidebar-text:var(--ink-900);--color-sidebar-muted:var(--stone-700);--color-nav-active-text:var(--ink-900);
  /* Dark surfaces (warm ink) and the colours drawn on them */
  --color-bg-dark:var(--ink-dark-900);--color-bg-dark-hover:var(--ink-dark-800);--color-border-on-dark:var(--ink-dark-line);
  --color-focus-on-dark:var(--terracotta-450);--color-indicator-on-dark:var(--terracotta-400);--color-emphasis-on-dark:var(--terracotta-450);
- --color-positive-on-dark:var(--cream-50);--color-negative-on-dark:var(--burgundy-200);
+ --color-positive-on-dark:var(--green-200);--color-negative-on-dark:var(--burgundy-200);
  --color-warning-on-dark:var(--mustard-300);--color-info-on-dark:var(--navy-200);
  /* Retired roles kept as aliases while components migrate */
  --color-accent:var(--color-action);--color-accent-tint:var(--color-bg-subtle);
- --chart-revenue:var(--ink-800);--chart-cost:var(--stone-500);--chart-highlight:var(--terracotta-600);--chart-loss:var(--burgundy-700);
- --chart-1:var(--ink-800);--chart-2:var(--series-slate);--chart-3:var(--series-sand);--chart-4:var(--stone-600);--chart-5:var(--terracotta-600);
- --chart-sales:var(--chart-revenue);--chart-profit:var(--chart-highlight);
-
+ /* Charts: measures and channels are separate palettes and never share a chart. Colour is never the only key:
+    lines also differ by dash and marker, loss sits below the zero line, and the highlight is a ring, never a fill. */
+ --chart-revenue:var(--ink-800);--chart-cost:var(--stone-500);--chart-profit:var(--green-600);--chart-loss:var(--burgundy-600);
+ --chart-highlight:var(--terracotta-600);--chart-grid:var(--cream-250);--chart-axis:var(--stone-700);
+ --chart-ch-shopee:var(--brown-700);--chart-ch-lazada:var(--blue-500);--chart-ch-tiktok:var(--plum-600);
+ --chart-ch-line:var(--leaf-500);--chart-ch-store:var(--slate-green-600);--chart-ch-other:var(--stone-450);
+ /* Landing depth hero (light, as on main): background, text, square lines and the orange glow */
  --color-hero-bg:var(--color-bg-canvas);--color-hero-text:var(--color-text);--color-hero-muted:var(--color-text-muted);
- --color-hero-line:var(--color-border-strong);--color-hero-glow:var(--color-brand-bright);--color-tile-shadow:var(--stone-500);
+ --color-hero-line:var(--color-border-strong);--color-hero-glow:var(--color-brand-bright);
+ /* Deprecated index and measure aliases kept while nothing new uses them */
+ --chart-1:var(--chart-ch-shopee);--chart-2:var(--chart-ch-lazada);--chart-3:var(--chart-ch-tiktok);--chart-4:var(--chart-ch-line);--chart-5:var(--chart-ch-store);
+ --chart-sales:var(--chart-revenue);
 
  /* Typography */
- --font-sans:'Anuphan','Inter',Tahoma,sans-serif;--font-numeric:'Inter','Anuphan',sans-serif;
+ /* IBM Plex Sans sets Latin and digits (equal-width figures, true minus); Noto Sans Thai sets Thai (web/public/fonts/fonts.css).
+    Leelawadee UI and Tahoma cover Thai on Windows if the web fonts fail. */
+ --font-sans:'IBM Plex Sans','Noto Sans Thai','Leelawadee UI',Tahoma,sans-serif;--font-numeric:var(--font-sans);
+ /* Headings. Temporarily the UI sans: the Noto Serif Thai heading face waits for its source and licence review. */
+ --font-display:var(--font-sans);
+ /* Page title: 26px on phones growing to 30px from about 1200px wide. */
+ --text-title:clamp(26px,calc(24px + .5vw),30px);
  --text-xs:12px;--text-sm:13px;--text-md:14px;--text-base:16px;--text-lg:18px;--text-xl:22px;--text-2xl:28px;--text-money-xl:clamp(32px,6vw,44px);
  --weight-regular:400;--weight-medium:500;--weight-semibold:600;
- --leading-body:1.6;--leading-heading:1.35;--leading-tight:1.2;
+ --leading-body:1.6;--leading-heading:1.5;--leading-tight:1.2;
 
  /* Shape, depth, space */
- --radius-sm:6px;--radius-md:10px;--radius-lg:16px;--radius-pill:999px;--radius-round:50%;
- --shadow-sm:0 1px 3px rgb(20 20 19/.06);--shadow-md:0 4px 16px rgb(20 20 19/.08);--shadow-lg:0 12px 32px rgb(20 20 19/.12);
+ /* Cards 12, controls and ordinary buttons 9; chips, badges, tags and toggles keep the pill; composer 20, dialogs 16. */
+ --radius-sm:6px;--radius-md:9px;--radius-lg:12px;--radius-pill:999px;--radius-round:50%;--radius-composer:20px;--radius-dialog:16px;
+ /* Flat by default: surface on canvas plus a hairline border separates. Only floating layers (dialogs, popovers, toasts)
+    and the composer keep elevation; --shadow-sm/-md stay as names that resolve to none. */
+ --shadow-sm:none;--shadow-md:none;--shadow-lg:0 12px 32px rgb(20 20 19/.12);--shadow-composer:0 1px 2px rgb(20 20 19/.04),0 4px 16px rgb(20 20 19/.06);
  --space-1:4px;--space-2:8px;--space-3:12px;--space-4:16px;--space-5:20px;--space-6:24px;--space-7:32px;--space-8:48px;
- --focus-width:3px;--focus-offset:3px;--target-min:44px;--control-height:48px;
+ --focus-width:3px;--focus-offset:3px;--target-min:44px;--control-height:44px;--input-height:48px;
  --nav-height:76px;--radius-card:var(--radius-lg);
 
  /* 3. Legacy aliases */

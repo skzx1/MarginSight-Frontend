@@ -1,18 +1,19 @@
 'use client';
 import { useLanguage } from '../language';
-import { money } from '../../lib/format';
+import { profitParts } from '../../lib/signed-money';
 import s from './profit-amount.module.css';
 
-/** Profit or loss shown with a sign and a text label, so the meaning never depends on colour alone. Colour is inherited from the surrounding context (light or dark panel). Display only. */
+/** Profit or loss shown with a sign and a text label, so the meaning never depends on colour alone. Colour is inherited from the surrounding context (light or dark panel). Display only.
+ *  The visible text is hidden from screen readers; they hear the spoken form ("ขาดทุน 53.00 บาท"), so no "minus" is read aloud. */
 export function ProfitAmount({ value, className = '' }: { value: number | null | undefined; className?: string }) {
-  const { t, locale } = useLanguage();
-  if (value == null) return <span className="money">—</span>;
+  const { locale } = useLanguage();
+  const parts = profitParts(value, locale);
+  const spoken = <span className="sr-only">{parts.spoken}</span>;
   // Zero gets no label: "break-even" would be misleading for an empty store.
-  if (value === 0) return <span className="money">{'฿' + money(0, locale)}</span>;
-  const label = t(value < 0 ? 'signedLoss' : 'signedProfit');
-  const sign = value < 0 ? '−' : '+';
+  if (!parts.label) return <span className="money"><span aria-hidden="true">{parts.amount}</span>{spoken}</span>;
   return <span className={`${s.amount} ${className}`.trim()}>
-    <span className={s.label}>{label}</span>
-    <span className="money">{sign}฿{money(Math.abs(value), locale)}</span>
+    <span className={s.label} aria-hidden="true">{parts.label}</span>
+    <span className="money" aria-hidden="true">{parts.amount}</span>
+    {spoken}
   </span>;
 }

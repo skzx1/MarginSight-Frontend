@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { demo, fullDemo, fullDemoMode, localMode, login, request, session } from '../../lib/auth';
 import { bangkokDate } from '../../lib/format';
 import { useAction } from '../../lib/use-resource';
@@ -28,8 +28,14 @@ import StoreHub, { LineConnection } from '../screens/store';
 import s from './login.module.css';
 import assistantStyles from '../components/assistant.module.css';
 
+/** At most this many extra catalog pages are read to find a deep-linked SKU; not found after that = list + notice. */
+const TARGET_PAGE_LIMIT = 10;
+
 function StoreWorkspace({ stores, store, changeStore, create }: { stores: Store[]; store: Store; changeStore: (id: string) => void; create: () => void }) {
-  const { screen, navigate, registerGuard, canLeave } = useNavigation();
+  const { screen, detail, navigate, registerGuard, canLeave, takeArrivalFocus } = useNavigation();
+  // Detail routes (P4-G3): #products/<sku>, #orders/<key>. Opening/closing stays on the screen (no leave guard, no h1 focus).
+  const productDetail = useCallback((sku: string | null, options?: { replace?: boolean }) => navigate('products', { detail: sku, replace: options?.replace }), [navigate]);
+  const orderDetail = useCallback((key: string | null, options?: { replace?: boolean }) => navigate('orders', { detail: key, replace: options?.replace }), [navigate]);
   const [localStoreName, setLocalStoreName] = useState<string>();
   const { t } = useLanguage();
   const [month, setMonth] = useState(bangkokDate().slice(0, 7));
@@ -48,21 +54,36 @@ function StoreWorkspace({ stores, store, changeStore, create }: { stores: Store[
   const base = '/stores/' + encodeURIComponent(store.id);
   const guest = fullDemoMode();
   const props: FeatureProps = { base, month, guest, realStore: !!store.personal, origin: store.personal ? 'REAL' : store.dataOrigin ?? 'MOCK' };
+  // searchedSku: the SKU a finished refresh(targetSku) looked for, so the products screen can judge a deep link "not found" (P4-G3).
+  const [searchedSku, setSearchedSku] = useState<string | null>(null), pendingTarget = useRef<string | null>(null);
   const refresh = async (targetSku?: string) => {
-    const id = ++version.current; setLoading(true); setCatalogError(undefined);
+    const id = ++version.current; setLoading(true); setCatalogError(undefined); pendingTarget.current = targetSku ?? null;
     try {
       let result = await request<PageResult<CatalogProduct>>(base + '/products');
       const items = [...result.items];
-      while (result.next && id === version.current && (items.length < products.length || (targetSku && !items.some(item => item.sku === targetSku)))) {
+      // Reload as many pages as were loaded before; a target SKU may add at most TARGET_PAGE_LIMIT further pages.
+      let extra = 0;
+      while (result.next && id === version.current) {
+        const restoring = items.length < products.length;
+        const searching = !!targetSku && !items.some(item => item.sku === targetSku) && extra < TARGET_PAGE_LIMIT;
+        if (!restoring && !searching) break;
+        if (!restoring) extra++;
         result = await request<PageResult<CatalogProduct>>(base + '/products?cursor=' + encodeURIComponent(result.next));
         items.push(...result.items);
       }
       if (id === version.current) { setProducts(items); setMore(result.next); }
     }
     catch (e) { if (id === version.current) setCatalogError(e); }
-    finally { if (id === version.current) setLoading(false); }
+    finally { if (id === version.current) { setLoading(false); pendingTarget.current = null; if (targetSku) setSearchedSku(targetSku); } }
   };
-  useEffect(() => { void refresh(); return () => { version.current++; }; }, [base, screen]);
+  const catalogTarget = screen === 'products' ? detail ?? undefined : undefined;
+  // Arriving on #products/<sku> looks for that SKU (refresh(targetSku)).
+  useEffect(() => { void refresh(catalogTarget); return () => { version.current++; }; }, [base, screen]); // eslint-disable-line react-hooks/exhaustive-deps
+  // A same-screen change (typed hash, Back/Forward) to a SKU that is not loaded searches for it too.
+  useEffect(() => {
+    if (!catalogTarget || pendingTarget.current === catalogTarget || products.some(item => item.sku === catalogTarget)) return;
+    void refresh(catalogTarget);
+  }, [catalogTarget]); // eslint-disable-line react-hooks/exhaustive-deps
   const loadMore = async () => {
     if (!more || loading) return;
     const id = ++version.current; setLoading(true); setCatalogError(undefined);
@@ -70,20 +91,20 @@ function StoreWorkspace({ stores, store, changeStore, create }: { stores: Store[
     catch (e) { if (id === version.current) setCatalogError(e); }
     finally { if (id === version.current) setLoading(false); }
   };
-  const ask = (sku: string) => { setSelectedSku(sku); setAssistantDraftStore(store.id); setDraftRequest(n => n + 1); navigate('assistant'); };
+  const ask = (sku: string) => { setSelectedSku(sku); setAssistantDraftStore(store.id); setDraftRequest(n => n + 1); navigate('assistant', { focus: 'assistant-input' }); };
   const simulate = (sku: string) => { setSelectedSku(sku); navigate('simulation'); };
   const key = store.id + '|' + month;
   const assistantPeriod = periodBounds(overviewPeriod, bangkokDate()) ?? { start: bangkokDate().slice(0, 7) + '-01', end: bangkokDate() };
   return <AssistantProvider key={base} base={base} defaultContext={{ ...assistantPeriod, sku: null }}>
-    <AppShell screen={screen} navigate={navigate} stores={stores} store={screen === 'store' && localStoreName ? { ...store, name: localStoreName } : store} changeStore={id => { if (id !== store.id && canLeave()) changeStore(id); }} month={month} changeMonth={setMonth} guest={guest} overviewControls={<OverviewPeriodControl value={overviewPeriod} onChange={setOverviewPeriod} />} assistantNav={<AssistantDrawerNav />}>
-      {['products','addProduct','simulation','receipts'].includes(screen) && <><ErrorNotice error={catalogError} />{catalogError && <button className="secondary" onClick={() => void refresh()}>{t('retry')}</button>}{loading && screen !== 'products' && <Loading />}{more && screen !== 'products' && screen !== 'addProduct' && <button className="secondary" disabled={loading} onClick={() => void loadMore()}>{t('next')} · {t('products')}</button>}</>}
+    <AppShell screen={screen} navigate={navigate} stores={stores} store={screen === 'store' && localStoreName ? { ...store, name: localStoreName } : store} changeStore={id => { if (id !== store.id && canLeave()) changeStore(id); }} month={month} changeMonth={setMonth} guest={guest} origin={props.origin} canLeave={canLeave} takeArrivalFocus={takeArrivalFocus} periodControl={<OverviewPeriodControl value={overviewPeriod} onChange={setOverviewPeriod} />} assistantNav={<AssistantDrawerNav />}>
+      {['products','addProduct','simulation','receipts'].includes(screen) && <><ErrorNotice error={catalogError} />{catalogError && <button className="secondary" onClick={() => void refresh(catalogTarget)}>{t('retry')}</button>}{loading && screen !== 'products' && <Loading />}{more && screen !== 'products' && screen !== 'addProduct' && <button className="secondary" disabled={loading} onClick={() => void loadMore()}>{t('next')} · {t('products')}</button>}</>}
       <div key={key} className={'screen-content screen-' + screen}>
         {screen === 'overview' && <Overview {...props} navigate={navigate} period={overviewPeriod} onMissingCosts={() => { setMissingCostsOnly(true); navigate('products'); }} />}
         {screen === 'finance' && <Finance key={base} {...props} period={overviewPeriod} onPeriodChange={setOverviewPeriod} navigate={navigate} onMissingCosts={() => { setMissingCostsOnly(true); navigate('products'); }} />}
-        {screen === 'products' && <Products {...props} loading={loading} products={products} more={more} loadMore={() => void loadMore()} refresh={refresh} ask={ask} simulate={simulate} onAddProduct={() => navigate('addProduct')} initialMissingCostsOnly={missingCostsOnly} />}
+        {screen === 'products' && <Products {...props} loading={loading} products={products} more={more} loadMore={() => void loadMore()} refresh={refresh} ask={ask} simulate={simulate} onAddProduct={() => navigate('addProduct')} initialMissingCostsOnly={missingCostsOnly} detail={detail} onDetail={productDetail} catalogFailed={!!catalogError} searchedSku={searchedSku} />}
         {screen === 'addProduct' && <AddProductPage {...props} existingProducts={products} onCancel={() => navigate('products')} onSaved={newProd => { setProducts(old => [newProd, ...old.filter(p => p.sku !== newProd.sku)]); navigate('products'); }} onBatchSaved={batch => { const skus = new Set(batch.map(b => b.sku)); setProducts(old => [...batch, ...old.filter(p => !skus.has(p.sku))]); }} />}
         {screen === 'simulation' && <Simulation {...props} products={products} initialSku={selectedSku} />}
-        {screen === 'orders' && <Orders {...props} />}
+        {screen === 'orders' && <Orders {...props} detail={detail} onDetail={orderDetail} />}
         {screen === 'reconciliation' && <Settlement {...props} />}
         {screen === 'imports' && <Imports {...props} />}
         {screen === 'receipts' && <Receipts {...props} products={products} refreshProducts={refresh} />}
@@ -118,7 +139,7 @@ export default function Page() {
     return () => window.removeEventListener('auth-expired', onExpired);
   }, []);
   if (preview) return <Preview back={() => setPreview(false)} />;
-  if (!ready) return <main className="landing"><div className="public-topbar"><a className={s.homeLink} href="/" aria-label="MarginShot"><Brand /></a><LanguageSwitch /></div><div className="landing-content"><div className="landing-story"><span className="eyebrow">MARGINSHOT / {t('tagline')}</span><h1>{t('welcome')}</h1><p className="lead">{t('welcomeBody')}</p><div className="landing-ledger" aria-hidden="true"><span>{t('revenue')}</span><span>− {t('costs')}</span><span>− {t('fees')}</span><strong>= {t('profit')}</strong></div><p className="caption">{t('scope')}</p></div><section className="entry-panel"><h2>{t('trustNote')}</h2><button disabled={action.busy || !configReady} onClick={() => void action.run(async () => { await fullDemo(); await initialize(); })}>{action.busy ? t('working') : t('demo')}<Icon name="arrow" /></button><p className="caption">{t('demoNote')}</p><button className="ghost" onClick={() => setPreview(true)}>{t('preview')}</button><div className="entry-divider" /><button className="secondary" disabled={action.busy || !configReady} onClick={() => void action.run(() => login())}>{t('login')}</button><button className="ghost" disabled={action.busy || !configReady} onClick={() => void action.run(() => login(true))}>{t('signup')}</button>{configReady && localMode() && <button className="ghost" disabled={action.busy} onClick={() => void action.run(async () => { await demo(); await initialize(); })}>{t('localDemo')}</button>}{expired && <p className="notice">{t('expired')}</p>}<ErrorNotice error={action.error} />{!configReady && !action.busy && <button className="secondary" onClick={() => void action.run(async () => { await session(); setConfigReady(true); })}>{t('retry')}</button>}</section></div><footer className="public-footer">MarginShot · {t('outcomeNote')}</footer></main>;
+  if (!ready) return <main className="landing"><div className="public-topbar"><a className={s.homeLink} href="/" aria-label="MarginShot"><Brand /></a><LanguageSwitch /></div><div className="landing-content"><div className="landing-story"><span className="eyebrow">MARGINSHOT / {t('tagline')}</span><h1>{t('welcome')}</h1><p className="lead">{t('welcomeBody')}</p><div className="landing-ledger" aria-hidden="true"><span>{t('revenue')}</span><span>− {t('costs')}</span><span>− {t('fees')}</span><strong>= {t('profit')}</strong></div><p className="caption">{t('scope')}</p></div><section className="entry-panel"><h2>{t('trustNote')}</h2><button disabled={action.busy || !configReady} onClick={() => void action.run(async () => { await fullDemo(); await initialize(); })}>{action.busy ? t('working') : t('demo')}<Icon name="arrow" /></button><p className="caption">{t('demoNote')}</p><button className="ghost" onClick={() => setPreview(true)}>{t('preview')}</button><div className="entry-divider" /><button className="secondary" disabled={action.busy || !configReady} onClick={() => void action.run(() => login())}>{t('login')}</button><button className="ghost" disabled={action.busy || !configReady} onClick={() => void action.run(() => login(true))}>{t('signup')}</button>{configReady && localMode() && <button className="ghost" disabled={action.busy} onClick={() => void action.run(async () => { await demo(); await initialize(); })}>{t('localDemo')}</button>}{expired && <p className="notice"><Icon name="warning" />{t('expired')}</p>}<ErrorNotice error={action.error} />{!configReady && !action.busy && <button className="secondary" onClick={() => void action.run(async () => { await session(); setConfigReady(true); })}>{t('retry')}</button>}</section></div><footer className="public-footer">MarginShot · {t('outcomeNote')}</footer></main>;
   const store = stores.find(item => item.id === storeId);
   if (!store || setup) return <Onboarding busy={action.busy} error={action.error} back={stores.length ? () => setSetup(false) : undefined} create={name => action.run(async () => { const created = await request<Store>('/me/store', { name }); const data = await request<PageResult<Store>>('/me/stores'); setStores(data.items); setStoreId(created.id); setSetup(false); location.hash = 'overview'; })} />;
   return <StoreWorkspace key={store.id} stores={stores} store={store} changeStore={setStoreId} create={() => setSetup(true)} />;

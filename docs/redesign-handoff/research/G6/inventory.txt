@@ -1,0 +1,43 @@
+G6 — INVENTORY OF CURRENT ROUTES / SCREENS / NAVIGATION (read-only; checkout claude/design-tokens @795bf58; IA code = baseline 5eb4fe9 because 795bf58 touches only finance-chart.tsx/add-product.tsx number formatting)
+Method: [VERIFIED: read source files listed per line] + screenshots in scratchpad\qa\final-en, final-click, after3.
+
+A. NEXT ROUTES (static export, output:'export', trailingSlash:true — web/next.config.ts)
+ /            app/page.tsx  -> <AuthCallback/> (redirects ?code/?error to /login/) + <Welcome/> = welcome/landing.tsx
+ /login/      app/login/page.tsx (client). States: (1) !ready -> entry "landing" panel: demo (fullDemo), preview (Preview component, in-page state), login (Cognito), signup, localDemo (localMode only), retry, expired notice
+              (2) no store or setup -> Onboarding (create store, back, logout) (3) StoreWorkspace -> AppShell + hash screens
+ 404          app/not-found.tsx (public-page, home link)      error  app/error.tsx (retry + home)
+ layout       app/layout.tsx (lang=th, fonts.css, LanguageProvider, themeColor #152d26)
+
+B. HASH SCREENS on /login/#<screen> (lib/types.ts:24 Screen union, 14 values; components/shell.tsx useNavigation; unknown hash -> overview; leave-guard registerGuard/canLeave used by store settings)
+ primary (shell.tsx:233): overview, products, finance, assistant, store
+ parentScreen (shell.tsx:235): orders,reconciliation->overview; simulation,addProduct,playground->products; imports,receipts,rules,line->store
+ screen          label TH/EN                         content / actions                                                                                         entry points today
+ overview        ภาพรวม/Overview                     2 summary cards (profit+margin, sales+total costs), DataStatus+coverage, missing-cost button(->products filtered), OverviewCharts (sales&profit line + day picker, channel donut), quick actions (assistant, addProduct, imports), <details> sales allocation + channel insight, recent orders (search, channel chips, show more, in-page order evidence view)   nav, default
+ products        สินค้า/Products                     ProductCatalog: intro, Playground link, Add product; summary (loaded / missing price / missing cost toggles); search; Filter & Sort <dialog>; chips; table (>=768) / cards (<768); load more. Product detail = in-page (selectedSku): stats, add-cost form (in-page view), "ลองราคา" -> #simulation, "ถามผู้ช่วย" -> #assistant with SKU draft   nav; overview/finance missing-cost
+ addProduct      เพิ่มสินค้า                         manual tab / CSV tab, live preview, save, cancel                                                          products, overview quick action
+ simulation      ลองราคา                             product select, discount/price mode, result + evidence                                                    product detail only
+ playground      Playground                          per-product chat with marketplace controls (platform, category, seller type, campaigns), month         products link; kept mounted (hidden) after first open
+ finance         การเงิน/Finance                     own header (h1, MOCK badge, LanguageSwitch, Export report); period+channel+compare; 6 KPI w/ sparkline+delta; jump links; P&L + daily chart; channels table; orders (status chips, search); product top/bottom 5 (-> products); store expenses (+form, localStorage, MOCK only)   nav
+ assistant       ถามผู้ช่วย                          full-height chat: header (rename, MOCK, history btn <1024), welcome+prompts, composer w/ period & product context, dialogs: period, products, rename, delete, allHistory, sheet; history list in sidebar under nav item (AssistantDrawerNav)   nav, overview quick action, product detail
+ store           ข้อมูลร้าน/Store                    StoreSettings: tools grid (imports, receipts, rules, reconciliation), shop profile form, notifications & prefs (LanguageSwitch, margin threshold, email, digests — preview), channels (LINE ->#line), account (create store, logout), sticky save dock, unsaved guard   nav
+ orders          ออเดอร์                             list + detail evidence + confirm posted fees; month control                                               overview "all orders"
+ reconciliation  ตรวจยอดรับสินค้า                    note + export CSV/XLSX; month control                                                                      store tools grid
+ imports         นำเข้ารายงาน                        steps, upload, jobs, conflicts, job detail                                                                 store tools, overview quick action
+ receipts        อ่านบิลซื้อ                         OCR form + jobs                                                                                           store tools
+ rules           กฎและแคมเปญ                         segmented fee-rules / enrollments, add, advanced                                                          store tools
+ line            เชื่อม LINE                         status + generate link code                                                                               store channels card
+
+C. SHELL CONTROLS (shell.tsx AppShell)
+ - Brand + desktop-store (display-only store name) in sidebar (>=768).
+ - Store switcher: <Select> inside screen-header .context-controls on every screen EXCEPT finance and assistant (those hide the shared header).
+ - Period: OverviewPeriodControl on overview header; finance has its own (same overviewPeriod state, passed onPeriodChange). Month <input type=month> on orders, reconciliation, simulation, playground (separate `month` state).
+ - Back link "← parent" when screen != parent. Demo banner when guest (not on assistant/finance). Footer trust note (not on assistant).
+ - Language toggle: finance header, store settings, all public pages. Logout: store settings + onboarding only. LINE: store -> #line.
+ - document.title = label · MarginShot; focus moves to #screen-title on change.
+
+D. RESPONSIVE (globals.css + modules)
+ <768       top brand bar (white); bottom fixed tab bar 5 items (--nav-height 76px); workspace max 1120; tables->cards (products, overview orders); assistant shell fixed, nav hidden when keyboard open
+ 768–1023   dark sidebar as 80px rail (labels hidden) + toggle "expand" -> 240px; expanding WIDENS the grid column (content reflows; not an overlay) [VERIFIED: tablet-drawer-800/900 screenshots]; Escape collapses
+ >=1024     dark sidebar 240px fixed, toggle hidden; workspace max 1920, padding 28px
+ others     container queries @workspace <620 / >=900 / >=1100; finance 1600; store 1280; assistant 600; landing 1100/767/420; global 479 tweak
+ Spec §7 mobile breakpoint is <640 — differs from repo 768.

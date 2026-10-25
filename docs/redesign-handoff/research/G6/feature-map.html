@@ -1,0 +1,107 @@
+<!doctype html><html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>G6 IA Map</title>
+<style>
+:root{--bg:#FAF9F5;--s:#fff;--t:#141413;--m:#66625A;--b:#E6E2D8;--info:#2F5784;--ib:#E5ECF4;--w:#735C00;--wb:#F5EDCF;--l:#8E1238;--lb:#F7E3E8;--alt:#F0EEE6}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--t);font:14px/1.55 "Segoe UI","Leelawadee UI",Tahoma,sans-serif}
+.w{max-width:1280px;margin:0 auto;padding:16px}h1{font:600 26px/1.3 Georgia,"Leelawadee UI",serif;margin:8px 0}h2{font-size:18px;margin:28px 0 8px}
+.maps{display:grid;gap:16px}@media(min-width:900px){.maps{grid-template-columns:1fr 1fr}}
+.card{background:var(--s);border:1px solid var(--b);border-radius:12px;padding:16px;min-width:0}
+ul{margin:0;padding-left:18px}li{margin:2px 0}code{font-size:12px;background:var(--alt);padding:1px 4px;border-radius:4px}
+.tw{overflow-x:auto;border:1px solid var(--b);border-radius:12px;background:var(--s)}
+table{border-collapse:collapse;width:100%;min-width:900px;font-size:13px}th,td{text-align:left;vertical-align:top;padding:8px;border-bottom:1px solid var(--b)}th{background:var(--alt);font-size:12px;position:sticky;top:0}
+.k{display:inline-block;font-size:12px;font-weight:600;padding:1px 6px;border-radius:4px;white-space:nowrap}
+.V{background:var(--alt)}.M{background:var(--wb);color:var(--w)}.R{background:var(--lb);color:var(--l)}.I{background:var(--ib);color:var(--info)}.X{background:var(--t);color:#fff}.N{background:var(--ib);color:var(--info);outline:1px dashed var(--info)}
+small{color:var(--m)}
+</style></head><body><div class="w">
+<h1>G6 — แผนที่ฟีเจอร์และการนำทาง (ปัจจุบัน → เสนอ)</h1>
+<p><small>ที่มา: อ่านซอร์ส web/src/app (inventory.txt) + ภาพ qa/final-*. ทุกปลายทางเป็น hash route ที่มีอยู่แล้ว 14 ตัว (<code>lib/types.ts:24</code>). ป้าย: <span class="k V">VISUAL</span> เปลี่ยนหน้าตาเท่านั้น · <span class="k M">MOVE</span> ย้ายตำแหน่งใน IA · <span class="k R">ROUTE</span> เปลี่ยน route · <span class="k I">INTERACT/STATE</span> เปลี่ยนพฤติกรรม/สถานะ · <span class="k X">REMOVE/REPLACE</span> ต้องอนุมัติชัดเจน · <span class="k N">NEW</span> ไม่มีในระบบตอนนี้</small></p>
+
+<h2>1. แผนที่การนำทาง</h2>
+<div class="maps">
+<div class="card"><b>ปัจจุบัน</b><ul>
+<li>/ landing → “เข้าสู่ระบบ / เริ่มดูข้อมูลตัวอย่าง” → /login/</li>
+<li>/login/ entry panel → demo · preview (in-page) · Cognito login/signup · local demo → onboarding (ถ้ายังไม่มีร้าน) → workspace</li>
+<li>Workspace nav 5 ตัว: <b>ภาพรวม</b> · <b>สินค้า</b> · <b>การเงิน</b> · <b>ถามผู้ช่วย</b> (+ประวัติแชตใน sidebar) · <b>ข้อมูลร้าน</b></li>
+<li>ภาพรวม → ออเดอร์ (“ออเดอร์ทั้งหมด”), เพิ่มสินค้า, นำเข้ารายงาน, ถามผู้ช่วย (quick actions), สินค้า (ต้นทุนขาด)</li>
+<li>สินค้า → Playground (ลิงก์), เพิ่มสินค้า, [รายละเอียดในหน้า] → ลองราคา (#simulation), ถามผู้ช่วย, เพิ่มต้นทุน</li>
+<li>การเงิน → สินค้า (ต้นทุนขาด / ดูทั้งหมด) · ส่งออกรายงาน</li>
+<li>ข้อมูลร้าน → นำเข้ารายงาน, อ่านบิลซื้อ, กฎและแคมเปญ, ตรวจยอดรับ, เชื่อม LINE, สร้างร้าน, ออกจากระบบ, ภาษา</li>
+<li>ตัวเลือกร้าน: หัวหน้าทุกจอยกเว้นการเงิน/ผู้ช่วย · ภาษา: การเงิน + ข้อมูลร้าน · ออกจากระบบ: ข้อมูลร้านเท่านั้น</li>
+<li>มือถือ &lt;768: แท็บล่าง 5 ตัวเดียวกัน · แท็บเล็ต 768–1023: rail 80px ขยายเป็น 240px (ดันเนื้อหา) · ≥1024 sidebar มืด 240px</li></ul></div>
+<div class="card"><b>เสนอ (ไม่มี route ใหม่)</b><ul>
+<li>Sidebar 232px จัดกลุ่ม: <b>ภาพรวม</b> │ สินค้า: <b>สินค้า</b>, Playground │ เงิน: <b>การเงิน</b>, ออเดอร์, ตรวจยอดรับ │ นำเข้าข้อมูล: นำเข้ารายงาน, อ่านบิลซื้อ, กฎและแคมเปญ │ ผู้ช่วย: <b>ถามผู้ช่วย</b> (+ประวัติ) │ ร้าน: <b>ข้อมูลร้าน</b>, เชื่อม LINE │ account block: ภาษา, ออกจากระบบ</li>
+<li>เพิ่มสินค้า / ลองราคา / รายละเอียดสินค้า / รายละเอียดออเดอร์ = ยังเป็นปลายทางตามบริบท (ไม่อยู่ใน sidebar)</li>
+<li>Top bar (≥768): ตัวเลือกร้าน (ซ้าย) · ป้ายข้อมูลจำลอง · ช่วงเวลา (เฉพาะจอที่ใช้) — มือถือ: ร้านใน top bar, ช่วงเวลาใต้ top bar</li>
+<li>parent ใหม่: ออเดอร์/ตรวจยอดรับ → <b>การเงิน</b> (เดิม ภาพรวม/ร้าน)</li>
+<li>มือถือ &lt;768: แท็บล่าง 5 ตัวเดิม (ภาพรวม · สินค้า · การเงิน · ถาม · ร้าน) — หน้า “ร้าน” ยังเป็น hub ของเครื่องมือ</li>
+<li>768–1023: rail 72px แสดง 5 ตัวหลัก + ปุ่ม ☰ เปิด drawer <i>ซ้อนทับ</i> แสดงเมนูเต็ม (G7 ตัดสิน focus trap/Esc)</li>
+<li>≥1280: คอลัมน์ขวา 320px บนภาพรวมและรายละเอียดสินค้า · ≥1600: 360px, เนื้อหาสูงสุด 1440px</li></ul></div></div>
+
+<h2>2. Feature map</h2>
+<div class="tw"><table><thead><tr><th>#</th><th>ฟีเจอร์ (มีอยู่จริง)</th><th>ตำแหน่งปัจจุบัน</th><th>ตำแหน่งที่เสนอ</th><th>ประเภท</th><th>หมายเหตุ / ความเสี่ยง</th></tr></thead><tbody>
+<tr><td>1</td><td>เมนูหลัก 5 ตัว</td><td>sidebar มืด / rail / แท็บล่าง</td><td>sidebar สว่างจัดกลุ่ม (สี = G4)</td><td><span class="k V">VISUAL</span> <span class="k M">MOVE</span></td><td>สีพื้น sidebar สว่าง vs มืด รอ G4; focus-on-dark tokens อาจไม่ใช้แล้ว</td></tr>
+<tr><td>2</td><td>Playground</td><td>ลิงก์ในหน้าสินค้า</td><td>sub-item ใต้ “สินค้า” ใน sidebar + ลิงก์เดิม</td><td><span class="k M">MOVE</span></td><td>active state ต้องเป็น exact screen ใน sidebar แต่ parent บน rail/แท็บ</td></tr>
+<tr><td>3</td><td>ออเดอร์ (#orders)</td><td>ภาพรวม “ออเดอร์ทั้งหมด”; parent=overview</td><td>sidebar ใต้ “เงิน” + ลิงก์ในการเงิน + ลิงก์เดิมในภาพรวม; parent=finance</td><td><span class="k M">MOVE</span> <span class="k I">STATE</span></td><td>แก้ parentScreen() → ปุ่มย้อนกลับเปลี่ยนเป็น “← การเงิน”</td></tr>
+<tr><td>4</td><td>ตรวจยอดรับ (#reconciliation)</td><td>การ์ดเครื่องมือในข้อมูลร้าน; parent=overview (ไม่สอดคล้อง)</td><td>sidebar ใต้ “เงิน” + การ์ดในการเงิน + การ์ดเดิมในร้าน; parent=finance</td><td><span class="k M">MOVE</span> <span class="k I">STATE</span></td><td>แก้ความไม่สอดคล้องเดิม (entry อยู่ร้าน แต่ parent เป็นภาพรวม)</td></tr>
+<tr><td>5</td><td>นำเข้ารายงาน / อ่านบิลซื้อ / กฎและแคมเปญ</td><td>การ์ดเครื่องมือในข้อมูลร้าน (+นำเข้าใน quick action)</td><td>กลุ่ม “นำเข้าข้อมูล” ใน sidebar + การ์ดเดิม (hub มือถือ)</td><td><span class="k M">MOVE</span></td><td>parent ยัง = store (rail/แท็บ “ร้าน” active)</td></tr>
+<tr><td>6</td><td>เชื่อม LINE</td><td>การ์ดช่องทางในข้อมูลร้าน</td><td>sub-item ใต้ “ร้าน” + การ์ดเดิม</td><td><span class="k M">MOVE</span></td><td>—</td></tr>
+<tr><td>7</td><td>ตัวเลือกร้าน</td><td>page header (ไม่มีในการเงิน/ผู้ช่วย)</td><td>top bar ทุกจอ (ผู้ช่วย: ใน chat header หรือคงไม่มี)</td><td><span class="k M">MOVE</span> <span class="k I">INTERACT</span></td><td>ต้องผ่าน canLeave() เดิม; บนมือถือเป็นปุ่มเปิด sheet/select (G7)</td></tr>
+<tr><td>8</td><td>ช่วงเวลา (overviewPeriod) ภาพรวม+การเงิน</td><td>header ภาพรวม / แถบ controls การเงิน</td><td>top bar (≥768) / แถวใต้ top bar (&lt;768)</td><td><span class="k M">MOVE</span></td><td>state เดิมใช้ร่วมกันอยู่แล้ว — ไม่รวมกับ month</td></tr>
+<tr><td>9</td><td>เดือน (month) ออเดอร์/ตรวจยอด/ลองราคา/Playground</td><td>page header</td><td>คงใน page header ของจอนั้น</td><td><span class="k V">VISUAL</span></td><td>การรวม month กับ period = <span class="k I">STATE</span> ไม่เสนอรอบนี้</td></tr>
+<tr><td>10</td><td>ภาษา TH/EN</td><td>หัวหน้าการเงิน + ข้อมูลร้าน + หน้า public</td><td>account block ใน sidebar + ข้อมูลร้าน + หน้า public (เอาออกจากหัวการเงิน)</td><td><span class="k M">MOVE</span></td><td>มือถือ: เข้าที่แท็บ “ร้าน” เท่าเดิม</td></tr>
+<tr><td>11</td><td>ออกจากระบบ</td><td>ข้อมูลร้าน, onboarding</td><td>เพิ่มใน account block (≥768) + ที่เดิม</td><td><span class="k M">MOVE</span></td><td>ต้องเรียก canLeave() ก่อน logout เหมือนเดิม</td></tr>
+<tr><td>12</td><td>ปุ่มย้อนกลับ “← parent”, focus #screen-title, document.title</td><td>shell header</td><td>คงไว้ใน page header มาตรฐานทุกจอ</td><td><span class="k V">VISUAL</span></td><td>ข้อความย้อนกลับเปลี่ยนตามข้อ 3–4</td></tr>
+<tr><td>13</td><td>การ์ดสรุปภาพรวม (กำไร+มาร์จิน, ยอดขาย+ต้นทุนรวม)</td><td>2 การ์ดใหญ่ (กำไรพื้นมืด)</td><td>4 KPI (กำไร, ยอดขาย, มาร์จิน, ต้นทุน+ค่าธรรมเนียม) — ตัวเลขเดิม</td><td><span class="k V">VISUAL</span></td><td>ไม่มี delta บนภาพรวม (มีแค่การเงิน) → ถ้าใส่ = NEW; สัญลักษณ์กำไร/ขาดทุน = G2</td></tr>
+<tr><td>14</td><td>Quick actions (ผู้ช่วย, เพิ่มสินค้า, นำเข้า)</td><td>แถวปุ่มกลางภาพรวม</td><td>เพิ่มสินค้า=primary ใน page header, นำเข้า=secondary, ผู้ช่วย=panel คอลัมน์ขวา</td><td><span class="k M">MOVE</span></td><td>—</td></tr>
+<tr><td>15</td><td>การกระจายยอดขาย + ช่องทาง (details)</td><td>&lt;details&gt; ปิดอยู่</td><td>การ์ด “เงินไปไหน” + “ช่องทางขาย” ในคอลัมน์ขวา (เปิดเสมอ); donut ย้ายจาก OverviewCharts</td><td><span class="k M">MOVE</span> <span class="k I">STATE</span></td><td>เลิกพับ = เปลี่ยน interaction เล็กน้อย; ต้องแยก donut ออกจาก OverviewCharts</td></tr>
+<tr><td>16</td><td>OverviewCharts เส้น + เลือกวัน</td><td>ภาพรวม</td><td>คอลัมน์หลัก</td><td><span class="k V">VISUAL</span></td><td>สีกราฟ = G4</td></tr>
+<tr><td>17</td><td>ออเดอร์ล่าสุด + ค้นหา + chip ช่องทาง + รายละเอียดในหน้า</td><td>ภาพรวม ล่างสุด</td><td>คอลัมน์หลัก ใต้กราฟ; ตาราง ≥768 / การ์ด &lt;768</td><td><span class="k V">VISUAL</span></td><td>chip ที่เลือก = ink (สเปก §6)</td></tr>
+<tr><td>18</td><td>Data status + coverage + missing-cost</td><td>ใต้การ์ดสรุป</td><td>alert เหนือ KPI (missing cost) + caption ใต้ KPI</td><td><span class="k V">VISUAL</span></td><td>ลำดับอ่านบนมือถือเปลี่ยน: แจ้งเตือนมาก่อนกำไร (เดิมกำไรก่อน — โค้ดมีคอมเมนต์ตั้งใจ) → ต้องยืนยัน</td></tr>
+<tr><td>19</td><td>สินค้า: สรุป/ค้นหา/ตัวกรอง/เรียง/ตาราง/การ์ด</td><td>หน้า สินค้า</td><td>โครงเดิม + header มาตรฐาน</td><td><span class="k V">VISUAL</span></td><td>คอลัมน์ “สถานะ” = <span class="k N">NEW</span> (G2 + เกณฑ์)</td></tr>
+<tr><td>20</td><td>รายละเอียดสินค้า + เพิ่มต้นทุน</td><td>in-page state</td><td>in-page เดิม; header + KPI 4 + ประวัติต้นทุน; ≥1280 คอลัมน์ขวา (ลิงก์ลองราคา, ถาม)</td><td><span class="k V">VISUAL</span></td><td>deep link #products/SKU = <span class="k R">ROUTE</span> ไม่เสนอ</td></tr>
+<tr><td>21</td><td>ลองราคา (#simulation)</td><td>จากรายละเอียดสินค้า</td><td>เดิม</td><td><span class="k V">VISUAL</span></td><td>สเปกแท็บ “ราคา” ≈ ฟีเจอร์นี้/Playground — ดูข้อ 30</td></tr>
+<tr><td>22</td><td>เพิ่มสินค้า (manual/CSV)</td><td>#addProduct</td><td>เดิม; ปุ่ม primary ใน header สินค้า/ภาพรวม</td><td><span class="k V">VISUAL</span></td><td>—</td></tr>
+<tr><td>23</td><td>การเงิน: KPI 6, jump links, P&amp;L, กราฟรายวัน, ช่องทาง, ออเดอร์, Top/Bottom 5, ค่าใช้จ่าย, ส่งออก</td><td>header ของตัวเอง</td><td>header มาตรฐาน (h1+export), period ใน top bar, jump links เป็นแถบ sticky, เพิ่มการ์ด “ตรวจยอดรับ”</td><td><span class="k V">VISUAL</span> <span class="k M">MOVE</span></td><td>sticky = G7</td></tr>
+<tr><td>24</td><td>ผู้ช่วยเต็มหน้า + dialogs + ประวัติ</td><td>#assistant, ประวัติใน sidebar</td><td>เดิม; ประวัติยังอยู่ใต้รายการ “ถามผู้ช่วย”; ตัวเลือก: แถวแชตล่าสุดใต้ composer</td><td><span class="k V">VISUAL</span></td><td>ลุค = G3, พฤติกรรม = G7</td></tr>
+<tr><td>25</td><td>ข้อมูลร้าน (ฟอร์ม, save dock, guard)</td><td>#store</td><td>เดิม; การ์ดเครื่องมือคงไว้เป็น hub</td><td><span class="k V">VISUAL</span></td><td>—</td></tr>
+<tr><td>26</td><td>Demo banner / footer trust note</td><td>บนสุด / ล่างสุดของ workspace</td><td>ป้าย “ข้อมูลจำลอง” ใน top bar + banner เดิม (ถ้า G7 เห็นว่าจำเป็น)</td><td><span class="k M">MOVE</span></td><td>ห้ามทำให้ผู้ใช้เข้าใจผิดว่าเป็นข้อมูลจริง</td></tr>
+<tr><td>27</td><td>Landing / login / onboarding / 404 / error / preview</td><td>หน้า public</td><td>ไม่เปลี่ยน IA (P5)</td><td><span class="k V">VISUAL</span></td><td>Cognito/auth-callback ห้ามแตะ</td></tr>
+<tr><td>28</td><td>Rail แท็บเล็ตขยาย</td><td>ขยายดันเนื้อหา (grid column)</td><td>drawer ซ้อนทับ + scrim</td><td><span class="k I">INTERACT</span></td><td>G7: focus trap, Esc, คืน focus</td></tr>
+<tr><td>29</td><td>ค้นหารวม Ctrl K</td><td>ไม่มี (มีค้นหาเฉพาะหน้า)</td><td>ไม่แนะนำรอบนี้ — เอาออกจาก wireframe แล้ว</td><td><span class="k N">NEW – ไม่อยู่ใน scope</span></td><td>ต้องมี index ข้ามสินค้า/ออเดอร์/แชต — งานใหม่</td></tr>
+<tr><td>30</td><td>แท็บมือถือ “ราคา” (สเปก)</td><td>ไม่มี</td><td>ไม่แนะนำ: แทนแท็บ “การเงิน” = ลบทางเข้าหลัก</td><td><span class="k N">NEW</span> <span class="k X">REPLACE</span></td><td>มีฟีเจอร์ใกล้เคียงแล้ว: #simulation, #playground</td></tr>
+<tr><td>31</td><td>การแจ้งเตือน (กระดิ่ง)</td><td>ไม่มี (มีแค่ค่าตั้งอีเมลแบบตัวอย่าง)</td><td>ไม่แนะนำ</td><td><span class="k N">NEW</span></td><td>—</td></tr>
+<tr><td>32</td><td>ตัวเลือกช่องทางระดับ global (shop/channel)</td><td>ตัวกรองช่องทางเฉพาะการเงินและภาพรวม</td><td>ไม่แนะนำ — ร้านเท่านั้นใน top bar</td><td><span class="k N">NEW</span> <span class="k I">STATE</span></td><td>ต้องเพิ่ม state ช่องทางกลาง</td></tr>
+<tr><td>33</td><td>AI panel บนภาพรวม (สเปก §8)</td><td>quick action ไปหน้าผู้ช่วย</td><td>panel launcher คอลัมน์ขวา → #assistant พร้อม draft</td><td><span class="k N">NEW</span> <span class="k I">INTERACT</span></td><td>แชตเต็มใน panel = ความซับซ้อนสูง (session ซ้อน 2 ที่) ไม่แนะนำ</td></tr>
+<tr><td>34</td><td>“Recent activity” (สเปก §6)</td><td>ไม่มี</td><td>ไม่ทำ</td><td><span class="k N">NEW</span></td><td>ไม่มี activity log</td></tr>
+<tr><td>35</td><td>Count badge ใน nav (สินค้าไม่มีต้นทุน)</td><td>ไม่มี (มีตัวเลขในหน้าสินค้า)</td><td>เอาออกจาก wireframe แล้ว (รออนุมัติ)</td><td><span class="k N">NEW</span></td><td>ตัวเลขเป็นเฉพาะรายการที่โหลดแล้ว → อาจทำให้เข้าใจผิด</td></tr>
+</tbody></table></div>
+
+<h2>3. Breakpoints ที่เสนอ</h2>
+<div class="card"><ul>
+<li><b>320–639</b>: แท็บล่าง 5 ตัว · top bar = โลโก้ + ร้าน · KPI 2×2 · ตาราง→การ์ด · primary เต็มกว้าง · คอลัมน์ขวาต่อท้าย</li>
+<li><b>640–767</b>: ยังแท็บล่าง (คงเกณฑ์ 768 ของ repo ไม่ใช้ 640 ของสเปก) · KPI 4 คอลัมน์ · การ์ด 2 คอลัมน์</li>
+<li><b>768–1023</b>: rail 72px + drawer ซ้อน · top bar มีร้าน+ช่วงเวลา · grid 2 คอลัมน์</li>
+<li><b>1024–1279</b>: sidebar 232px · คอลัมน์เดียว (คอลัมน์ขวาต่อท้าย)</li>
+<li><b>≥1280</b>: คอลัมน์ขวา 320px · <b>≥1600</b>: 360px, เนื้อหาสูงสุด 1440px กลางจอ</li></ul></div>
+
+<h2>4. ความเสี่ยงและการพึ่งพา</h2>
+<div class="card"><ul>
+<li><b>G4</b>: sidebar สว่าง (#F4F2EC) vs มืดปัจจุบัน — wireframe ใช้สว่างตามสเปก แต่โครงไม่ขึ้นกับสี; ต้องการ token ของ nav active/indicator และ focus บนพื้นสว่าง</li>
+<li><b>G7</b>: drawer ซ้อน, sticky sub-nav การเงิน, ตัวเลือกร้านบนมือถือ, AI launcher, ลำดับโฟกัสเมื่อสลับจอ (focus #screen-title เดิม)</li>
+<li><b>G3</b>: ลุค sparkle/greeting/composer ทั้งหน้าเต็มและ panel</li>
+<li><b>G2</b>: ป้ายสถานะสินค้า, สัญลักษณ์กำไร/ขาดทุนใน KPI/ตาราง</li>
+<li>ไม่มี test ที่ตรวจ nav/CSS (53 tests) → ต้อง QA ภาพด้วย qa/capture.mjs + interact.mjs ทุก breakpoint</li>
+<li>Assistant shell มี CSS พิเศษ (.shell, keyboard-open, height vars) — เปลี่ยน sidebar ต้องทดสอบหน้าผู้ช่วยแยก</li></ul></div>
+
+<h2>4b. Fix pass</h2><div class="card"><ul><li>จุดกดทุกจุด ≥44px (chip, nav, ภาษา, ปุ่มร้าน)</li><li>ไม่ซ่อน filter/คอลัมน์/ป้ายข้อมูลจำลองบนมือถือ — ตารางเลื่อนในการ์ด</li><li>radius: control 9px, card 12px, composer 20px; pill เฉพาะ filter chip (สเปก §6), ป้ายสถานะ/ข้อมูลจำลอง และปุ่มส่งกลม</li><li>KPI ทดสอบ ฿1,234,567.89: 1 คอลัมน์ <h2>5. ขอบเขต commitlt;360, 2 คอลัมน์, 4 คอลัมน์เมื่อคอลัมน์หลัก ≥760px (container query)</li><li>จอรองทั้งหมด + onboarding + ตัวเลือกร้านบนผู้ช่วย: wf/subscreens.html</li></ul></div>
+<h2>5. ขอบเขต commit ที่เสนอสำหรับ P4</h2>
+<div class="card"><ol>
+<li>Shell tokens/visual: sidebar 232 + กลุ่ม + active indicator (VISUAL, ยังไม่ย้ายรายการ)</li>
+<li>Sidebar groups + sub-items + account block (ภาษา/ออกจากระบบ) + parentScreen orders/reconciliation→finance (MOVE/STATE)</li>
+<li>Top bar: ย้ายตัวเลือกร้าน + ช่วงเวลา + ป้ายข้อมูลจำลอง; header มาตรฐาน (title+actions) รวมการเงิน (MOVE)</li>
+<li>Tablet rail 72 + overlay drawer (INTERACT, ร่วม G7)</li>
+<li>Overview layout: KPI 4 + คอลัมน์ขวา (เงินไปไหน, ช่องทาง) + header actions (VISUAL/MOVE)</li>
+<li>Products list/detail skeleton (VISUAL)</li>
+<li>Finance skeleton + sticky sections + ลิงก์ออเดอร์/ตรวจยอดรับ (VISUAL/MOVE)</li>
+<li>(แยก gate) AI launcher panel บนภาพรวม/สินค้า (NEW)</li>
+<li>(แยก gate) ป้ายสถานะสินค้า / count badge (NEW, หลัง G2)</li></ol></div>
+</div></body></html>

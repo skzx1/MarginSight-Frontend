@@ -1,0 +1,82 @@
+G2 Financial indicators: notes (all repo reads were read-only; base = checkout 795bf58, minus the 795bf58 hunks)
+
+INVENTORY: profit/loss surfaces and their current format (web/src/...)
+- app/components/profit-amount.tsx  ProfitAmount: "กำไร +฿118.30" / "ขาดทุน −฿53.00" (U+2212); 0 -> "฿0.00" with no label; null -> "—". Colour is inherited from the parent.
+  Used in: ledger.tsx:20, overview.tsx:67,92,93,108, overview-charts.tsx:44,45, product-catalog.tsx:94, products.tsx:169,320,324, preview.tsx:18, assistant.tsx:197, finance-chart.tsx:30 (readout).
+- app/screens/finance.tsx:47 signedProfit() is a second copy of the same logic, as a string. profitCash is used in the statement net row, the channel table plus total, orders, and rankings.
+  ProfitValue: aria-hidden animated value plus an sr-only signedProfit.
+  cash() (l.72): "−฿x" with no label, used for non-profit money.
+  pct() (l.74): toFixed -> ASCII "-3.2%".
+  delta() (l.120-122): "+12.4% · ช่วงก่อนหน้า". Negative changes use an ASCII hyphen from toFixed, and -0.04 gives "-0.0%".
+- finance-chart.tsx (baseline, before 795bf58), l.20: fmt = '฿'+money(value) -> "฿-240.00", which appears in the SVG <title> tooltips, the readout for non-profit metrics, and the whole daily table (including its profit column). Margin shows "-3.2%".
+- overview-charts.tsx:39-40: SVG <title> "day: -53.00 THB" (raw money(), ASCII minus, no label).
+- assistant.tsx:175 copy(): `${label}: ฿${money(profit)}` -> "฿-53.00" (no profit/loss word, ASCII minus).
+- add-product.tsx:314 has a signed "+/−฿" (in the baseline). Lines 340 and 361 in the baseline print "฿-x" (fixed only in 795bf58).
+- welcome/discount-simulator.tsx:27: "−฿x" with no label.
+- lib/mock-data.ts:207/209: mock assistant text uses toFixed(2) "฿-x".
+- copy.ts:70 signedProfit/signedLoss exist. copy has no placeholders: use prefix/suffix keys.
+
+VERIFIED (font cmap parse with py -I, read-only): U+25B2/25BC (▲▼) are only in inter-variable.ttf.
+  They are NOT in anuphan, IBM Plex Sans (font-0..3), or Noto Sans Thai (font-4..7). U+2212 and ฿ are in all of them.
+VERIFIED (node Intl):
+  money(-0) = "-0.00"
+  money(-40) = "-0.40" (ASCII 0x2d)
+  th-TH accounting currency formats -53 as "(฿53.00)"
+  (-0.04).toFixed(1) = "-0.0"
+
+HELPER SPEC (new file web/src/lib/signed-money.ts, pure; wraps money(), does not change it)
+  type PL = 'gain' | 'loss' | 'zero' | 'missing'
+  plKind(satang: number|null|undefined): PL                      // -0 -> 'zero'
+  signedBaht(satang, locale='th'): string                         // "+฿118.30" | "−฿53.00" | "฿0.00" | "—"   (U+2212, money(Math.abs(v)))
+  profitParts(satang, locale='th'): { kind: PL; label: string|null; amount: string; text: string; spoken: string }
+      text   = "ขาดทุน −฿53.00" | "Loss −฿53.00"   This is the ONE visible rule for level values everywhere: KPI, rows, tooltips, assistant sentences, clipboard.
+               In sentences it is used as a tag after a "กำไร/ขาดทุนสุทธิ:" lead-in, e.g. "เดือนนี้ กำไร/ขาดทุนสุทธิ: ขาดทุน −฿53.00 จาก 12 ออเดอร์".
+      spoken = "ขาดทุน 53.00 บาท" | "Loss of 53.00 baht"   (sr-only / aria-label only; the word carries the sign, so no "minus" is read aloud)
+  (the 'phrase' variant is REMOVED)
+  signedPercent(value: number|null, locale='th', digits=1): string // "+12.4%" "−3.2%" "0.0%" | "—"   rounding happens FIRST; a value that rounds to 0 (incl. -0.04, 0.04, -0) -> "0.0%" with no sign
+  deltaParts(change: number|null, unit: 'pct'|'pp', locale): { dir: 'up'|'down'|'flat'|'none'; text: string; spoken: string }
+      dir is decided on the ROUNDED value. flat -> no arrow, text "0.0% · ไม่เปลี่ยนแปลง" / "0.0% · no change". none -> "ไม่มีฐานเปรียบเทียบ".
+  React: ProfitAmount becomes a thin view over profitParts (visible text aria-hidden + sr-only spoken). <Delta> renders an SVG triangle (aria-hidden, neutral colour) + signedPercent + "เทียบช่วงก่อน".
+
+CALL-SITE MIGRATION:
+  finance.tsx signedProfit/profitCash -> profitParts().text
+  delta() -> deltaParts
+  pct() -> signedPercent
+  finance-chart fmt -> signedBaht/signedPercent
+  overview-charts <title> -> profitParts().text
+  assistant copy() -> profitParts().text
+  add-product differences -> signedBaht
+  discount-simulator -> signedBaht
+
+TESTS (new tests/signed-money.test.mjs; tests/frontend.test.mjs:22-23 stay untouched):
+  profitParts(11830,'th').text === 'กำไร +฿118.30'
+  profitParts(-5300,'th').text === 'ขาดทุน −฿53.00'
+  profitParts(-5300,'en').text === 'Loss −฿53.00'
+  profitParts(0).text === '฿0.00' && label === null
+  profitParts(-0).kind === 'zero' && text === '฿0.00'   (money(-0) itself stays "-0.00")
+  profitParts(-40,'th').text === 'ขาดทุน −฿0.40'
+  profitParts(-123456789,'en').text === 'Loss −฿1,234,567.89'
+  profitParts(null).text === '—' && kind === 'missing'
+  every negative output contains U+2212 and no U+002D
+  spoken: 'ขาดทุน 53.00 บาท' / 'Loss of 53.00 baht'
+  deltaParts(0|-0.04|0.04).dir === 'flat', the text has no ▲/▼ and no sign, and spoken === 'ไม่เปลี่ยนแปลง'
+  signedPercent(12.44) '+12.4%'; (-3.21) '−3.2%'; (-0.04) '0.0%'; (null) '—'
+  deltaParts(null) -> 'none' with copy noBaseline
+  copy parity test covers the new keys automatically.
+
+COPY KEYS (pairs [th, en]):
+  spokenProfit ['กำไร','Profit of'], spokenLoss ['ขาดทุน','Loss of'], bahtUnit ['บาท','baht'],
+  deltaUp ['เพิ่มขึ้น','up'], deltaDown ['ลดลง','down'], deltaFlat ['ไม่เปลี่ยนแปลง','no change'],
+  vsPrevious ['เทียบช่วงก่อน','vs previous period'], percentPoints [' จุด',' pp'], noBaseline ['ไม่มีฐานเปรียบเทียบ','No comparison baseline'],
+  netProfitLoss ['กำไร/ขาดทุนสุทธิ','Net profit / loss'], sellingAtLoss ['ขายขาดทุน','Selling at a loss'],
+  profitUnavailable ['ยังคำนวณกำไรไม่ได้','Profit not available'] (+ reason uses the existing missingCost* keys)
+
+DECISION (fix pass after challenger review)
+- Level values use ONE rule: label + sign, "ขาดทุน −฿53.00", in every surface including sentences. Why:
+  (a) The number token "−฿53.00" is identical everywhere, including the sign-only fallback (dense tables, axes), so the two forms never disagree.
+  (b) It stays colour-free with two cues: the word, plus the sign for EN or digit-scanning users.
+  (c) Double-negative risk: the label is used as a status tag next to the number, never as a verb in prose ("ขาดทุนไป −53" is banned), and headers read "กำไร/ขาดทุน...". The residual risk is ASSUMPTION; test it with sellers.
+- Headers or labels above a value that can be negative must say "กำไร/ขาดทุน" / "Net profit/loss", never only "กำไร".
+  Affected: finance KPI "กำไรสุทธิ", channel table "กำไรสุทธิ", orders column "กำไร", overview profitCard, chart legend/tooltip names, assistant result label.
+  New copy key netProfitLoss covers these. Ranking titles such as "กำไรสูงสุด 5 อันดับ" may stay because they name the sort, not the value.
+- Zero or rounds-to-zero delta is neutral everywhere: no arrow, no sign, "ไม่เปลี่ยนแปลง". Fixed in indicators.html (R.delta + edge table).

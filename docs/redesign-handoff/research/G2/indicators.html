@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Profit/Loss Indicators</title>
+<style>
+/* Fonts: the repo's CURRENT shipped fonts, loaded read-only from the checkout (offline). Plex/Noto rows use the orphan font-0/font-4 files. */
+@font-face{font-family:'Anuphan';src:url('file:///<home>/Documents/Kasetsart/NTT%20DATA/MarginSight-Frontend/web/public/fonts/anuphan-variable.ttf');font-weight:100 900}
+@font-face{font-family:'Inter';src:url('file:///<home>/Documents/Kasetsart/NTT%20DATA/MarginSight-Frontend/web/public/fonts/inter-variable.ttf');font-weight:100 900}
+@font-face{font-family:'PlexSansTest';src:url('file:///<home>/Documents/Kasetsart/NTT%20DATA/MarginSight-Frontend/web/public/fonts/font-0.ttf')}
+@font-face{font-family:'NotoThaiTest';src:url('file:///<home>/Documents/Kasetsart/NTT%20DATA/MarginSight-Frontend/web/public/fonts/font-4.ttf')}
+:root{--canvas:#FAF9F5;--surface:#FFFFFF;--alt:#F0EEE6;--text:#141413;--muted:#66625A;--border:#E6E2D8;--strong:#8C877D;
+  --gain:#141413;--gainBg:#ECE9E1;--gainFg:#3B3833;--loss:#8E1238;--lossBg:#F7E3E8;
+  --sans:'Anuphan','Inter',Tahoma,sans-serif;--num:'Inter','Anuphan',sans-serif}
+.green{--gain:#187b62;--gainBg:#E3F1EC;--gainFg:#145F4C}
+*{box-sizing:border-box}
+body{margin:0;background:var(--canvas);color:var(--text);font:14px/1.5 var(--sans)}
+main{padding:16px;max-width:1440px;margin:0 auto}
+h1{font-size:22px;margin:0 0 4px}h2{font-size:18px;margin:24px 0 8px}h3{font-size:15px;margin:0 0 8px}
+p.note{color:var(--muted);margin:0 0 12px;font-size:13px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:12px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px;min-width:0}
+.card>h3 small{display:block;font-weight:400;color:var(--muted);font-size:12px}
+.lbl{font-size:12px;color:var(--muted);margin:10px 0 4px;text-transform:none}
+.money{font-family:var(--num);font-variant-numeric:tabular-nums;white-space:nowrap}
+.pl{display:inline-flex;align-items:baseline;flex-wrap:wrap;gap:0 .35em;font-variant-numeric:tabular-nums}
+.pl .tag{font-family:var(--sans);font-size:max(12px,.6em);font-weight:500}
+.gain{color:var(--gain)}.loss{color:var(--loss)}.zero,.missing{color:var(--muted)}
+.ico{width:1em;height:1em;vertical-align:-.12em;flex:none;align-self:center}
+.kpi{border:1px solid var(--border);border-radius:8px;padding:10px 12px}
+.kpi .h{font-size:13px;color:var(--muted)}
+.kpi .v{font-size:26px;font-weight:600;line-height:1.3;font-family:var(--num)}
+.delta{font-size:13px;color:var(--muted);display:inline-flex;gap:.3em;align-items:center}
+.stmt{display:flex;justify-content:space-between;gap:8px;border-top:1px solid var(--border);padding:6px 0;align-items:baseline}
+.stmt.net{font-weight:600}
+.prow{display:grid;grid-template-columns:1fr auto;gap:2px 8px;border-top:1px solid var(--border);padding:8px 0}
+.prow .n{font-weight:500;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.prow .s{font-size:12px;color:var(--muted)}
+.prow .p{text-align:right;font-weight:600}
+.chart{position:relative;height:118px;border:1px solid var(--border);border-radius:8px;background:var(--surface)}
+.chart>svg{position:absolute;inset:0;width:100%;height:100%}
+.tip{position:absolute;right:8px;top:6px;background:var(--surface);border:1px solid var(--strong);border-radius:6px;padding:4px 8px;font-size:12px;box-shadow:0 2px 6px rgba(0,0,0,.12)}
+.legend{display:flex;gap:12px;font-size:12px;color:var(--muted);margin-top:4px;flex-wrap:wrap;align-items:center}
+.sw{display:inline-block;width:12px;height:12px;border-radius:2px;vertical-align:-1px;margin-right:4px}
+.badge{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:500;padding:2px 8px;border-radius:999px;border:1px solid currentColor;line-height:1.5}
+.badge.lossb{background:var(--lossBg);color:var(--loss);border-radius:3px;border-width:2px}
+.badge.gainb{background:var(--gainBg);color:var(--gainFg)}
+.say{background:var(--alt);border-radius:8px;padding:8px 10px;font-size:14px}
+.edge{display:grid;grid-template-columns:auto 1fr;gap:2px 10px;font-size:13px}
+.edge dt{color:var(--muted)}.edge dd{margin:0;text-align:right}
+.en{border-top:1px dashed var(--strong);margin-top:10px;padding-top:6px;font-size:13px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.rec{outline:3px solid var(--text);outline-offset:-1px}
+table.spec{border-collapse:collapse;width:100%;background:var(--surface);font-size:13px}
+table.spec th,table.spec td{border:1px solid var(--border);padding:6px 8px;text-align:left;vertical-align:top}
+table.spec td.r{text-align:right}
+.scroll{overflow-x:auto}
+.fontrow{display:grid;grid-template-columns:150px 1fr;gap:4px 12px;font-size:20px;align-items:baseline}
+.fontrow span:nth-child(odd){font-size:12px;color:var(--muted)}
+.verdict{font-size:12px;margin-top:8px;padding:6px 8px;border-radius:6px;background:var(--alt)}
+@media (max-width:600px){.fontrow{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<main>
+<h1>ตัวบ่งชี้กำไร/ขาดทุน · Profit/loss indicators</h1>
+<p class="note">G2 research mockup. Fonts = current repo fonts (Anuphan + Inter, loaded offline from the checkout). Values in satang go through a copy of <code>money()</code> (unchanged). Each card shows the same data in every surface. Outlined card = recommendation.</p>
+
+<h2>ฟอนต์: ▲▼ และ − (U+2212) มีอยู่ในฟอนต์ไหน</h2>
+<div class="card"><div class="fontrow" id="fonts"></div></div>
+
+<div id="palettes"></div>
+
+<h2>ระบบที่แนะนำ: กรณีขอบ (TH / EN)</h2>
+<div class="scroll"><table class="spec" id="edges"></table></div>
+</main>
+<script>
+const MINUS = '\u2212';
+// verbatim copy of web/src/lib/format.ts money()
+const money = (v, l = 'th') => v == null ? '—' : new Intl.NumberFormat(l === 'th' ? 'th-TH' : 'en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(v / 100);
+const L = { th: { profit: 'กำไร', loss: 'ขาดทุน', net: 'กำไรสุทธิ', vs: 'เทียบช่วงก่อน', baht: 'บาท', miss: 'ยังคำนวณไม่ได้', missWhy: 'ไม่มีต้นทุน 2 สินค้า', up: 'เพิ่มขึ้น', down: 'ลดลง', flat: 'ไม่เปลี่ยนแปลง', netpl: 'กำไร/ขาดทุนสุทธิ' },
+            en: { profit: 'Profit', loss: 'Loss', net: 'Net profit', vs: 'vs previous', baht: 'baht', miss: 'Not available', missWhy: '2 products missing cost', up: 'up', down: 'down', flat: 'no change', netpl: 'Net profit/loss' } };
+const kind = v => v == null ? 'missing' : v === 0 ? 'zero' : v < 0 ? 'loss' : 'gain';
+const sgn = v => v < 0 ? MINUS : v > 0 ? '+' : '';
+const signed = (v, l) => v == null ? '—' : sgn(v) + '฿' + money(Math.abs(v), l);
+const svgIcon = (k, label) => k === 'gain'
+  ? `<svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="7" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M4.5 8h7M8 4.5v7" stroke="currentColor" stroke-width="1.8"/></svg>`
+  : k === 'loss' ? `<svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><rect x="1" y="1" width="14" height="14" rx="2" fill="currentColor"/><path d="M4.5 8h7" stroke="#fff" stroke-width="2"/></svg>` : '';
+const tri = up => `<svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="${up ? 'M8 3l6 10H2z' : 'M8 13L2 3h12z'}" fill="currentColor"/></svg>`;
+const spoken = (v, l) => v == null ? L[l].miss : v === 0 ? '0.00 ' + L[l].baht : `${v < 0 ? L[l].loss : L[l].profit} ${money(Math.abs(v), l)} ${L[l].baht}`;
+
+// Each option: amount(v,l) -> HTML for a money level; delta(pct,l) -> HTML; legend(l); badge(v,l); sentence(v,l)
+const opts = {
+  A: { t: 'A · ป้ายข้อความ + เครื่องหมาย (ปัจจุบัน)', s: 'label + sign',
+    amount: (v, l) => v == null || v === 0 ? `<span class="money">${signed(v, l)}</span>` : `<span class="pl"><span class="tag">${v < 0 ? L[l].loss : L[l].profit}</span><span class="money">${signed(v, l)}</span></span>`,
+    delta: (p, l) => `${sgn(p)}${Math.abs(p).toFixed(1)}% · ${L[l].vs}`,
+    legend: l => `<span><i class="sw" style="background:var(--gain)"></i>${L[l].profit} (+)</span><span><i class="sw" style="background:var(--loss)"></i>${L[l].loss} (${MINUS})</span>`,
+    badge: (v, l) => `<span class="badge">${v < 0 ? L[l].loss : L[l].profit}</span>` },
+  B: { t: 'B · เครื่องหมายอย่างเดียว + สี', s: 'sign only (U+2212)',
+    amount: (v, l) => `<span class="money">${signed(v, l)}</span>`,
+    delta: (p, l) => `${sgn(p)}${Math.abs(p).toFixed(1)}%`,
+    legend: l => `<span><i class="sw" style="background:var(--gain)"></i>+</span><span><i class="sw" style="background:var(--loss)"></i>${MINUS}</span>`,
+    badge: (v, l) => `<span class="badge">${signed(v, l)}</span>` },
+  C: { t: 'C · ลูกศร ▲▼ + เครื่องหมาย', s: 'arrow glyph + sign',
+    amount: (v, l) => `<span class="money">${v > 0 ? '▲ ' : v < 0 ? '▼ ' : ''}${signed(v, l)}</span>`,
+    delta: (p, l) => `${p > 0 ? '▲' : p < 0 ? '▼' : ''} ${Math.abs(p).toFixed(1)}%`,
+    legend: l => `<span><i class="sw" style="background:var(--gain)"></i>▲ ${L[l].profit}</span><span><i class="sw" style="background:var(--loss)"></i>▼ ${L[l].loss}</span>`,
+    badge: (v, l) => `<span class="badge">${v < 0 ? '▼' : '▲'} ${v < 0 ? L[l].loss : L[l].profit}</span>` },
+  D: { t: 'D · ไอคอน SVG (วงกลมบวก / สี่เหลี่ยมลบ) + เครื่องหมาย', s: 'SVG icon w/ accessible name + sign',
+    amount: (v, l) => `<span class="pl" role="img" aria-label="${spoken(v, l)}">${svgIcon(kind(v))}<span class="money" aria-hidden="true">${signed(v, l)}</span></span>`,
+    delta: (p, l) => `${p ? tri(p > 0) : ''}${sgn(p)}${Math.abs(p).toFixed(1)}%`,
+    legend: l => `<span>${svgIcon('gain')} ${L[l].profit}</span><span class="loss">${svgIcon('loss')} ${L[l].loss}</span>`,
+    badge: (v, l) => `<span class="badge">${svgIcon(kind(v))}${v < 0 ? L[l].loss : L[l].profit}</span>` },
+  E: { t: 'E · ป้ายรูปทรง (pill) + ข้อความ', s: 'shape-coded badge + label',
+    amount: (v, l) => v == null || v === 0 ? `<span class="money">${signed(v, l)}</span>` : `<span class="badge ${v < 0 ? 'lossb' : 'gainb'}" style="font-size:inherit"><span class="tag">${v < 0 ? L[l].loss : L[l].profit}</span><span class="money">${signed(v, l)}</span></span>`,
+    delta: (p, l) => `${sgn(p)}${Math.abs(p).toFixed(1)}% · ${L[l].vs}`,
+    legend: l => `<span class="badge gainb">${L[l].profit}</span><span class="badge lossb">${L[l].loss}</span>`,
+    badge: (v, l) => `<span class="badge ${v < 0 ? 'lossb' : 'gainb'}">${v < 0 ? L[l].loss : L[l].profit}</span>` },
+  F: { t: 'F · วงเล็บแบบบัญชี (฿53.00)', s: 'accounting parentheses',
+    amount: (v, l) => `<span class="money">${v == null ? '—' : v < 0 ? '(฿' + money(-v, l) + ')' : '฿' + money(v, l)}</span>`,
+    delta: (p, l) => p < 0 ? `(${Math.abs(p).toFixed(1)}%)` : `${p.toFixed(1)}%`,
+    legend: l => `<span><i class="sw" style="background:var(--gain)"></i>฿x</span><span><i class="sw" style="background:var(--loss)"></i>(฿x)</span>`,
+    badge: (v, l) => `<span class="badge">${v < 0 ? '(' + L[l].loss + ')' : L[l].profit}</span>` },
+  R: { t: 'R · แนะนำ: A สำหรับ "ระดับ" + D-triangle สีกลางสำหรับ "การเปลี่ยนแปลง" + E เฉพาะสถานะ', s: 'RECOMMENDED: label+sign for levels; neutral SVG direction + sign + words for deltas; badge only for row status', rec: true,
+    amount: (v, l) => v == null ? `<span class="missing">—</span>` : v === 0 ? `<span class="money zero">฿${money(0, l)}</span>` : `<span class="pl"><span class="tag">${v < 0 ? L[l].loss : L[l].profit}</span><span class="money" aria-hidden="true">${signed(v, l)}</span><span class="sr">${spoken(v, l)}</span></span>`,
+    delta: (p, l) => { const q = Math.round(p * 10) / 10 || 0; if (!q) return `<span class="delta">0.0% · ${L[l].flat}</span>`; p = q; return `<span class="delta" style="color:var(--muted)">${tri(p > 0)}<span aria-hidden="true">${sgn(p)}${Math.abs(p).toFixed(1)}%</span><span class="sr">${p > 0 ? L[l].up : L[l].down} ${Math.abs(p).toFixed(1)}%</span> · ${L[l].vs}</span>`; },
+    legend: l => `<span><i class="sw" style="background:var(--gain)"></i>${L[l].profit}</span><span><i class="sw" style="background:var(--loss)"></i>${L[l].loss}</span><span>— = ${L[l].miss}</span>`,
+    badge: (v, l) => v < 0 ? `<span class="badge lossb">${svgIcon('loss')}${l === 'th' ? 'ขายขาดทุน' : 'Selling at a loss'}</span>` : '' },
+};
+
+const bars = [11830, -24000, 3200, -5300, 8000];
+function chart(o, l) {
+  const w = 300, h = 118, zero = 60, sc = 40 / 24000;
+  const g = bars.map((v, i) => { const bh = Math.max(2, Math.abs(v) * sc); const x = 20 + i * 48; return `<rect x="${x}" y="${v < 0 ? zero : zero - bh}" width="28" height="${bh}" fill="var(--${v < 0 ? 'loss' : 'gain'})" ${v < 0 && o === 'E' ? 'stroke="var(--text)" stroke-dasharray="3 2"' : ''}/>`; }).join('');
+  return `<div class="chart"><svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" aria-hidden="true"><line x1="10" x2="${w - 10}" y1="${zero}" y2="${zero}" stroke="var(--strong)"/>${g}</svg><div class="tip">24 ${l === 'th' ? 'ต.ค.' : 'Oct'} · ${o === 'R' ? L[l].netpl : L[l].net}<br><strong>${opts[o].amount(-24000, l)}</strong></div></div><div class="legend">${opts[o].legend(l)}</div>`;
+}
+function sentence(o, l) {
+  if (o === 'R') return l === 'th' ? `เดือนนี้ ${L.th.netpl}: <strong>${opts.R.amount(-5300, 'th')}</strong> จาก 12 ออเดอร์ ต้นทุนค่าส่งสูงขึ้น` : `This month, ${L.en.netpl}: <strong>${opts.R.amount(-5300, 'en')}</strong> across 12 orders; shipping costs rose.`;
+  const a = opts[o].amount(-5300, l);
+  return l === 'th' ? `เดือนนี้ ${L.th.net} ${a} จาก 12 ออเดอร์ ต้นทุนค่าส่งสูงขึ้น` : `This month: ${L.en.net} ${a} across 12 orders; shipping costs rose.`;
+}
+function card(o, pal) {
+  const O = opts[o], th = 'th';
+  return `<section class="card ${O.rec ? 'rec' : ''}"><h3>${O.t}<small>${O.s}</small></h3>
+  <div class="lbl">KPI card</div><div class="kpi"><div class="h">${O.rec ? 'กำไร/ขาดทุนสุทธิ' : L.th.net}</div><div class="v">${O.amount(-5300, th)}</div><div class="delta">${O.delta(12.4, th)}</div></div>
+  <div class="lbl">Finance statement row</div>
+  <div class="stmt"><span>ยอดขายสุทธิ</span><span class="money">฿1,290.00</span></div>
+  <div class="stmt net"><span>${O.rec ? 'กำไร/ขาดทุนสุทธิ' : L.th.net}</span><span>${O.amount(-5300, th)}</span><span class="money" style="color:var(--muted);font-weight:400">${o === 'C' ? '▼ 4.1%' : o === 'F' ? '(4.1%)' : MINUS + '4.1%'}</span></div>
+  <div class="lbl">Product rows (390-width card)</div>
+  <div class="prow"><span class="n">เสื้อยืดคอกลม สีดำ ไซซ์ L แพ็ก 3 ตัว</span><span class="p">${O.amount(-40, th)}</span><span class="s">SKU TS-BLK-L3 · ขาย ฿199.00</span><span>${O.badge(-40, th)}</span></div>
+  <div class="prow"><span class="n">แก้วเก็บความเย็น 900ml</span><span class="p">${O.amount(11830, th)}</span><span class="s">SKU CUP-900 · ขาย ฿390.00</span><span></span></div>
+  <div class="prow"><span class="n">ชุดของขวัญปีใหม่ (ล็อตใหญ่)</span><span class="p">${O.amount(-123456789, th)}</span><span class="s">SKU GIFT-NY</span><span></span></div>
+  <div class="lbl">Chart tooltip + legend</div>${chart(o, th)}
+  <div class="lbl">Status badge</div><div>${O.badge(-5300, th) || '<span class="note">(no badge)</span>'} ${O.badge(11830, th)}</div>
+  <div class="lbl">Assistant answer</div><div class="say">${sentence(o, th)}</div>
+  <div class="lbl">Zero / tiny / large / missing</div>
+  <dl class="edge"><dt>ศูนย์</dt><dd>${O.amount(0, th)}</dd><dt>เล็กมาก</dt><dd>${O.amount(-40, th)}</dd><dt>ใหญ่</dt><dd>${O.amount(-123456789, th)}</dd><dt>ไม่มีข้อมูล</dt><dd>${O.amount(null, th)} <small class="missing">${L.th.missWhy}</small></dd></dl>
+  <div class="en"><strong>EN</strong> · ${O.rec ? L.en.netpl : L.en.net}: ${O.amount(-5300, 'en')} · ${O.amount(11830, 'en')} · <span class="delta">${O.delta(12.4, 'en')}</span><div class="say" style="margin-top:4px">${sentence(o, 'en')}</div></div>
+  </section>`;
+}
+document.getElementById('palettes').innerHTML = [['ink', 'Palette 1 — gain = ink #141413, loss = burgundy #8E1238 (proposed, no green)'], ['green', 'Palette 2 — gain = green #187b62, loss = burgundy #8E1238']]
+  .map(([p, title]) => `<div class="${p}"><h2>${title}</h2><div class="grid">${Object.keys(opts).map(o => card(o, p)).join('')}</div></div>`).join('');
+
+const fonts = [['Anuphan (current UI)', "'Anuphan'"], ['Inter (current numeric)', "'Inter'"], ['IBM Plex Sans (font-0)', "'PlexSansTest'"], ['Noto Sans Thai (font-4)', "'NotoThaiTest'"], ['Tahoma (system)', 'Tahoma']];
+document.getElementById('fonts').innerHTML = fonts.map(([n, f]) => `<span>${n}</span><span style="font-family:${f},serif">ขาดทุน ${MINUS}฿53.00 · -฿53.00 · ▲ ▼ · (฿53.00)</span>`).join('');
+
+const cases = [['กำไร', 11830], ['ขาดทุน', -5300], ['ศูนย์', 0], ['ลบศูนย์ (-0)', -0], ['เล็กมาก', -40], ['1 สตางค์', 1], ['ใหญ่', -123456789], ['ไม่มีข้อมูล', null]];
+document.getElementById('edges').innerHTML = `<tr><th>กรณี (หัวคอลัมน์: กำไร/ขาดทุน)</th><th>satang</th><th>TH visible</th><th>EN visible</th><th>TH spoken (sr-only, ASSUMPTION)</th><th>EN spoken</th></tr>` +
+  cases.map(([n, v]) => `<tr><td>${n}</td><td class="r">${v === null ? 'null' : Object.is(v, -0) ? '-0' : v}</td><td class="r">${opts.R.amount(v, 'th')}${v == null ? ' <small class="missing">' + L.th.missWhy + '</small>' : ''}</td><td class="r">${opts.R.amount(v, 'en')}${v == null ? ' <small class="missing">' + L.en.missWhy + '</small>' : ''}</td><td>${spoken(v, 'th')}</td><td>${spoken(v, 'en')}</td></tr>`).join('') +
+  [12.44, -3.21, -0.04, 0.04, 0].map(p => { const q = Math.round(p * 10) / 10 || 0; const sp = (l, w) => q ? (q > 0 ? L[l].up : L[l].down) + ' ' + Math.abs(q).toFixed(1) + w : L[l].flat; return `<tr><td>delta %</td><td class="r">${p}</td><td>${opts.R.delta(p, 'th')}</td><td>${opts.R.delta(p, 'en')}</td><td>${sp('th', ' เปอร์เซ็นต์ เทียบช่วงก่อน')}</td><td>${sp('en', ' percent vs previous')}</td></tr>`; }).join('') +
+  `<tr><td>delta, no base</td><td>prev=0</td><td colspan="2">— ไม่มีฐานเปรียบเทียบ / No comparison baseline</td><td colspan="2">same as visible</td></tr>`;
+</script>
+</body>
+</html>

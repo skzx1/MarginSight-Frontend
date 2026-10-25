@@ -1,7 +1,7 @@
 'use client';
 import type { ReactNode } from 'react';
 import { useLanguage } from './language';
-export type IconName = 'overview' | 'upload' | 'products' | 'orders' | 'simulation' | 'assistant' | 'receipt' | 'rules' | 'reconcile' | 'line' | 'arrow' | 'check' | 'shield' | 'refresh' | 'logout' | 'menu' | 'close' | 'settings' | 'search' | 'calculator' | 'plus' | 'sparkles' | 'chevronRight';
+export type IconName = 'overview' | 'upload' | 'products' | 'orders' | 'simulation' | 'assistant' | 'receipt' | 'rules' | 'reconcile' | 'line' | 'arrow' | 'check' | 'shield' | 'refresh' | 'logout' | 'menu' | 'close' | 'settings' | 'search' | 'calculator' | 'plus' | 'sparkles' | 'chevronRight' | 'warning' | 'info' | 'trendUp' | 'trendDown';
 const paths: Record<IconName, ReactNode> = {
   overview: <><rect x="3" y="3" width="7" height="7" rx="2" /><rect x="14" y="3" width="7" height="7" rx="2" /><rect x="3" y="14" width="7" height="7" rx="2" /><rect x="14" y="14" width="7" height="7" rx="2" /></>,
   upload: <path d="M12 16V3m-5 5 5-5 5 5M4 16v4a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-4" />,
@@ -25,7 +25,11 @@ const paths: Record<IconName, ReactNode> = {
   calculator: <><rect x="4" y="2" width="16" height="20" rx="2" /><line x1="8" y1="6" x2="16" y2="6" /><line x1="16" y1="14" x2="16" y2="18" /><path d="M8 10h.01M12 10h.01M16 10h.01M8 14h.01M12 14h.01M8 18h.01M12 18h.01" /></>,
   plus: <path d="M12 5v14m-7-7h14" />,
   sparkles: <path d="m12 3 1.9 4.8a2 2 0 0 0 1.3 1.3L20 11l-4.8 1.9a2 2 0 0 0-1.3 1.3L12 19l-1.9-4.8a2 2 0 0 0-1.3-1.3L4 11l4.8-1.9a2 2 0 0 0 1.3-1.3L12 3Z" />,
-  chevronRight: <path d="m9 18 6-6-6-6" />
+  chevronRight: <path d="m9 18 6-6-6-6" />,
+  warning: <path d="M12 3 2 20h20L12 3Zm0 7v4m0 3v.01" />,
+  info: <path d="M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18Zm0 8v5m0-8v.01" />,
+  trendUp: <path d="m12 6 7 11H5l7-11Z" />,
+  trendDown: <path d="m12 18 7-11H5l7 11Z" />
 };
 export function Icon({
   name

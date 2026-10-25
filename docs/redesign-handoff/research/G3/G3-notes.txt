@@ -1,0 +1,48 @@
+G3 Design Identity — บันทึกละเอียด (ประกอบรายงานสรุป)
+
+1) คุณภาพที่เจ้าของน่าจะต้องการ [ASSUMPTION จากถ้อยคำสเปก]
+- สงบ/ไม่ตะโกน: §3.1 "One loud color", §3.4 "Positive is quiet", §5 "Shadows: none"
+- อบอุ่น: canvas ครีม #FAF9F5 "Claude cream", terracotta, ไม่มีเขียว (§1 #3)
+- บรรณาธิการ/อ่านง่าย: §1 #10 serif เฉพาะหัวข้อ, §4 "serif is for headings only"
+- AI แบบสนทนา: §1 #12, §8 greeting "สวัสดีตอนเย็น วันนี้ร้านเป็นยังไงบ้าง?" (ทักแบบคน ไม่ใช่ฟอร์ม)
+- chrome น้อย: §5 แยกชั้นด้วย surface+hairline, §7 sidebar สีอ่อน
+- ความเชื่อถือ: §3.3 "Color never works alone", §10 ตารางวัดคอนทราสต์; แอปปัจจุบันมี "อ้างอิงข้อมูล" + "ดูผลคำนวณและหลักฐาน" (assistant.tsx) -> trust มาจาก provenance มากกว่าสี
+
+2) generic vs signature [ASSUMPTION — ความรู้ทั่วไปเรื่องผลิตภัณฑ์ AI ไม่ได้เปิดเว็บตรวจ]
+Generic (พบใน ChatGPT/Gemini/Copilot ฯลฯ): กล่องพิมพ์+ปุ่มส่งขวา, chip คำถามแนะนำ, บรรทัดทักทายบน empty state, ประวัติแชต, bubble ผู้ใช้สีเทา/คำตอบพื้นเรียบ, sparkle 4 แฉก (ไอคอน AI ทั่วไป; มีอยู่แล้วใน ui.tsx)
+Signature ที่ผู้ใช้น่าจะโยงกับ claude.ai: (ก) เครื่องหมาย spark/asterisk แฉกถี่สี terracotta (ข) ชุดสีครีม+ink+terracotta ร่วมกับ serif — สเปกใช้ hex เดียวกันตรงตัว (#FAF9F5 "Claude cream", #141413 "Claude ink", #D97757) (ค) โครงหน้ากลางจอ: mark + serif ทักทายตามช่วงเวลา เหนือ composer ขาวมุมโค้งใหญ่ที่เป็นเงาเดียวในแอป + แถว Recent ด้านล่าง (§8 เขียนว่า "claude.ai pattern", §1 #1 "Faithful copy", §5 "as on claude.ai")
+ความไม่แน่นอน: ทีละชิ้นเป็น generic; ความเสี่ยงสับสนมาจาก "การรวมกัน" (combination) ไม่ใช่องค์ประกอบเดียว. การเปลี่ยนสีอย่างเดียวไม่ทำให้โครง (ค) หายไป.
+
+3) ทิศทาง: ดู D0/DA/DB/DC .html (คำอธิบายอยู่ท้ายแต่ละไฟล์)
+Motion (ใส่ไว้ใน CSS ทุกไฟล์มี prefers-reduced-motion: reduce ปิดทั้งหมด):
+- D0: sparkle หมุน/กะพริบตอนคิด (ไม่ได้ทำในม็อก) | DA: เส้นกั้นหน้าวาดลงด้านล่าง 0.5s; ตอนคิด = เส้นจุดไหลซ้าย→ขวา | DB: สลิป "พิมพ์" ขึ้น 8px 0.35s | DC: ชิ้นกำไรขยายตามสัดส่วน 0.6s. reduced = สถานะนิ่งสุดท้าย
+
+4) ข้อสังเกตจากภาพ (มองแล้ว)
+- D0 @390: คำทักทาย serif กลางจอแตกบรรทัดกลางคำ "ยัง|ไงบ้าง" ; DC @390 "ตรง|ไหน" -> ต้องใช้ <wbr>/การตัดคำไทยกำกับ หรือข้อความสั้นลง [VERIFIED: screenshot]
+- DA: เส้นกั้นหน้าคู่สี navIndicator ด้านซ้ายแผงผู้ช่วย คล้าย "loss row 3px left stripe" (§2 Loss) -> เสี่ยงสื่อความหมายผิด ควรใช้เฉพาะหน้า landing หรือเปลี่ยนเป็นสี border/ink [VERIFIED: screenshot + สเปก §2]
+- DB @390: ช่อง ช่วงวันที่/สินค้า อัดในแถวเดียว ป้ายห่างค่า อ่านยากขึ้น [VERIFIED: screenshot]
+- DB เวอร์ชันแรก ขอบฟันเลื่อยมองไม่เห็น (สีพื้นขาวบนครีม) แก้เป็นเส้น borderStrong แล้ว [VERIFIED: crop-DB-composer.png]
+- ทุกไฟล์ไม่มี horizontal overflow ที่ 390/1440, ไม่มีเป้ากด <44px, ฟอนต์เล็กสุด 12px [VERIFIED: probe.txt]
+
+5) ฟอนต์ [VERIFIED เฉพาะไฟล์ที่มีในเครื่อง: glyph-coverage.txt]
+- Anuphan, Noto Sans Thai (font-4..7), Leelawadee UI, Tahoma, TH Sarabun New: ไทยครบ 87/87; IBM Plex Sans/Inter: ไม่มีไทย
+- Anuphan/Noto Sans Thai ไม่มี ▲▼ ⚠ ⓘ -> mark/ไอคอนควรเป็น SVG ไม่ใช่ glyph
+- Noto Serif Thai, Trirong, Bai Jamjuree, IBM Plex Sans Thai, Sarabun(Google), IBM Plex Mono: ไม่มีไฟล์ในเครื่อง/ไม่มีเน็ต = NOT VERIFIED (ทั้ง glyph และ license; ตามที่รู้ทั่วไป [ASSUMPTION] ทั้งหมดเป็น SIL OFL 1.1 บน Google Fonts และ IBM Plex Mono ไม่มีอักษรไทย ซึ่งสอดคล้อง BRIEF)
+- serif ในภาพใช้ Angsana New เป็น proxy (ฟอนต์ระบบของ Microsoft — ใช้เฉพาะเรนเดอร์ภาพในเครื่องนี้; ไม่เสนอให้ใช้ในผลิตภัณฑ์; สิทธิ์การใช้งานบนเว็บเป็นคำถามสำหรับฝ่ายกฎหมาย ดูข้อ 7) — ภาพ serif จริงจะต่างออกไป
+
+6) DA2 (หลังคำทักท้วงของ challenger) [RECOMMENDATION]
+- DA เดิมยังคงลำดับ greeting ใหญ่ -> composer ใหญ่ -> แชตล่าสุด (โครงแบบ claude.ai) แม้ชิดซ้าย
+- DA2 เปลี่ยนโครง: ไม่มีคำทักทายใหญ่; หัวข้อ serif 22px "บัญชีเดือนนี้ ถึงวันนี้" + ตาราง 3 บรรทัด (ยอดขาย/กำไรสุทธิ/สินค้าที่ขาดทุน — ตัวเลขจากข้อมูลหน้าภาพรวม = ข้อเสนอ ต้องผูกข้อมูลจริง) -> คำถามแนะนำเป็นบรรทัดสมุด -> composer เป็น "บรรทัดถัดไป" ใต้ข้อมูล -> แชตล่าสุดเป็นคอลัมน์ขวา (1440) / ท้ายหน้า (390)
+- ไฟล์: DA2-ledger-docked.html, shots/DA2-ledger-docked-1440.png, -390.png, crop-DA2-390.png; probe: ไม่มีเป้า <44px, ฟอนต์เล็กสุด 12px, ไม่ overflow [VERIFIED]
+- คำแนะนำปรับเป็น DA2 + DC (แถบ "ใช้ข้อมูล"/บรรทัดที่มาของ DC ใน composer และแผง; ไม่ใช้เส้นกั้นหน้าในแผง)
+
+7) คำถามสำหรับฝ่ายกฎหมาย/แบรนด์ (ไม่ใช่ข้อสรุปทางกฎหมาย)
+1. การใช้ค่า hex เดียวกับที่ claude.ai ใช้ (#FAF9F5, #141413, #D97757, #F0EEE6) ร่วมกับการเรียกในสเปกว่า "Claude cream/ink" และ "Faithful copy" ต้องปรับหรือไม่
+2. การรวม mark + คำทักทาย serif ตามช่วงเวลาจัดกลาง + composer โค้งมีเงา + แถว Recent เสี่ยงทำให้ผู้ใช้เข้าใจว่าเกี่ยวข้องกับ Anthropic หรือไม่ (D0)
+3. sparkle 4 แฉก (มีใน ui.tsx แล้ว) ใช้เป็นไอคอนผู้ช่วยต่อได้หรือไม่ และ mark แบบ spark/asterisk แฉกถี่ควรหลีกเลี่ยงหรือไม่
+4. สเปกอ้าง uniz.host เป็นต้นแบบเลย์เอาต์ — มีข้อกังวลเรื่องการลอกเลย์เอาต์/trade dress หรือไม่
+5. ชื่อผลิตภัณฑ์: MarginShot (โค้ด) vs MarginSight (สเปก) — ชื่อไหนเป็นทางการ และต้องตรวจเครื่องหมายการค้าหรือไม่
+6. mark ใหม่ (สมุดบัญชี / ใบเสร็จ / ชิ้นกำไร) ต้องค้นความคล้ายกับเครื่องหมายที่มีอยู่ก่อนใช้หรือไม่
+7. ฟอนต์: เงื่อนไข OFL ของ Noto Serif Thai/Trirong/IBM Plex Sans Thai/Bai Jamjuree/Sarabun (ยังไม่ได้ตรวจไฟล์ใบอนุญาต) — ต้องแนบไฟล์ใบอนุญาตอย่างไรเมื่อ self-host
+8. ฟอนต์ระบบ Microsoft (Angsana New/Leelawadee/Tahoma) ที่อาจเป็น fallback บนเครื่องผู้ใช้หรือใช้ในภาพนำเสนอ — มีข้อจำกัดการใช้งานหรือไม่
+9. คำทักทายที่ใส่ชื่อร้าน/ตัวเลขยอดขาย (DC, DA2) แสดงบนจอที่อาจมีคนอื่นเห็น — มีประเด็นความเป็นส่วนตัวหรือไม่

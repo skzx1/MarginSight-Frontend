@@ -66,7 +66,7 @@ export default function StoreSettings({ base, navigate, canCreate, create, store
   if (!ready) return <div className={s.root}>{header}<div className={s.skeleton} role="status" aria-busy="true"><span className="sr-only">{text('กำลังโหลดการตั้งค่า', 'Loading settings')}</span><div /><div /><div /></div></div>;
   const cancel = () => { state.cancel(); setAttempted(false); setTouched({}); };
 
-  return <div className={s.root + (dirty ? ' ' + s.hasChanges : '')}>{header}
+  return <div className={s.root}>{header}
     <section className={s.card} aria-labelledby="store-data-title"><Heading id="store-data-title" title={t('dataTasks')} note={text('เลือกเครื่องมือเพื่อเพิ่มข้อมูลและตรวจยอดของร้าน', 'Add store records and review your numbers with these tools.')} />
       <div className={s.toolGrid}>{tools.map(tool => <button type="button" className={s.tool} key={tool.screen} onClick={() => navigate(tool.screen)}>
         <span className={s.toolIcon} aria-hidden="true"><Icon name={tool.icon} /></span><strong>{t(tool.screen)}</strong><span className={s.toolDescription}>{tool.note}</span>

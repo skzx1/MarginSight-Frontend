@@ -1,3 +1,13 @@
-/* Self-hosted variable fonts; licenses beside the font files. */
+/* Self-hosted fonts; licenses beside the font files. */
 @font-face{font-family:'Anuphan';font-style:normal;font-weight:100 700;font-display:swap;src:url('/fonts/anuphan-variable.ttf') format('truetype')}
 @font-face{font-family:'Inter';font-style:normal;font-weight:100 900;font-display:swap;src:url('/fonts/inter-variable.ttf') format('truetype')}
+/* UI family: IBM Plex Sans for Latin and numbers, Noto Sans Thai for Thai. The TTF files are used unmodified (no subsetting or
+   conversion while the "Plex" reserved font name is under review). Noto Sans Thai also has Latin glyphs, so its unicode-range keeps
+   it to Thai letters, marks and digits plus the joiners/dotted circle that Thai shaping needs; everything else, including the
+   baht sign U+0E3F, stays in Plex so amounts use one family. */
+@font-face{font-family:'IBM Plex Sans';font-style:normal;font-weight:400;font-display:swap;src:url('/fonts/font-0.ttf') format('truetype')}
+@font-face{font-family:'IBM Plex Sans';font-style:normal;font-weight:500;font-display:swap;src:url('/fonts/font-1.ttf') format('truetype')}
+@font-face{font-family:'IBM Plex Sans';font-style:normal;font-weight:600;font-display:swap;src:url('/fonts/font-2.ttf') format('truetype')}
+@font-face{font-family:'Noto Sans Thai';font-style:normal;font-weight:400;font-display:swap;src:url('/fonts/font-4.ttf') format('truetype');unicode-range:U+0E01-0E3A,U+0E40-0E5B,U+200B-200D,U+25CC}
+@font-face{font-family:'Noto Sans Thai';font-style:normal;font-weight:500;font-display:swap;src:url('/fonts/font-5.ttf') format('truetype');unicode-range:U+0E01-0E3A,U+0E40-0E5B,U+200B-200D,U+25CC}
+@font-face{font-family:'Noto Sans Thai';font-style:normal;font-weight:600;font-display:swap;src:url('/fonts/font-6.ttf') format('truetype');unicode-range:U+0E01-0E3A,U+0E40-0E5B,U+200B-200D,U+25CC}

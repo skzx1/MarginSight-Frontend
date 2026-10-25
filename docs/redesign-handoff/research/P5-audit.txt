@@ -1,0 +1,99 @@
+P5 BRAND RECONCILIATION AUDIT (read-only; 2026-10-25; branch feat/marginsight-redesign HEAD c9b43a3 + uncommitted tree)
+Labels: [V:method] verified, [A] assumption, [R] recommendation. No repo file was edited.
+Evidence: scratchpad\p5\ (cr.mjs contrast script; sheet.png / sheet@2x.png composite render; favicon-16/32.png, marginshot-icon-light-16/32.png, zoom.png = headless Chrome renders).
+
+0. KEY FACTS
+- Every brand asset on the branch is byte-identical to origin/main: `git diff origin/main c9b43a3 -- web/public web/branding web/src/app/layout.tsx scripts/cloud-brand-auth.py` is empty, and the working-tree diff for the same paths is empty. The only uncommitted change in ui.tsx adds icons (warning/info/trendUp/trendDown) and does not touch Brand. [V:git diff]
+- The P4a [rev1] logo note is STALE. 9f3edfe rewrote marginshot-icon-light.svg. It is now tile #979384 (warm grey) with a one-colour glyph #121510 and the orange M rising-line geometry. The old file (96dbb96) was tile #B5D99C with glyph #0D2923 (9.84:1). The numbers in P4a (9.84 / 13.81 / 1.40) describe a file that no longer exists. [V:git show 96dbb96:… vs cat]
+- marginshot-icon.svg (the asset Brand and HeroDepth use) also changed. It was an Emerald tile #0D2923. It is now a near-black tile #141711 with a cream M #F9F9F0 and an orange gradient arrow. web/public/favicon.svg is byte-identical to it. [V:cmp]
+- Upstream docs record these assets as VERIFIED_AWS: favicon/icon published with 9f3edfe and 2bc06b9, Cognito CSSVersion 20261025064501 (docs/verification.md:377-395, docs/status.md:150-162). They are deployed but not accepted as P5 deliverables (plan REV2 (b)). [V:read]
+
+1. INVENTORY
+A1 web/public/branding/marginshot-icon.svg (128x128 app icon, dark).
+   Colours: tile #141711 rx24; M #F9F9F0; arrow gradient #F28A4A→#D56832→#A7441F; highlight #F49A62 at .46; shade #7C341B at .14. It also defines an unused gradient "stone" (#A39F90/#8C887A).
+   Used by: ui.tsx:43 Brand (40px, every topbar/sidebar, login, 404, error, onboarding, preview, landing header and footer) and hero-depth.tsx:61 (100px core on the dark hero).
+   Contrast [V:cr.mjs]: M/tile 17.09; arrow on tile 7.33 / 5.05 / 3.01 (dark end); tile against sidebar #F4F2EC 16.17, surface 18.10, canvas 17.18.
+   On the dark hero/header #1F1E1C the tile is 1.09:1. The tile edge is not visible there; the glyph (17.09 / ≥3.01) carries the mark.
+   Criteria: logos are exempt from 1.4.11, but N-type ≥3:1 is met for the glyph against its tile in every context.
+   Fit with the locks: it uses no token colours. The orange #D56832/#A7441F sits near terracotta #C8643F/#B04F2C but is not equal to it. T14/L2 allow brand orange in the logo. D1 green does not appear (correct: the logo is not a financial value). [V:read]
+A2 web/public/favicon.svg = A1 (identical bytes).
+   Wired by layout.tsx:5 metadata.icons {icon:'/favicon.svg'}. There is no PNG/ICO fallback, no apple-touch-icon and no manifest. [V:grep]
+   Legibility [V:render zoom.png]: at 16px the dark tile and the orange diagonal arrow read clearly. The M breaks into two cream shards, so the silhouette identifies the mark but the letter M does not. 32px is fully legible.
+   Against a light tab strip, tile vs white is 18.10, so it passes. Against a dark tab strip the tile edge is lost (1.09 vs #1F1E1C), but the cream and orange glyph remain visible [V:sheet.png].
+A3 web/public/branding/marginshot-icon-light.svg (tile #979384, glyph #121510; the rise/stone gradients are defined but unused).
+   Not referenced anywhere in web/src [V:grep]. It exists only as an asset.
+   Contrast: glyph/tile 5.98; tile vs sidebar 2.75 and vs surface 3.08.
+   Render at 40px on the sidebar: a muted grey tile, flat and much weaker than A1 [V:sheet.png].
+   Verdict: P4a's plan to swap to this file would downgrade the sidebar logo. A1 already gives 16.17:1 on the light sidebar (D2), so the Emerald-era reason for a light variant is gone.
+A4 marginshot-mark.svg (256x232), marginshot-logo.svg (stacked) and marginshot-logo-horizontal.svg (660x232): transparent backgrounds.
+   Colours: #121510 left stroke and wordmark, stone gradient #A39F90→#8C887A, orange gradient as in A1.
+   Wordmark = outlined Inter 750 glyphs (docs/verification.md:379). The web Brand text is live IBM Plex Sans 600, so the typefaces differ. Weight 750 exceeds the ≤600 rule, but this is artwork, not text; record it as an exception, not a violation. [A]
+   Not used by any web/src file [V:grep]; the horizontal geometry feeds the Cognito logo (A7).
+   On canvas #FAF9F5 [V:cr.mjs]: black 17.48; stone 2.52 / 3.37; arrow 2.34 / 3.40 / 5.71. The light ends of the stone and the arrow fall below 3:1 against cream. They are decorative parts of the mark, so the black stroke and wordmark carry identification.
+   Unusable on dark: #121510 vs #1F1E1C = 1.11 [V:render: black stroke disappears].
+A5 web/src/app/layout.tsx:6 viewport.themeColor '#FAF9F5' = token --cream-50 / --color-bg-canvas.
+   This is the only colour literal allowed outside tokens.css (tests/style-policy.test.mjs:11). It matches the app canvas.
+   It does NOT match the landing page: the landing header and hero are dark #1F1E1C (.depthPage .header, landing.module.css:34). On mobile Chrome the address bar will be cream above a dark header. [V:read; visual effect A]
+A6 Brand usage CSS.
+   globals.css:53 `.logo` has a transparent background.
+   landing.module.css:3 `.brand :global(.logo){background:var(--color-action)…radius 9px}`. In the footer this terracotta fill sits fully behind the opaque tile (the 9px clip is inside the tile's 6px corner), so it is invisible dead styling. [V:read + render]
+   landing.module.css:36 sets transparent in the dark header.
+   hero-depth.module.css:24 `.core img` radius 22px.
+   All of it is token-driven; no literals.
+A7 web/branding/cognito-logo.svg/.png (350x123 horizontal mark + wordmark, transparent; PNG 10,141 B, under the AWS 100 KB limit). Colours as in A4, on banner #faf9f5 [V:Read png].
+   web/branding/cognito.css (classic hosted UI; 15 rules, all hex):
+   - banner and background #faf9f5 = canvas
+   - label and legal #66625a = muted (5.76 on canvas)
+   - text #141413 = ink
+   - submit #fff on #b04f2c (5.25), hover #933f22 (7.06) = action/action-hover
+   - input border #8c877d = border-strong (3.57 vs #fff), radius 10px
+   - focus outline 2px #b04f2c offset 2px (4.98 vs canvas)
+   - error #8e1238 on #f7e3e8 (7.46) = loss/loss-bg
+   - passwordCheck-valid #141413 (ink, matching the main gain=ink scheme; status, not money, so D1 does not strictly apply)
+   - submit radius 999px (pill)
+   Verdict: the colours agree with tokens.css values (manual comparison) [V:read].
+   scripts/cloud-brand-auth.py uploads cognito.css and cognito-logo.png to the classic hosted UI (ManagedLoginVersion 1) with a backup. It is AWS-owned (rule 3).
+A8 Docs.
+   DESIGN.md:71-73 still describes Emerald colours and the light landing field (already tracked as the "DESIGN.md colour section" open item).
+   docs/status.md / verification.md record the orange logo and Cognito as VERIFIED_AWS.
+   web/src/app/theme-palette.json is upstream's source palette; it is not brand art.
+   No doc defines logo usage rules (clear space, minimum size, light/dark variant). [V:grep]
+A9 Name and text. Product name "MarginShot" appears in metadata (layout.tsx, page.tsx OG without an image, login/layout.tsx), the shell title, footers, eyebrow "MARGINSHOT", CSV filenames and mock-data. The repo name is MarginSight, which is intentional (docs/status.md:129). No OG image or manifest exists. [V:grep]
+
+2. COGNITO MISMATCH (tracked concern C8; nothing applied)
+- Fonts:
+  - The web uses IBM Plex Sans + Noto Sans Thai (fonts.css, P2a).
+  - The AWS classic hosted UI allow-list has no font-family property at all [V:WebFetch docs.aws.amazon.com hosted-ui-classic-branding]. Cognito therefore renders in AWS's default stack; the exact family is [A] (likely a Helvetica/Arial-type system stack), and Thai falls back to the OS font.
+  - The wordmark in the logo is outlined Inter, so it is consistent wherever it appears.
+  - Classic branding cannot fix the font. Only Managed Login (v2) branding could, and that is a domain/branding-version change that needs AWS approval and possibly re-testing auth.
+- Properties AWS does not list for these classes [V:AWS doc]:
+  - border-radius on submit or input. 999px and 10px are therefore probably ignored [A], so the live button shape may not match D8 (radius 9).
+  - submit font-weight 600. AWS documents only bold/italic/normal, so 600 may be ignored [A].
+  - outline-offset on input:focus. The focus outline is documented as "width in px", so 3px (F5) is possible within classic; offset is not.
+  - The live check reported primary RGB 176/79/44 with white text (docs/verification.md:395), so the colours did apply.
+- Colours: no mismatch with current tokens [V:read]. If the owner later changes any action/loss/muted token, cognito.css must be updated by hand (no generator or test links them).
+- [R] Add a node test that asserts each cognito.css hex equals the named token value. It is read-only against web/branding and makes no AWS change, so drift becomes visible. This counts as a repo test, not a Cognito change, but rule 3 lists web/branding/* as never-change, so the owner must still OK it as "touching" that area (read-only).
+
+3. PROPOSED MINIMAL P5 SCOPE
+
+(a) In-repo under D7 (styling only, no auth change, no new decision):
+  a1 Correct plan note P4a [rev1]: keep Brand on marginshot-icon.svg in the light sidebar and do not swap to icon-light (16.17:1 vs 2.75:1 tile edge). The swap was justified by the Emerald file that 9f3edfe replaced. Files: plan.txt only (lead).
+     Acceptance: no Brand code change; sidebar screenshot at 1024/1280/1440 TH+EN shows the dark tile.
+  a2 Remove the dead terracotta `.logo` background in landing.module.css:3 (invisible behind the tile; keeps L2 tidy). File: web/src/app/welcome/landing.module.css.
+     Acceptance: pixel-identical landing header/footer screenshots; style-policy tests pass.
+  a3 Update DESIGN.md: replace the Emerald colour section, add short logo-usage rules (A1 on light surfaces and in the favicon; on dark, the glyph carries the mark; mark/wordmark SVGs only on light; min size 16px, where the M is not legible). File: DESIGN.md.
+     Acceptance: no "Emerald"/green-accent wording; it names the tokens.
+  a4 Test: tests/brand-assets.test.mjs asserts favicon.svg == marginshot-icon.svg, layout.tsx themeColor equals --color-bg-canvas, and every /branding/*.svg referenced in web/src exists.
+     Acceptance: node --test passes; no snapshots of art.
+
+(b) Needs an owner decision:
+  b1 themeColor: keep cream #FAF9F5 (matches the app) or use a per-route dark value for the landing (#1F1E1C). Next's viewport.themeColor supports media and route-level overrides, so page.tsx could export its own viewport. This is a brand decision.
+  b2 Delete or keep the unused assets: marginshot-icon-light.svg, -mark, -logo, -logo-horizontal (unused by web; -horizontal is the Cognito source).
+  b3 Add a favicon PNG/ICO fallback, apple-touch-icon and manifest. Optionally a 16px-specific simplified favicon (arrow only), because the M breaks up at 16px.
+  b4 Accept the upstream orange logo / favicon / Cognito look as the P5 deliverable (closes REV2 (b)) or request redesign. Also accept the orange gradient (#D56832/#A7441F) not equal to terracotta tokens, and the Inter-750 wordmark vs Plex UI text.
+  b5 OG/social image (none exists).
+
+(c) Needs AWS/Cognito approval:
+  c1 Any cognito.css edit, for example focus outline 2→3px (F5), removing ineffective radius/600 declarations, and re-publishing via scripts/cloud-brand-auth.py.
+  c2 Font parity, which needs a move to Managed Login (v2) branding. This is a domain-level change with auth re-verification and is out of scope unless the owner approves.
+  c3 Any re-publish of favicon or brand assets to S3/CloudFront (deploy not authorised).

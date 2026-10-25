@@ -453,3 +453,14 @@ Fresh CloudShell clones: Frontend75 tests, Backend87 tests, Python6; typechecks,
 Live API proof: two successful real Qwen general generations (Thai greeting then English follow-up), financial routing marker without model output, unknown fee totals remain null while known-fee subtotal62.88 stays exact, monthly268 from6orders unchanged. Strict unknown SKU in chat mode400; spoofed financial input400, cross-tenant403, origin403, no-auth401, privateS3403. Guest non-expiry/backdated-expiry regression still passes. Browser actual general replies display no recorded amount/card or dated ledger reference. No REALmerchant records read into the model or written. No OCR/LINE inference/operation in this release.
 
 Ignored evidence `.local/general-chat-20261025/aws-final-report.json` and `browser-verification.json`; Frontend `evidence/aws-general-chat.png` plus `evidence/aws-model.png`. Live financial results remain domain-owned; generated knowledge/examples are not merchant finance verification.
+
+
+## 25 October 2026 100-question/ranking verification
+
+Fresh CloudShell verification: Frontend82, Backend88 tests; Python6 operator tests; typecheck, static export, bundled Lambda smoke, unchanged domain SHA/version and SAM lint pass. The100 curated intent cases are checked individually inside the backend suite;82+88=170 test cases is the suite count, not170 model generations. Canonical Backend fixture and shipped Frontend JSON byte-identical SHA256 `2da873c30f3b1e1c00fc96a4fb1901092126bc4b4ac551e7084a3254c7bd09b6`.
+
+Ranking regression covers user-reported rank2 vs first place, rank3, lowest rank2, Thai ordinals/digits, stable ties, selected-SKU scope, unknown/mixed exclusion and invalid/out-of-range ranks.250successive follow-ups keep bounded hidden request length. Loss question reads negative recorded profit; unspecified campaign asks for explicit choice.
+
+Live browser:100questions/10categories, search ordinal2 gives2matches, draft-only selection, actual rank2=54.20 and follow-up rank3=50.20. Live API10:22:36UTC: one successful general Qwen response to a merchant discount-reply writing request, financial routing marker without model generation, current catalog discount and monthly268/6orders unchanged. No-discount Lazada scenario250.00minus120.00costminus21.40knownfees=108.60subtotal, netProfit remainsnull. Prior tenant/origin403, spoofed-input400, no-auth401/private-S3403 and guest expiry regressions still pass. No REALmerchant writes or OCR/LINE operation.
+
+Ignored proof `.local/merchant-questions-20261025/aws-final-report.json`, `browser-verification.json`; Frontend screenshots `evidence/aws-question-bank.png`, `aws-rank-2.png`, `aws-rank-3.png`. A readable100-question handout is outside both repos at D:/NTT/output/MarginShot-merchant-questions-100.md. See merchant-questions.md for usage and fixture ownership.

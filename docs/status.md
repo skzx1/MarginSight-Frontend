@@ -219,3 +219,12 @@ User-requested AWS Lambda Environment variables page opened and filtered to ASSI
 ## Ranking correction and 100 merchant questions — local verified
 
 Frontend82 / Backend88 tests pass, including all100 curated intent cases. Corrected requested rank2/3 instead of always selecting first place; Thai ordinals/digits, lowest rank, unknown/mixed exclusions, stable ties, out-of-range notices and follow-ups are covered. Added100 distinct questions in10 categories as a searchable draft picker; selection does not send/infer automatically. No-discount campaign wording explicitly maps to0percent. Question fixture copies have matching SHA; this is content/routing validation, not training or100 live-model evaluations. AWS deployment pending at this source commit.
+
+
+## AWS verified: 100 merchant questions and ordinal ranking — 25 October 2026
+
+Runtime Frontend `04527bafd537a8809e187bfb4124b62c9eaff126`, Backend `c68b3b4a0a2f1854dcdf5ca26a757a0216c75617`. Account109991964227 / ap-southeast-1. Exact logged change set `samcli-deploy1792923276` executed10:18:18UTC; stack UPDATE_COMPLETE, seven Lambda hashes match reviewed bundle. Frontend published10:20:22UTC,18object hashes verified; invalidation `IA1BKDQTG1EAOARJW0KQPMINDF` Completed, public release commit matches. No resource/role/model/parameter changes, replacement or training.
+
+Added100 distinct merchant questions in10 categories, searchable and selectable as an editable draft. Browser verified100buttons/count100,10categories, no horizontal overflow, search ordinal2 finds2questions and selection does not send automatically. Ranking now respects requested2/3 rather than always selecting first place; live browser rank2 BAG-002profit54.20, follow-up rank3 CASE-004profit50.20. Financial ranking remains complete single-SKU recorded orders with stable SKU ties; unknown and mixed baskets excluded. Out-of-range ranks return notices; follow-ups do not accumulate oversized hidden prompts.
+
+100-question fixture routing benchmark passes; this is not fine-tuning or100 live-model evaluations. Campaign no-discount wording correctly means0percent; missing campaign choice prompts selection; recorded-loss questions use actual amounts. Existing general chat/model page and all prior quota removals remain available. Overall PARTIAL_WITH_EXTERNAL_BLOCKERS unchanged for earlier realOCR/LINE/nativeplatform/two-real-Cognito acceptance inputs.

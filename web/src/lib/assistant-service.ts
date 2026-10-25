@@ -19,7 +19,7 @@ export async function answerQuestion({ base, question, context, products, locale
     const options=context.marketplace&&context.marketplace.platform!=='recorded'?await api<MarketplaceOptions>(base+'/assistant-options',undefined,signal):undefined;
     const selection=context.marketplace?marketplaceRequest(context.marketplace,options):undefined;
     const answer=await api<AssistantAnswer & {catalogScenario:{basis:'CATALOG';at:string}}>(base+'/assistant/catalog-discount',{message:question.slice(0,1500),sku:context.sku,locale,...(selection?{scenario:selection}:{})},signal);
-    return {text:answer.answer,context,source:'fallback',catalogReferenceAt:answer.catalogScenario.at,catalogSummary:catalogSummary(answer.catalogScenario),note:th?'ใช้ราคากับต้นทุนสินค้าปัจจุบันต่อ 1 หน่วย เป็นการเปรียบเทียบก่อนค่าใช้จ่ายอื่น ไม่ใช่กำไรสุทธิหรือยอดขายของเดือนที่เลือก':'Current catalog price and cost for one unit. This comparison is before other expenses, not net profit or recorded sales for the selected month.'};
+    return {text:answer.answer,context,source:'fallback',catalogReferenceAt:answer.catalogScenario.at,catalogSummary:catalogSummary(answer.catalogScenario),note:th?'ต่อ 1 หน่วย · หักเฉพาะรายการที่แสดง ยังไม่ใช่กำไรสุทธิ':'Per unit · Listed deductions only; not net profit or recorded sales.'};
   }
   const scenario = /คุ้มทุน|ขั้นต่ำ|break.even|โปรแกรม|แคมเปญ|campaign/i.test(question);
   if (scenario) {

@@ -205,7 +205,7 @@ export default function Assistant({ base, guest, origin, products, initialSku, d
         {reply.result && <div className={s.resultCard}><div className={s.resultMain}><span>{reply.result.label}</span><strong className={reply.result.profitSatang == null ? s.missing : reply.result.profitSatang < 0 ? s.loss : ''}>{reply.result.profitSatang == null ? t('missing') : <ProfitAmount value={reply.result.profitSatang} />}</strong></div>
           <dl>{reply.result.revenueSatang !== undefined && <div><dt>{t('revenue')}</dt><dd><Money value={reply.result.revenueSatang} /></dd></div>}{reply.result.marginPct !== undefined && <div><dt>{t('margin')}</dt><dd>{reply.result.marginPct == null ? '—' : new Intl.NumberFormat(locale, { maximumFractionDigits: 1 }).format(reply.result.marginPct) + '%'}</dd></div>}{reply.result.count !== undefined && <div><dt>{locale === 'th' ? 'จากออเดอร์' : 'Recorded orders'}</dt><dd>{reply.result.count} {t('orders')}</dd></div>}{reply.result.beforeSatang !== undefined && <><div><dt>{t('before')}</dt><dd><Money value={reply.result.beforeSatang} /></dd></div><div><dt>{t('after')}</dt><dd><Money value={reply.result.afterSatang} /></dd></div></>}</dl>
         </div>}
-        <AnswerText text={reply.text} />
+        {reply.catalogSummary?<details className={s.evidence}><summary>{locale==='th'?'ดูวิธีคำนวณและรายการที่หัก':'Calculation and deductions'}</summary><AnswerText text={reply.text}/></details>:<AnswerText text={reply.text} />}
         <div className={s.answerFootnote}>
           <ChatIcon name="calendar" />
           <div><span>{t('basedOn')}: {answerReferenceLabel(reply.context,reply.catalogReferenceAt,locale)} · {productLabel(reply.context.sku)}</span>

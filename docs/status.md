@@ -150,3 +150,8 @@ VERIFIED_LOCAL: linked sales now let all five new products use assistant scenari
 ## Orange logo and pending publication — 25 October 2026
 
 New first-reference M + Rising Line SVG assets are VERIFIED_LOCAL (53 tests/build and vector rendering). AWS build/backups completed for the earlier source, but change-set review/execute and static publish remain unverified/unissued; browser control is blocked. Rebuild the new frontend revision before publication. Overall PARTIAL_WITH_EXTERNAL_BLOCKERS remains.
+
+
+## 25 October source and release status
+
+Frontend9f3edfe/Backend031467b are VERIFIED_AWS for landing/logo and expanded storefront assistant fix. Real Qwen API/browser CAP-005 discount28.12THB passed; see verification.md. Subsequent user-provided cream/ink/terracotta palette applies all pages and Cognito branding assets locally;53 tests,37role/32contrast checks and14screens pass, live publication pending at this commit. Overall PARTIAL_WITH_EXTERNAL_BLOCKERS remains.

@@ -129,3 +129,8 @@ Local-only development, static build/tests and isolated local MOCK sessions. Loc
 ## Release preparation — 25 October 2026
 
 CloudShell preflight04:33:33UTC read team account109991964227, Singapore stable stack, budget350USD and lagged ActualSpend0.033USD. Clean source builds/backups and SAM prepare were initiated; no stack execute/static publish/model request was issued by this agent before browser tools became unavailable. Preparation can upload SAM artifacts and consume standard S3/CloudShell/API usage; not a local dry run. New logo rendering/build is local only. Verify change-set state and budget before resuming; no final deployment cost or completion claimed.
+
+
+## Completed code/static publication and palette follow-up — 25 October 2026
+
+Fresh preflight06:23:58UTC/read-before-execute BudgetHackathon-Team10 still limit350USD/laggedActualSpend0.033USD, LastUpdated04:22:10UTC. Team350/trial25 unchanged. One reviewed existing-stack code update,18S3readbackobjects and one8path CDN invalidation; no added capacity/resources/IAM. API verification created2 isolatedMOCKsessions and browser1; one real Qwen API question plus one browser question, bounded simulations and reads. No real merchant write/OCR/LINE/training. Standard traffic/inference/storage may accrue; no fresh measured final charge claimed. Pending palette/Sign-in is appearance-only: local53-test build and palette checks so far. Re-read budget before publishing that follow-up.

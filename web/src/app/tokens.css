@@ -1,37 +1,51 @@
-/* Design tokens (A′ Emerald Unified): the only :root declaration. Load before globals.css.
+/* Design tokens (warm cream / ink / terracotta): the only :root declaration. Load before globals.css.
    1. Primitives hold raw values. 2. Semantic tokens name a role and reference primitives; components use these.
-   3. Legacy aliases keep older var() names working and resolve to A′ semantics.
-   Aliases resolve at :root, so a CSS module that re-declares a primitive does NOT change a semantic token; override semantic names instead. */
+   3. Legacy aliases keep older var() names working and resolve to the current semantics.
+   Aliases resolve at :root, so a CSS module that re-declares a primitive does NOT change a semantic token; override semantic names instead.
+   Colour roles follow theme-palette.json; imported contrast claims are checked independently during verification. */
 :root{
  /* 1. Primitives */
- --emerald-950:#0b1f19;--emerald-900:#152d26;--emerald-850:#22413a;--emerald-800:#24392f;--emerald-dark-line:#3b5a4f;
- --emerald-700:#187b62;--emerald-400:#77b48d;--emerald-100:#e3f1ea;--emerald-50:#f0f5ef;
- --neutral-0:#ffffff;--neutral-25:#fcfcf9;--neutral-50:#f8fcf9;--neutral-100:#eef1ee;--neutral-200:#dfe6df;--neutral-300:#c6d8cc;
- --neutral-500:#7d8f84;--neutral-600:#6c7a72;--neutral-700:#56685e;--neutral-slate:#5c6b63;
- --red-700:#b42318;--red-200:#ffb4a8;--red-50:#fff0ed;
- --amber-800:#795008;--amber-600:#a87a1f;--amber-50:#fff5df;--orange-600:#c26b12;
- --blue-700:#1f5fa8;--blue-600:#3c5fa8;--blue-50:#eaf2fb;--purple-600:#8a4f9e;
- /* Earth primitive names kept for untouched references; they now point at A′ equivalents. */
- --forest:var(--emerald-800);--olive-deep:var(--emerald-900);--olive:var(--neutral-700);--olive-light:var(--emerald-400);
- --pale:var(--neutral-300);--stone:var(--neutral-500);--sand:var(--neutral-200);--tan:var(--amber-600);
- --brown:var(--orange-600);--brown-deep:var(--amber-800);
- --paper:var(--neutral-25);--sage-tint:var(--emerald-50);--khaki-line:var(--neutral-200);--khaki-field:var(--neutral-500);--red:var(--red-700);--cream:var(--amber-50);
+ --cream-0:#ffffff;--cream-50:#faf9f5;--cream-100:#f4f2ec;--cream-150:#f0eee6;--cream-175:#ece9e1;--cream-200:#e8e5dc;--cream-250:#e6e2d8;
+ --stone-500:#8c877d;--stone-600:#6e6a62;--stone-700:#66625a;--ink-700:#3b3833;--ink-800:#2b2a27;--ink-900:#141413;
+ --ink-dark-900:#1f1e1c;--ink-dark-800:#2e2c29;--ink-dark-line:#5a564e;--cream-inverse-muted:#c9c4b8;
+ --terracotta-400:#d97757;--terracotta-450:#e08a68;--terracotta-500:#c8643f;--terracotta-600:#b04f2c;--terracotta-650:#a2482a;--terracotta-700:#933f22;
+ --burgundy-700:#8e1238;--burgundy-600:#a3284e;--burgundy-200:#f4a9ba;--burgundy-50:#f7e3e8;
+ --mustard-700:#735c00;--mustard-300:#e3c35a;--mustard-50:#f5edcf;
+ --navy-700:#2f5784;--navy-200:#a9c2e3;--navy-50:#e5ecf4;
+ --green-700:#145f4c;--green-600:#17735c;--green-200:#9acbae;--green-50:#e3f1ec;
+ /* Chart channel roles from the supplied JSON palette. */
+ --series-slate:#4e6e8e;--series-sand:#9a7b3e;
 
  /* 2. Semantic roles */
- --color-action:var(--emerald-900);--color-action-hover:var(--emerald-950);--color-on-action:var(--neutral-0);
- --color-text:var(--emerald-800);--color-text-muted:var(--neutral-700);
- --color-text-inverse:var(--neutral-50);--color-text-inverse-muted:var(--neutral-300);
- --color-accent:var(--emerald-700);--color-link:var(--emerald-700);--color-positive:var(--emerald-700);--color-selected:var(--emerald-700);
- --color-focus:var(--emerald-700);--color-focus-on-dark:var(--emerald-400);--color-positive-on-dark:var(--emerald-400);
- --color-negative:var(--red-700);--color-negative-bg:var(--red-50);--color-negative-on-dark:var(--red-200);
- --color-bg-canvas:var(--neutral-25);--color-bg-surface:var(--neutral-0);--color-bg-subtle:var(--emerald-50);--color-accent-tint:var(--emerald-100);
- --color-bg-dark:var(--emerald-900);--color-bg-dark-hover:var(--emerald-850);--color-border-on-dark:var(--emerald-dark-line);
- --color-border:var(--neutral-200);--color-border-strong:var(--neutral-500);
- --color-warning:var(--amber-800);--color-warning-bg:var(--amber-50);--color-warning-border:var(--amber-600);
- --color-info:var(--blue-700);--color-info-bg:var(--blue-50);
- --color-disabled-bg:var(--neutral-100);--color-disabled-text:var(--neutral-600);
- --chart-1:var(--emerald-700);--chart-2:var(--orange-600);--chart-3:var(--blue-600);--chart-4:var(--purple-600);--chart-5:var(--neutral-slate);
- --chart-sales:var(--chart-1);--chart-profit:var(--chart-2);
+ --color-action:var(--terracotta-600);--color-action-hover:var(--terracotta-700);--color-on-action:var(--cream-0);
+ --color-text:var(--ink-900);--color-text-muted:var(--stone-700);
+ --color-text-inverse:var(--cream-50);--color-text-inverse-muted:var(--cream-inverse-muted);
+ --color-link:var(--terracotta-650);--color-selected:var(--ink-900);
+ --color-focus:var(--terracotta-600);--color-indicator:var(--terracotta-500);--color-brand-bright:var(--terracotta-400);
+ --color-count-bg:var(--ink-900);--color-count-fg:var(--cream-0);
+ --color-positive:var(--ink-900);--color-positive-bg:var(--cream-175);--color-positive-fg:var(--ink-700);
+ --color-negative:var(--burgundy-700);--color-negative-bg:var(--burgundy-50);
+ --color-bg-canvas:var(--cream-50);--color-bg-surface:var(--cream-0);--color-bg-subtle:var(--cream-150);
+ --color-bg-sidebar:var(--cream-100);--color-nav-active-bg:var(--cream-200);
+ --color-border:var(--cream-250);--color-border-strong:var(--stone-500);
+ --color-warning:var(--mustard-700);--color-warning-bg:var(--mustard-50);--color-warning-border:var(--stone-500);
+ --color-info:var(--navy-700);--color-info-bg:var(--navy-50);
+ --color-disabled-bg:var(--cream-150);--color-disabled-text:var(--stone-500);
+ --color-shadow:var(--ink-900);
+ --color-sidebar-text:var(--ink-900);--color-sidebar-muted:var(--stone-700);--color-nav-active-text:var(--ink-900);
+ /* Dark surfaces (warm ink) and the colours drawn on them */
+ --color-bg-dark:var(--ink-dark-900);--color-bg-dark-hover:var(--ink-dark-800);--color-border-on-dark:var(--ink-dark-line);
+ --color-focus-on-dark:var(--terracotta-450);--color-indicator-on-dark:var(--terracotta-400);--color-emphasis-on-dark:var(--terracotta-450);
+ --color-positive-on-dark:var(--cream-50);--color-negative-on-dark:var(--burgundy-200);
+ --color-warning-on-dark:var(--mustard-300);--color-info-on-dark:var(--navy-200);
+ /* Retired roles kept as aliases while components migrate */
+ --color-accent:var(--color-action);--color-accent-tint:var(--color-bg-subtle);
+ --chart-revenue:var(--ink-800);--chart-cost:var(--stone-500);--chart-highlight:var(--terracotta-600);--chart-loss:var(--burgundy-700);
+ --chart-1:var(--ink-800);--chart-2:var(--series-slate);--chart-3:var(--series-sand);--chart-4:var(--stone-600);--chart-5:var(--terracotta-600);
+ --chart-sales:var(--chart-revenue);--chart-profit:var(--chart-highlight);
+
+ --color-hero-bg:var(--color-bg-canvas);--color-hero-text:var(--color-text);--color-hero-muted:var(--color-text-muted);
+ --color-hero-line:var(--color-border-strong);--color-hero-glow:var(--color-brand-bright);--color-tile-shadow:var(--stone-500);
 
  /* Typography */
  --font-sans:'Anuphan','Inter',Tahoma,sans-serif;--font-numeric:'Inter','Anuphan',sans-serif;
@@ -41,7 +55,7 @@
 
  /* Shape, depth, space */
  --radius-sm:6px;--radius-md:10px;--radius-lg:16px;--radius-pill:999px;--radius-round:50%;
- --shadow-sm:0 1px 3px rgb(21 45 38/.06);--shadow-md:0 4px 16px rgb(21 45 38/.08);--shadow-lg:0 12px 32px rgb(21 45 38/.12);
+ --shadow-sm:0 1px 3px rgb(20 20 19/.06);--shadow-md:0 4px 16px rgb(20 20 19/.08);--shadow-lg:0 12px 32px rgb(20 20 19/.12);
  --space-1:4px;--space-2:8px;--space-3:12px;--space-4:16px;--space-5:20px;--space-6:24px;--space-7:32px;--space-8:48px;
  --focus-width:3px;--focus-offset:3px;--target-min:44px;--control-height:48px;
  --nav-height:76px;--radius-card:var(--radius-lg);

@@ -5,6 +5,7 @@ credentials, users or authentication policies. Existing customization is backed 
 """
 import hashlib
 import json
+import datetime
 from pathlib import Path
 from urllib.parse import urlparse
 import boto3
@@ -23,21 +24,24 @@ cognito = boto3.client('cognito-idp', region_name='ap-southeast-1')
 details = cognito.describe_user_pool_domain(Domain=domain)['DomainDescription']
 assert details['AWSAccountId'] == account and details['UserPoolId'] == pool
 assert details.get('ManagedLoginVersion', 1) == 1, 'Requires existing classic hosted UI'
+client_before = cognito.describe_user_pool_client(UserPoolId=pool, ClientId=client)['UserPoolClient']
 before = cognito.get_ui_customization(UserPoolId=pool, ClientId=client)['UICustomization']
 evidence = root / '.local'
 evidence.mkdir(exist_ok=True)
-backup = evidence / 'cognito-ui-before.json'
-if not backup.exists():
-    backup.write_text(json.dumps({k:before.get(k) for k in ['CSS','ImageUrl','CSSVersion']},indent=2),encoding='utf-8')
+stamp = datetime.datetime.now(datetime.timezone.utc).strftime('%Y%m%dT%H%M%S%f')
+backup = evidence / ('cognito-ui-before-' + stamp + '.json')
+backup.write_text(json.dumps({k:before.get(k) for k in ['CSS','ImageUrl','CSSVersion']},indent=2),encoding='utf-8')
 css = (root / 'web/branding/cognito.css').read_text(encoding='utf-8')
 logo = (root / 'web/branding/cognito-logo.png').read_bytes()
 assert len(css.encode()) < 3072 and len(logo) < 100000
 result = cognito.set_ui_customization(UserPoolId=pool, ClientId=client, CSS=css, ImageFile=logo)['UICustomization']
 after = cognito.get_ui_customization(UserPoolId=pool, ClientId=client)['UICustomization']
 assert after['CSS'] == css
+assert cognito.describe_user_pool_client(UserPoolId=pool, ClientId=client)['UserPoolClient'] == client_before, 'App client authentication settings changed'
 report = {'account':account,'region':'ap-southeast-1','classicBranding':True,
           'cssSha256':hashlib.sha256(css.encode()).hexdigest(),
           'cssVersion':after.get('CSSVersion'),'hasLogo':bool(after.get('ImageUrl')),
-          'authPoliciesChanged':False,'readBackMatched':True}
+          'logoSha256':hashlib.sha256(logo).hexdigest(), 'logoUrl':after.get('ImageUrl'),
+          'backup':str(backup),'authPoliciesChanged':False,'appClientUnchanged':True,'readBackMatched':True}
 (evidence/'cognito-ui-after.json').write_text(json.dumps(report,indent=2),encoding='utf-8')
 print(json.dumps(report))

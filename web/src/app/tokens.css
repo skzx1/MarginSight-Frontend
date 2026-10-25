@@ -77,7 +77,7 @@
  --content-wide:1600px;--content-readable:760px;
  /* Icon gaps by role (control 10, nav 12, chip 6, inline link 4), icon sizes, and the content-sized select range. */
  --icon-gap-control:10px;--icon-gap-nav:12px;--icon-gap-chip:6px;--icon-gap-inline:4px;--icon-md:20px;--icon-sm:16px;
- --select-min:6rem;--select-max:22rem;--select-chevron-space:36px;
+ --select-min:12rem;--select-max:22rem;--select-chevron-space:42px;
  --nav-height:76px;--radius-card:var(--radius-lg);
 
  /* 3. Legacy aliases */

@@ -5,7 +5,7 @@ import { logout } from '../../lib/auth';
 import { MONTH_SCREENS, NAV_GROUPS, OWN_HEADER_SCREENS, PERIOD_SCREENS, SCREEN_TITLE_ID, createArrivalFocus, headerBackTarget, navState, nextDrawerOpen, type DrawerEvent } from '../../lib/navigation';
 import { DETAIL_SCREENS, DETAIL_TITLE_ID, formatHash, parseHash, routeChange, type Route } from '../../lib/routes';
 import type { Screen, Store } from '../../lib/types';
-import { LanguageSwitch, useLanguage } from '../language';
+import { useLanguage } from '../language';
 import { Brand, Icon } from '../ui';
 import { DataStatus } from './ledger';
 import { Field, Select } from './forms';
@@ -65,6 +65,8 @@ export function AppShell({ screen, navigate, stores, store, changeStore, month, 
   const [actionsSlot, setActionsSlot] = useState<HTMLDivElement | null>(null);
   const drawerToggle = useRef<HTMLButtonElement>(null);
   const sharedHeader = !OWN_HEADER_SCREENS.includes(screen);
+  // The MOCK tag labels the page's data, so it sits beside the h1; a guest's demo banner already carries it.
+  const demoBanner = guest && !['assistant', 'finance'].includes(screen);
   useEffect(() => { document.title = t(screen) + ' · MarginShot'; }, [screen, t]);
   // Focus moves only when the screen changes (not on a language switch). An arrival intent (A11) hands focus to the screen.
   useEffect(() => {
@@ -126,7 +128,6 @@ export function AppShell({ screen, navigate, stores, store, changeStore, month, 
       </nav>
       <div className="sidebar-account" role="group" aria-label={t('navAccount')}>
         <span className="nav-group-heading">{t('navAccount')}</span>
-        <LanguageSwitch />
         <button type="button" className="ghost sidebar-logout" onClick={() => { if (canLeave()) logout(); }}><Icon name="logout" /><span>{t('logout')}</span></button>
       </div>
     </div>
@@ -134,11 +135,10 @@ export function AppShell({ screen, navigate, stores, store, changeStore, month, 
     <main id="main-content" tabIndex={-1} className={'workspace ' + (screen === 'assistant' ? 'assistant-workspace' : '')}>
       {sharedHeader && <div className="context-bar" role="group" aria-label={t('screenContext')}>
         <div className="context-store"><Select label={t('store')} value={store.id} onChange={e => changeStore(e.target.value)}>{stores.map(item => <option key={item.id} value={item.id}>{item.name ?? item.id}</option>)}</Select></div>
-        {origin === 'MOCK' && <DataStatus value="MOCK" />}
         {PERIOD_SCREENS.includes(screen) && periodControl && <div className="context-period">{periodControl}</div>}
       </div>}
-      {guest && !['assistant','finance'].includes(screen) && <div className="demo-banner"><DataStatus value="MOCK" /><span>{t('demoBanner')}</span></div>}
-      {sharedHeader && <header className="screen-header"><div>{back && <button className="ghost back-link" onClick={() => navigate(back.screen, { detail: back.detail })}>← {back.detail && backLabel ? backLabel : t(back.screen)}</button>}<h1 id="screen-title" tabIndex={-1}>{t(screen)}</h1></div><div className="screen-header-actions">{MONTH_SCREENS.includes(screen) && <div className="context-controls"><Field label={t('month')} type="month" value={month} onChange={e => { if (e.target.value) changeMonth(e.target.value); }} /></div>}<div ref={setActionsSlot} className="screen-actions" /></div></header>}
+      {demoBanner && <div className="demo-banner"><DataStatus value="MOCK" /><span>{t('demoBanner')}</span></div>}
+      {sharedHeader && <header className="screen-header"><div>{back && <button className="ghost back-link" onClick={() => navigate(back.screen, { detail: back.detail })}>← {back.detail && backLabel ? backLabel : t(back.screen)}</button>}<div className="screen-title-row"><h1 id="screen-title" tabIndex={-1}>{t(screen)}</h1>{origin === 'MOCK' && !demoBanner && <DataStatus value="MOCK" />}</div></div><div className="screen-header-actions">{MONTH_SCREENS.includes(screen) && <div className="context-controls"><Field label={t('month')} type="month" value={month} onChange={e => { if (e.target.value) changeMonth(e.target.value); }} /></div>}<div ref={setActionsSlot} className="screen-actions" /></div></header>}
       {children}
       {screen !== 'assistant' && <footer className="app-footer">MarginShot · {t('trustNote')}</footer>}</main>
   </div></ScreenActionsSlot.Provider>;

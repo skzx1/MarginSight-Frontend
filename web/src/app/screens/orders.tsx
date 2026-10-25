@@ -14,8 +14,12 @@ import { DETAIL_TITLE_ID, detailMayTakeFocus } from '../../lib/routes';
 /** Orders list and evidence detail. The open order is the route (#orders/<key>, P4-G3): refresh, Back/Forward and links reopen it. */
 export function Orders({ base, month, detail, onDetail, onDetailShown }: FeatureProps & { detail: string | null; onDetail: (key: string | null, options?: { replace?: boolean }) => void; onDetailShown?: (shown: boolean) => void }) {
   const { t } = useLanguage();
-  const [cursor, setCursor] = useState('');
-  const { data, error, loading, reload } = useResource<PageResult<OrderSummary>>(base + '/orders?month=' + month + (cursor ? '&cursor=' + encodeURIComponent(cursor) : ''));
+  // "Load more" appends the next page to the rows already shown; a new store or month starts again from the first page.
+  const scope = base + '|' + month;
+  const [paging, setPaging] = useState({ scope, cursor: '', earlier: [] as OrderSummary[] });
+  const page = paging.scope === scope ? paging : { scope, cursor: '', earlier: [] as OrderSummary[] };
+  const { data, error, loading, reload } = useResource<PageResult<OrderSummary>>(base + '/orders?month=' + month + (page.cursor ? '&cursor=' + encodeURIComponent(page.cursor) : ''));
+  const items = [...page.earlier, ...(data?.items ?? [])];
   const action = useAction();
   const [selected, setSelected] = useState<{ order: OrderSummary; result: Calculation }>();
   const [checked, setChecked] = useState(false), [linkMissing, setLinkMissing] = useState(false);
@@ -40,7 +44,7 @@ export function Orders({ base, month, detail, onDetail, onDetailShown }: Feature
   useEffect(() => () => onDetailShown?.(false), [onDetailShown]);
   useEffect(() => {
     if (!detail || shown || (!data && !error) || pending.current === detail) return;
-    const listed = data?.items.find(item => item.key === detail);
+    const listed = items.find(item => item.key === detail);
     setLinkMissing(false); pending.current = detail;
     void open(listed ?? detail).then(ok => {
       pending.current = null;
@@ -58,7 +62,7 @@ export function Orders({ base, month, detail, onDetail, onDetailShown }: Feature
     (row ?? document.getElementById(SCREEN_TITLE_ID))?.focus();
   }, [shown?.order.key]); // eslint-disable-line react-hooks/exhaustive-deps
   if (shown) return <><button className="ghost back-link" onClick={() => onDetail(null)}>← {t('orders')}</button><h2 id={DETAIL_TITLE_ID} tabIndex={-1}>{shown.order.orderId}</h2><ErrorNotice error={action.error} /><EvidencePanel result={shown.result} />{!shown.order.feesConfirmed && !!shown.result.postedFees?.length && <form className="confirm-panel" onSubmit={e => { e.preventDefault(); void action.run(async () => { const result = await request<Calculation>(base + '/orders/' + shown.order.key + '/settle', { confirmAllFeeLines: true, expectedInputHash: shown.result.inputHash }); setSelected({ order: { ...shown.order, feesConfirmed: true }, result }); setChecked(false); await reload(); }); }}><label className="check-field"><input type="checkbox" checked={checked} onChange={e => setChecked(e.target.checked)} />{t('feeReview')}</label><Submit busy={action.busy} disabled={!checked}>{t('confirmFees')}</Submit></form>}<button className="secondary" disabled={action.busy} onClick={() => void open(shown.order)}>{t('refresh')}</button></>;
-  return <><div role="status" aria-live="polite">{linkMissing && <p className="notice info"><Icon name="info" />{t('orderLinkMissing')}</p>}</div><ErrorNotice error={error || action.error} />{error && <button className="secondary" onClick={() => void reload()}>{t('retry')}</button>}{loading && <Loading />}{data?.items.length === 0 && <Empty title={t('noOrders')} />}{data?.items.map(order => <button className="list-link" key={order.key} data-order-key={order.key} disabled={action.busy} onClick={() => { setLinkMissing(false); onDetail(order.key); }}><span><strong>{order.orderId}</strong><small>{bangkokDate(order.orderAt)} · {order.platform}</small></span><DataStatus value={order.feesConfirmed ? 'CONFIRMED' : 'ESTIMATED'} /><span aria-hidden="true">→</span></button>)}{data?.next && <button className="secondary" onClick={() => setCursor(data.next!)}>{t('next')}</button>}</>;
+  return <><div role="status" aria-live="polite">{linkMissing && <p className="notice info"><Icon name="info" />{t('orderLinkMissing')}</p>}</div><ErrorNotice error={error || action.error} />{error && <button className="secondary" onClick={() => void reload()}>{t('retry')}</button>}{(!error || items.length > 0) && <section className="orders-list" aria-label={t('orders')}>{items.length > 0 && <p className="caption">{items.length} {t('orders')}</p>}{items.map(order => <button className="list-link" key={order.key} data-order-key={order.key} disabled={action.busy} onClick={() => { setLinkMissing(false); onDetail(order.key); }}><span><strong>{order.orderId}</strong><small>{bangkokDate(order.orderAt)} · {order.platform}</small></span><DataStatus value={order.feesConfirmed ? 'CONFIRMED' : 'ESTIMATED'} /><Icon name="arrow" /></button>)}{loading && <Loading />}{!loading && !error && items.length === 0 && <Empty title={t('noOrders')} />}{data?.next && <button className="secondary" onClick={() => setPaging({ scope, cursor: data.next!, earlier: items })}>{t('next')}</button>}</section>}</>;
 }
 export function Settlement({ base, month }: FeatureProps) {
   const { t } = useLanguage();

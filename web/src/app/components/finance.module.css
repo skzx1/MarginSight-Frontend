@@ -6,7 +6,7 @@
 .page h3{font-size:var(--text-base);line-height:var(--leading-heading);margin:0 0 12px}
 .page button,.page select,.page input,.page summary{min-height:44px}
 .page :is(button,input,select,summary,a):focus-visible{outline:var(--focus-width,3px) solid var(--color-focus);outline-offset:var(--focus-offset,3px)}
-.page input,.page select{background:var(--color-bg-surface);color:var(--color-text);border:1px solid var(--color-border-strong);border-radius:var(--radius-md);padding:10px 12px;width:100%;font-size:var(--text-base)}
+.page input,.page select{background-color:var(--color-bg-surface);color:var(--color-text);border:1px solid var(--color-border-strong);border-radius:var(--radius-md);padding:10px 12px;width:100%;font-size:var(--text-base)}
 .page select{padding-right:var(--select-chevron-space)}
 .page input::placeholder{color:var(--color-text-muted);opacity:1}
 .page input[type=checkbox]{width:18px;height:18px;min-height:18px;accent-color:var(--color-accent)}

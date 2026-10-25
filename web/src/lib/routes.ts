@@ -1,6 +1,6 @@
 // Hash routes with an optional detail id (P4-G3, D5): #<screen> and, for detail screens, #<screen>/<encoded id>.
 // Pure parse/format so tests can pin the URL contract. Plain #<screen> hashes keep working unchanged; no new Screen values.
-import { SCREENS } from './navigation.ts';
+import { SCREEN_TITLE_ID, SCREENS } from './navigation.ts';
 import type { Screen } from './types';
 
 /** Screens whose detail view has a URL: #products/<sku> and #orders/<order key>. */
@@ -46,3 +46,14 @@ export function routeChange(from: Route, to: Route): 'none' | 'detail' | 'screen
 
 /** Id of a detail view's heading (product name, order id): focused when the detail opens, and on arrival at a detail route. */
 export const DETAIL_TITLE_ID = 'detail-title';
+
+type Focused = { id?: string; tagName?: string; dataset?: { sku?: string; orderKey?: string } } | null;
+/**
+ * Whether a detail that just appeared may take focus: only when focus is nowhere (body), on the h1 or a detail heading,
+ * or on the row that opened this detail; never after the person moved on during a slow load.
+ */
+export function detailMayTakeFocus(active: Focused, detail: string): boolean {
+  if (!active || active.tagName === 'BODY') return true;
+  if (active.id === SCREEN_TITLE_ID || active.id === DETAIL_TITLE_ID) return true;
+  return active.dataset?.sku === detail || active.dataset?.orderKey === detail;
+}

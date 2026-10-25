@@ -11,7 +11,7 @@ import ProductCatalog, { focusProductRow, useProductCatalog } from '../component
 import { ProfitAmount } from '../components/profit-amount';
 import {saveProductListing} from '../../lib/catalog-actions';
 import { SCREEN_TITLE_ID } from '../../lib/navigation';
-import { DETAIL_TITLE_ID } from '../../lib/routes';
+import { DETAIL_TITLE_ID, detailMayTakeFocus } from '../../lib/routes';
 import { Icon } from '../ui';
 
 type CatalogProps = {
@@ -30,6 +30,8 @@ type CatalogProps = {
   onDetail: (sku: string | null, options?: { replace?: boolean }) => void;
   /** The catalog request failed: an unresolved deep link is kept (retry may find it) instead of being reported as not found. */
   catalogFailed?: boolean;
+  /** The SKU the last finished catalog search looked for (login/page.tsx refresh(targetSku)); a link is judged only after that search. */
+  searchedSku?: string | null;
 };
 
 export default function Products({
@@ -46,7 +48,8 @@ export default function Products({
   loading = false,
   detail,
   onDetail,
-  catalogFailed = false
+  catalogFailed = false,
+  searchedSku = null
 }: FeatureProps & CatalogProps) {
   const { t, locale } = useLanguage();
 
@@ -66,19 +69,21 @@ export default function Products({
   // The cost and listing forms belong to one open product: a route change (link, Back/Forward) closes them.
   const [formsFor, setFormsFor] = useState(detail);
   if (formsFor !== detail) { setFormsFor(detail); setCostFormOpen(false); setListingOpen(false); }
-  // A deep link is judged only after a catalog load that started on this screen (the list may be stale on arrival).
+  // A deep link is judged only after the catalog search for that SKU has finished (the list may be stale on arrival).
   const [linkMissing, setLinkMissing] = useState(false);
-  const sawLoad = useRef(loading);
-  useEffect(() => { if (loading) sawLoad.current = true; }, [loading]);
   useEffect(() => {
-    if (!detail || product || loading || catalogFailed || !sawLoad.current) return;
+    if (!detail || product || loading || catalogFailed || searchedSku !== detail) return;
     setLinkMissing(true); onDetail(null, { replace: true });
-  }, [detail, product, loading, catalogFailed, onDetail]);
+  }, [detail, product, loading, catalogFailed, searchedSku, onDetail]);
   // Focus (G7 F2): opening a detail focuses its heading; closing it returns focus to the row that opened it.
   const showingDetail = !!product && !costFormOpen && !listingOpen;
   const openedSku = useRef<string | null>(null);
   useEffect(() => {
-    if (showingDetail) { openedSku.current = product!.sku; setLinkMissing(false); document.getElementById(DETAIL_TITLE_ID)?.focus(); return; }
+    if (showingDetail) {
+      openedSku.current = product!.sku; setLinkMissing(false);
+      if (detailMayTakeFocus(document.activeElement as HTMLElement | null, product!.sku)) document.getElementById(DETAIL_TITLE_ID)?.focus();
+      return;
+    }
     if (detail || !openedSku.current) return;
     const sku = openedSku.current; openedSku.current = null;
     if (!focusProductRow(sku)) document.getElementById(SCREEN_TITLE_ID)?.focus();
@@ -241,7 +246,8 @@ export default function Products({
   }
 
   return <>
-    {linkMissing && <p className="notice info" role="status"><Icon name="info" />{t('productLinkMissing')}</p>}
+    {/* Persistent live region: the notice is inserted into it after mount, so it is announced. */}
+    <div role="status" aria-live="polite">{linkMissing && <p className="notice info"><Icon name="info" />{t('productLinkMissing')}</p>}</div>
     <ProductCatalog controls={catalog} loading={loading} more={more} loadMore={loadMore} onSelect={sku => onDetail(sku)} onAdd={() => {
       if (onAddProduct) onAddProduct();
       else location.hash = 'addProduct';

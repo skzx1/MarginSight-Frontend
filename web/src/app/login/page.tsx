@@ -28,6 +28,9 @@ import StoreHub, { LineConnection } from '../screens/store';
 import s from './login.module.css';
 import assistantStyles from '../components/assistant.module.css';
 
+/** At most this many extra catalog pages are read to find a deep-linked SKU; not found after that = list + notice. */
+const TARGET_PAGE_LIMIT = 10;
+
 function StoreWorkspace({ stores, store, changeStore, create }: { stores: Store[]; store: Store; changeStore: (id: string) => void; create: () => void }) {
   const { screen, detail, navigate, registerGuard, canLeave, takeArrivalFocus } = useNavigation();
   // Detail routes (P4-G3): #products/<sku>, #orders/<key>. Opening/closing stays on the screen (no leave guard, no h1 focus).
@@ -51,22 +54,36 @@ function StoreWorkspace({ stores, store, changeStore, create }: { stores: Store[
   const base = '/stores/' + encodeURIComponent(store.id);
   const guest = fullDemoMode();
   const props: FeatureProps = { base, month, guest, realStore: !!store.personal, origin: store.personal ? 'REAL' : store.dataOrigin ?? 'MOCK' };
+  // searchedSku: the SKU a finished refresh(targetSku) looked for, so the products screen can judge a deep link "not found" (P4-G3).
+  const [searchedSku, setSearchedSku] = useState<string | null>(null), pendingTarget = useRef<string | null>(null);
   const refresh = async (targetSku?: string) => {
-    const id = ++version.current; setLoading(true); setCatalogError(undefined);
+    const id = ++version.current; setLoading(true); setCatalogError(undefined); pendingTarget.current = targetSku ?? null;
     try {
       let result = await request<PageResult<CatalogProduct>>(base + '/products');
       const items = [...result.items];
-      while (result.next && id === version.current && (items.length < products.length || (targetSku && !items.some(item => item.sku === targetSku)))) {
+      // Reload as many pages as were loaded before; a target SKU may add at most TARGET_PAGE_LIMIT further pages.
+      let extra = 0;
+      while (result.next && id === version.current) {
+        const restoring = items.length < products.length;
+        const searching = !!targetSku && !items.some(item => item.sku === targetSku) && extra < TARGET_PAGE_LIMIT;
+        if (!restoring && !searching) break;
+        if (!restoring) extra++;
         result = await request<PageResult<CatalogProduct>>(base + '/products?cursor=' + encodeURIComponent(result.next));
         items.push(...result.items);
       }
       if (id === version.current) { setProducts(items); setMore(result.next); }
     }
     catch (e) { if (id === version.current) setCatalogError(e); }
-    finally { if (id === version.current) setLoading(false); }
+    finally { if (id === version.current) { setLoading(false); pendingTarget.current = null; if (targetSku) setSearchedSku(targetSku); } }
   };
-  // Arriving on #products/<sku> keeps loading pages until that SKU is found (refresh(targetSku)).
-  useEffect(() => { void refresh(screen === 'products' ? detail ?? undefined : undefined); return () => { version.current++; }; }, [base, screen]); // eslint-disable-line react-hooks/exhaustive-deps
+  const catalogTarget = screen === 'products' ? detail ?? undefined : undefined;
+  // Arriving on #products/<sku> looks for that SKU (refresh(targetSku)).
+  useEffect(() => { void refresh(catalogTarget); return () => { version.current++; }; }, [base, screen]); // eslint-disable-line react-hooks/exhaustive-deps
+  // A same-screen change (typed hash, Back/Forward) to a SKU that is not loaded searches for it too.
+  useEffect(() => {
+    if (!catalogTarget || pendingTarget.current === catalogTarget || products.some(item => item.sku === catalogTarget)) return;
+    void refresh(catalogTarget);
+  }, [catalogTarget]); // eslint-disable-line react-hooks/exhaustive-deps
   const loadMore = async () => {
     if (!more || loading) return;
     const id = ++version.current; setLoading(true); setCatalogError(undefined);
@@ -80,11 +97,11 @@ function StoreWorkspace({ stores, store, changeStore, create }: { stores: Store[
   const assistantPeriod = periodBounds(overviewPeriod, bangkokDate()) ?? { start: bangkokDate().slice(0, 7) + '-01', end: bangkokDate() };
   return <AssistantProvider key={base} base={base} defaultContext={{ ...assistantPeriod, sku: null }}>
     <AppShell screen={screen} navigate={navigate} stores={stores} store={screen === 'store' && localStoreName ? { ...store, name: localStoreName } : store} changeStore={id => { if (id !== store.id && canLeave()) changeStore(id); }} month={month} changeMonth={setMonth} guest={guest} origin={props.origin} canLeave={canLeave} takeArrivalFocus={takeArrivalFocus} periodControl={<OverviewPeriodControl value={overviewPeriod} onChange={setOverviewPeriod} />} assistantNav={<AssistantDrawerNav />}>
-      {['products','addProduct','simulation','receipts'].includes(screen) && <><ErrorNotice error={catalogError} />{catalogError && <button className="secondary" onClick={() => void refresh()}>{t('retry')}</button>}{loading && screen !== 'products' && <Loading />}{more && screen !== 'products' && screen !== 'addProduct' && <button className="secondary" disabled={loading} onClick={() => void loadMore()}>{t('next')} · {t('products')}</button>}</>}
+      {['products','addProduct','simulation','receipts'].includes(screen) && <><ErrorNotice error={catalogError} />{catalogError && <button className="secondary" onClick={() => void refresh(catalogTarget)}>{t('retry')}</button>}{loading && screen !== 'products' && <Loading />}{more && screen !== 'products' && screen !== 'addProduct' && <button className="secondary" disabled={loading} onClick={() => void loadMore()}>{t('next')} · {t('products')}</button>}</>}
       <div key={key} className={'screen-content screen-' + screen}>
         {screen === 'overview' && <Overview {...props} navigate={navigate} period={overviewPeriod} onMissingCosts={() => { setMissingCostsOnly(true); navigate('products'); }} />}
         {screen === 'finance' && <Finance key={base} {...props} period={overviewPeriod} onPeriodChange={setOverviewPeriod} navigate={navigate} onMissingCosts={() => { setMissingCostsOnly(true); navigate('products'); }} />}
-        {screen === 'products' && <Products {...props} loading={loading} products={products} more={more} loadMore={() => void loadMore()} refresh={refresh} ask={ask} simulate={simulate} onAddProduct={() => navigate('addProduct')} initialMissingCostsOnly={missingCostsOnly} detail={detail} onDetail={productDetail} catalogFailed={!!catalogError} />}
+        {screen === 'products' && <Products {...props} loading={loading} products={products} more={more} loadMore={() => void loadMore()} refresh={refresh} ask={ask} simulate={simulate} onAddProduct={() => navigate('addProduct')} initialMissingCostsOnly={missingCostsOnly} detail={detail} onDetail={productDetail} catalogFailed={!!catalogError} searchedSku={searchedSku} />}
         {screen === 'addProduct' && <AddProductPage {...props} existingProducts={products} onCancel={() => navigate('products')} onSaved={newProd => { setProducts(old => [newProd, ...old.filter(p => p.sku !== newProd.sku)]); navigate('products'); }} onBatchSaved={batch => { const skus = new Set(batch.map(b => b.sku)); setProducts(old => [...batch, ...old.filter(p => !skus.has(p.sku))]); }} />}
         {screen === 'simulation' && <Simulation {...props} products={products} initialSku={selectedSku} />}
         {screen === 'orders' && <Orders {...props} detail={detail} onDetail={orderDetail} />}

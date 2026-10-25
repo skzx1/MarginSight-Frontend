@@ -90,3 +90,15 @@ test('routeChange: the leave guard applies to screen changes only; list <-> deta
   assert.equal(routeChange(route('store'), route('products', 'A')), 'screen');
   assert.equal(routeChange(route('orders', 'K'), route('finance')), 'screen');
 });
+
+test('detailMayTakeFocus: only from body, the h1, a detail heading or the opening row', async () => {
+  const { detailMayTakeFocus } = await import('../web/src/lib/routes.ts');
+  assert.equal(detailMayTakeFocus(null, 'A'), true);
+  assert.equal(detailMayTakeFocus({ tagName: 'BODY', dataset: {} }, 'A'), true);
+  assert.equal(detailMayTakeFocus({ tagName: 'H1', id: 'screen-title', dataset: {} }, 'A'), true);
+  assert.equal(detailMayTakeFocus({ tagName: 'H2', id: 'detail-title', dataset: {} }, 'A'), true);
+  assert.equal(detailMayTakeFocus({ tagName: 'BUTTON', id: '', dataset: { sku: 'A' } }, 'A'), true);
+  assert.equal(detailMayTakeFocus({ tagName: 'BUTTON', id: '', dataset: { orderKey: 'K/1' } }, 'K/1'), true);
+  assert.equal(detailMayTakeFocus({ tagName: 'BUTTON', id: '', dataset: { sku: 'B' } }, 'A'), false, 'another row');
+  assert.equal(detailMayTakeFocus({ tagName: 'INPUT', id: 'search', dataset: {} }, 'A'), false, 'the person is typing elsewhere');
+});

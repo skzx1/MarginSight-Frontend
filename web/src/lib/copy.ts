@@ -85,7 +85,7 @@ export const copy = {
   // lane B (products, finance, deep links) keys:
   productDetailTools: ['ลองคิดต่อกับสินค้านี้', 'Explore this product'],
   productLinkMissing: ['ไม่พบสินค้าตามลิงก์นี้ จึงแสดงรายการสินค้าทั้งหมดแทน', 'The product in this link was not found, so the full product list is shown.'],
-  orderLinkMissing: ['ไม่พบออเดอร์ตามลิงก์นี้ในเดือนที่เลือก จึงแสดงรายการออเดอร์แทน', 'The order in this link is not in the selected month, so the order list is shown.'],
+  orderLinkMissing: ['ไม่พบออเดอร์ตามลิงก์นี้ จึงแสดงรายการออเดอร์แทน', 'The order in this link was not found, so the order list is shown.'],
   financeRecords: ['หลักฐานรายออเดอร์และยอดรับ', 'Order evidence and settlements'],
   ordersCardBody: ['ดูหลักฐานการคำนวณของแต่ละออเดอร์ และยืนยันค่าธรรมเนียม', 'See the calculation evidence for each order and confirm its fees.'],
   reconciliationCardBody: ['เทียบค่าธรรมเนียมที่ประมาณไว้กับยอดที่แพลตฟอร์มหักจริง', 'Compare estimated fees with what the platform actually deducted.'],

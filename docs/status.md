@@ -160,3 +160,8 @@ Frontend9f3edfe/Backend031467b are VERIFIED_AWS for landing/logo and expanded st
 ## Warm palette + Sign in live — 25 October 2026
 
 VERIFIED_AWS appearance: Frontend2bc06b9 is live with user-provided cream/ink/terracotta tokens on all app pages, light sidebar and warm hero motion. Cognito logo/CSS updated and app client unchanged. Local53 tests/37palette roles/32contrast checks/14screens; clean CloudShell53tests; S3hashes/CDN/public protections and five liveMOCK sections checked. Backend031467b expanded-storefront/Qwen fix remains live. Details in verification.md. Overall PARTIAL_WITH_EXTERNAL_BLOCKERS remains.
+
+
+## Product listing persistence — 25 October 2026
+
+VERIFIED_LOCAL; AWS pending at this commit. Manual/CSV creation saves price and entered quantity. Existing products have an edit form with conflict protection; unknown remains unknown and historic finance is unchanged. See product-listing.md and verification.md. Overall PARTIAL_WITH_EXTERNAL_BLOCKERS remains.

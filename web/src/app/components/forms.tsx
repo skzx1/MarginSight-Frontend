@@ -17,7 +17,7 @@ export function ErrorNotice({ error }: { error: unknown }) {
   if (code === 'MONEY_INPUT') key = 'moneyError';
   else if (/EXPIRED|UNAUTHORIZED/.test(code)) key = 'expired';
   else if (/LIMIT/.test(code)) key = 'quota';
-  else if (/REVIEW_AGAIN/.test(code)) key = 'reviewAgain';
+  else if (/REVIEW_AGAIN|PRODUCT_CHANGED_REFRESH/.test(code)) key = 'reviewAgain';
   else if (/INCOMPLETE|NO_ORDER|ONE_SKU/.test(code)) key = 'incomplete';
   else if (/FORBIDDEN/.test(code)) key = 'forbidden';
   else if (/FILE_INPUT|INVALID_FILE/.test(code)) key = 'fileError';

@@ -79,6 +79,7 @@ export default function AddProductPage({
     void action.run(async () => {
       const saved = await saveProductAndCost(request, base, {
         sku: cleanSku, name: name.trim(), unit: unit.trim(), costSatang,
+        sellingPriceSatang: draft.priceSatang!, quantity: qtyVal!,
         effectiveFrom: dateAt(bangkokDate()), origin
       }, setCreatedProduct, createdProduct);
       setSuccess(true);

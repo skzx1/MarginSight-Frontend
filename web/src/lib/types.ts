@@ -5,6 +5,7 @@ export type CatalogProduct = Product & {
   cost?: Cost | null;
   sellingPriceSatang?: number | null;
   quantity?: number;
+  listingVersion?: number;
   profitSatang?: number | null;
   dateAdded?: string;
 };

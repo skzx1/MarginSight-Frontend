@@ -1,7 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {catalogSummary} from '../web/src/lib/assistant-summary.ts';
-import {answerQuestion} from '../web/src/lib/assistant-service.ts';
+import {answerQuestion as routeQuestion} from '../web/src/lib/assistant-service.ts';
+// Isolate recorded adapters after classification; general-chat.test covers the real preflight.
+const answerQuestion=(input,api)=>routeQuestion(input,(path,body,signal)=>body?.mode==='chat'?Promise.resolve({kind:'STORE_DATA'}):api(path,body,signal));
 import {createChat,parseArchive} from '../web/src/lib/assistant-sessions.ts';
 const c={start:'2026-10-01',end:'2026-10-25',sku:'ASAW'};
 const summary={basis:'CATALOG',netProfitSatang:null,discountPct:20,originalPriceSatang:25000,discountedPriceSatang:20000,unitCostSatang:12000,differenceBeforeExpensesSatang:8000,platform:'shopee',knownPlatformFeeSatang:2419,knownCampaignFeeSatang:1712,platformFeeSatang:null,differenceAfterKnownFeesBeforeOtherExpensesSatang:5581};

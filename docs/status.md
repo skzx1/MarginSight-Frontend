@@ -200,3 +200,8 @@ Runtime Frontend `d2f12d52433ecae3b2ccafbffd4a6fd7c91ca7ed`, Backend `8ee733d91f
 AWS API09:21:06UTC: catalog250→200, cost120, known Lazada fees17.12, remaining62.88. Full platform fee total and net profit remain null when base rates/other expenses are missing; no zero substitution or financial-history writes. Requested long warning removed from new answers, replaced with numeric subtotal and a clear listed-deductions scope. Browser existing session survives reload; BAG-001200→160, cost130, fees13.70, card remaining16.30. Card has per-unit scope, rows and collapsed calculation detail; monthly recorded268/6orders unchanged. Old historical replies remain unchanged; ask again or regenerate to see the new card.
 
 All earlier usage-quota removals remain active. PARTIAL_WITH_EXTERNAL_BLOCKERS unchanged for external acceptance inputs previously listed.
+
+
+## General conversation — local verification, 25 October 2026
+
+Frontend75 / Backend87 tests and builds pass. User-authorized general conversation uses existing Qwen3 32B direct us-east-1, no new model/training/service/role. Existing /assistant POST accepts strict mode:chat; server classifies actual shop calculations without generation, which continue to the deterministic catalog/order adapters. General text generation has no tools, retrieval, SKU, store records or live web access. Only four completed general exchanges are sent as bounded untrusted context, with per-request size/deadline limits. General answers have separate provenance, no fake financial card/monthly reference. Provider failure is an honest retry notice; membership/origin isolation unchanged. AWS deployment and real inference pending at this source commit. PARTIAL_WITH_EXTERNAL_BLOCKERS remains for existing external integrations.

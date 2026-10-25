@@ -136,7 +136,10 @@ export default function Assistant({ base, guest, origin, products, initialSku, d
     const controller = new AbortController();
     pending.current.set(sessionId, { turnId: turn.id, controller });
     try {
-      const reply = await answerQuestion({ base, question: turn.requestQuestion ?? turn.question, context: turn.context, products, locale, signal: controller.signal });
+      const earlier=archive.sessions.find(chat=>chat.id===sessionId)?.turns??[];
+      const stop=earlier.findIndex(item=>item.id===turn.id);
+      const history=(stop<0?earlier:earlier.slice(0,stop)).filter(item=>item.state==='complete'&&item.reply?.conversation==='general'&&item.reply.source==='assistant').slice(-4).flatMap(item=>[{role:'user' as const,text:item.question},{role:'assistant' as const,text:item.reply!.text}]);
+      const reply = await answerQuestion({ base, question: turn.requestQuestion ?? turn.question, context: turn.context, products, locale, signal: controller.signal,history });
       if (!controller.signal.aborted) updateSession(sessionId, chat => ({ ...chat, updatedAt: new Date().toISOString(), turns: chat.turns.map(item => item.id === turn.id ? { ...item, reply, state: 'complete' } : item) }));
     } catch {
       if (!controller.signal.aborted) updateSession(sessionId, chat => ({ ...chat, turns: chat.turns.map(item => item.id === turn.id ? { ...item, state: 'failed' } : item) }));
@@ -173,7 +176,7 @@ export default function Assistant({ base, guest, origin, products, initialSku, d
   const copy = async (turn: ChatTurn) => {
     if (!turn.reply) return;
     const reply = turn.reply, result = reply.result;
-    const text = [reply.text, result && `${result.label}: ${result.profitSatang == null ? t('missing') : '฿' + money(result.profitSatang, locale)}`, t('basedOn') + ': ' + answerReferenceLabel(reply.context,reply.catalogReferenceAt,locale) + ' · ' + productLabel(reply.context.sku), reply.note].filter(Boolean).join('\n');
+    const text = [reply.text, result && `${result.label}: ${result.profitSatang == null ? t('missing') : '฿' + money(result.profitSatang, locale)}`, reply.conversation==='general'?(locale==='th'?'คำตอบทั่วไปจาก AI · ไม่ได้ดึงข้อมูลร้านหรือค้นเว็บสด':'General AI response · No shop records or live web search'):t('basedOn') + ': ' + answerReferenceLabel(reply.context,reply.catalogReferenceAt,locale) + ' · ' + productLabel(reply.context.sku), reply.note].filter(Boolean).join('\n');
     try { await navigator.clipboard.writeText(text); setCopied(turn.id); setTimeout(() => setCopied(''), 1800); } catch { setNotice('copyFailed'); }
   };
   const dateLabel = (context: ChatContext) => context.start === bangkokDate().slice(0, 7) + '-01' && context.end === bangkokDate() ? t('thisMonth') : contextLabel(context, locale);
@@ -208,7 +211,7 @@ export default function Assistant({ base, guest, origin, products, initialSku, d
         {reply.catalogSummary?<details className={s.evidence}><summary>{locale==='th'?'ดูวิธีคำนวณและรายการที่หัก':'Calculation and deductions'}</summary><AnswerText text={reply.text}/></details>:<AnswerText text={reply.text} />}
         <div className={s.answerFootnote}>
           <ChatIcon name="calendar" />
-          <div><span>{t('basedOn')}: {answerReferenceLabel(reply.context,reply.catalogReferenceAt,locale)} · {productLabel(reply.context.sku)}</span>
+          <div><span>{reply.conversation==='general'?(locale==='th'?'คำตอบทั่วไปจาก AI · ไม่ได้ดึงข้อมูลร้านหรือค้นเว็บสด':'General AI response · No shop records or live web search'):<>{t('basedOn')}: {answerReferenceLabel(reply.context,reply.catalogReferenceAt,locale)} · {productLabel(reply.context.sku)}</>}</span>
           {reply.note && <span className={s.footnoteNote}> · {reply.note}</span>}</div>
         </div>
         {reply.calculation && <details className={s.evidence}><summary>{t('evidence')}</summary><EvidencePanel result={reply.calculation} /></details>}

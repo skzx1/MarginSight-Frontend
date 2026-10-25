@@ -77,6 +77,9 @@ export const copy = {
   percentPoints: [' จุด', ' pp'], noBaseline: ['ไม่มีฐานเปรียบเทียบ', 'No comparison baseline'],
   netProfitLoss: ['กำไร/ขาดทุนสุทธิ', 'Net profit / loss'], sellingAtLoss: ['ขายขาดทุน', 'Selling at a loss'],
   profitUnavailable: ['ยังคำนวณกำไรไม่ได้', 'Profit not available'],
+  // lane A (overview + charts) keys:
+  // lane B (products, finance, deep links) keys:
+  // lane C (remaining screens) keys:
 } as const;
 export type CopyKey = keyof typeof copy;
 export type Locale = 'th' | 'en';

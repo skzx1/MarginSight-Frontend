@@ -565,7 +565,7 @@ dd{margin:0;text-align:right;overflow-wrap:anywhere;min-width:0;max-width:65%}
 .typing-dots .dot:nth-child(2){animation-delay:-.16s}
 @keyframes pulseDot{0%,80%,100%{transform:scale(.6);opacity:.4}40%{transform:scale(1);opacity:1}}
 .chat-pinned-composer{position:sticky;bottom:calc(var(--nav-height) + env(safe-area-inset-bottom) + 12px);z-index:20;background:var(--color-bg-canvas);padding:8px 0}
-.composer-form{display:flex;gap:10px;align-items:flex-end;background:var(--color-bg-surface);border:1px solid var(--color-border-strong);border-radius:var(--radius-lg);padding:10px 14px;box-shadow:var(--shadow-composer)}
+.composer-form{display:flex;gap:10px;align-items:flex-end;background:var(--color-bg-surface);border:1px solid var(--color-border-strong);border-radius:var(--radius-composer);padding:10px 14px;box-shadow:var(--shadow-composer)}
 .composer-form:focus-within{border-color:var(--color-focus);outline:var(--focus-width) solid var(--color-focus);outline-offset:2px}
 .chat-textarea{flex:1;border:0;resize:none;min-height:var(--control-height);max-height:160px;padding:6px;font-size:var(--text-base);line-height:1.5;background:transparent}
 .chat-textarea:focus,.chat-textarea:focus-visible{outline:none} /* ring is drawn on .composer-form:focus-within */
@@ -779,3 +779,9 @@ dd{margin:0;text-align:right;overflow-wrap:anywhere;min-width:0;max-width:65%}
 .channel-key li>span small{grid-column:2;font-size:var(--text-xs)}.channel-key strong{font-size:var(--text-sm);text-align:right;font-weight:var(--weight-medium)}.channel-key strong small{display:block;font-size:var(--text-xs)}
 @container workspace (min-width:900px){.dashboard-charts{grid-template-columns:minmax(0,1.9fr) minmax(260px,1fr)}}
 @media(max-width:479px){.dashboard-charts section{padding:20px 16px}.chart-heading{flex-wrap:wrap}.chart-readout{gap:14px}.chart-unit{padding:0}.overview-page .summary-main-number{font-size:var(--text-money-xl)}}
+/* === lane A: overview + charts (P4e/G1) === */
+/* === end lane A === */
+/* === lane B: products + finance + orders (P4f/P4g/G3) === */
+/* === end lane B === */
+/* === lane C: remaining screens (P4i) === */
+/* === end lane C === */

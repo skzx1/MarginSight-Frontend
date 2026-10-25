@@ -78,6 +78,10 @@ export const copy = {
   netProfitLoss: ['กำไร/ขาดทุนสุทธิ', 'Net profit / loss'], sellingAtLoss: ['ขายขาดทุน', 'Selling at a loss'],
   profitUnavailable: ['ยังคำนวณกำไรไม่ได้', 'Profit not available'],
   // lane A (overview + charts) keys:
+  seeSource: ['ดูที่มา', 'See breakdown'],
+  assistantLauncherTitle: ['ถาม MarginShot', 'Ask MarginShot'],
+  assistantLauncherHelper: ['ถามเรื่องกำไร ต้นทุน หรือราคาขายของร้าน เช่น “ถ้าลดราคา 15% จะเหลือเท่าไร?”', 'Ask about your profit, costs or prices, e.g. “What would I keep after a 15% discount?”'],
+  assistantLauncherAction: ['เปิดผู้ช่วย', 'Open the assistant'],
   // lane B (products, finance, deep links) keys:
   // lane C (remaining screens) keys:
 } as const;

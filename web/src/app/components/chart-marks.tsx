@@ -1,4 +1,24 @@
-import type { ReactNode } from 'react';
+import { useEffect, useLayoutEffect, useState, type ReactNode } from 'react';
+
+const useIsoLayoutEffect = typeof window === 'undefined' ? useEffect : useLayoutEffect;
+/**
+ * Measured CSS width of a chart <svg> (width:100%). The charts set viewBox = "0 0 <width> <height>", so one user unit is
+ * one CSS pixel and 12px labels render at 12px at every viewport width (F1). Rounded down so the drawing never scales below 1:1.
+ */
+export function useChartWidth(fallback = 640) {
+  const [node, ref] = useState<SVGSVGElement | null>(null);
+  const [width, setWidth] = useState(fallback);
+  useIsoLayoutEffect(() => {
+    if (!node) return;
+    const update = () => { const next = Math.floor(node.getBoundingClientRect().width); if (next > 0) setWidth(current => current === next ? current : next); };
+    update();
+    if (typeof ResizeObserver === 'undefined') return;
+    const observer = new ResizeObserver(update);
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [node]);
+  return [ref, width] as const;
+}
 
 /** Measure series. Each has its own colour, dash and marker shape, so no series is identified by colour alone. */
 export type Series = 'revenue' | 'cost' | 'profit';

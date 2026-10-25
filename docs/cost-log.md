@@ -175,3 +175,15 @@ Two scripted real general Qwen calls plus one agent-entered browser greeting wer
 Fresh preflight10:11:35UTC plus review/execute/publication gates verified account109991964227 / Singapore, BudgetLimit350USD, lagged ActualSpend0.033USD with LastUpdated04:22:10UTC. Not a current remaining-credit or final measured release cost. Existing25USD operator target unchanged. One executed existing-stack code update,18static object checks and8path invalidation. No new services/roles/capacity/model subscriptions, training or embedding/index rebuild.
 
 100question intent cases run locally/CI without model generation. Choosing a question drafts it; it does not call AI or submit automatically. Live API made one general Qwen generation for the creative discount-reply boundary; browser financial rank2/rank3 used no model generation. MOCK-only shops/catalog test writes; zero REALmerchant writes. User's prior removal of daily/session quotas remains. Ephemeral paired backup `/tmp/marginshot-merchant-questions-20261025-lj1pa4yj/pre-release`; rollback code/static assets together without deleting merchant data.
+
+## Website router publication — 25 October 2026
+
+Existing account109991964227 and regional resources only. Model evaluation/API usage recorded in Backend cost-log; no new model provider, database, IAM/capacity or training. One76file static publish and7path invalidation; four public entry/config/release readbacks; existing private bucket preserved. Final budget read08:41:35UTC:350USDteam limit, laggedActualSpend0.033USD LastUpdated04:22:10.530UTC, trial25USD unchanged; not current remaining credit or final charges. Existing demo quota exhausted; user chose existing tab, which also showed daily openings error. No quota changes or browser inference from that blocked session. Ordinary storage/CDN/API/inference/log usage may accrue; backups retained ignored, no credentials published.
+
+## Local upstream/router merge — 25 October 2026
+
+Local code merges/tests/builds only in Frontend; no new static publish/invalidation/auth/IAM or model inference for this merged release. Backend performed bounded read-only AWS checks/SAM preparations before user chose local-only; those are recorded in Backend cost-log. No cloud actions after local-only choice. Browser action was rejected by automatic approval review due to tool usage, and was not executed or bypassed. Retained artifacts may accrue existing storage cost; no measured final bill claim.
+
+## Router release preparation — 25 October 2026
+
+Commit/push/source verification and isolated clean npm-ci build only on Frontend so far;83tests/0npm audit vulnerabilities. AWS account/budget/live source readback is logged in Backend cost-log (lagged0.034USD, updated18:46:19.853+07;350team/25trial unchanged). Static publication, model/API verification and actual final spend remain separate evidence. No new auth/IAM/capacity/training changes are requested.

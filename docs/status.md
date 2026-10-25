@@ -228,3 +228,19 @@ Runtime Frontend `04527bafd537a8809e187bfb4124b62c9eaff126`, Backend `c68b3b4a0a
 Added100 distinct merchant questions in10 categories, searchable and selectable as an editable draft. Browser verified100buttons/count100,10categories, no horizontal overflow, search ordinal2 finds2questions and selection does not send automatically. Ranking now respects requested2/3 rather than always selecting first place; live browser rank2 BAG-002profit54.20, follow-up rank3 CASE-004profit50.20. Financial ranking remains complete single-SKU recorded orders with stable SKU ties; unknown and mixed baskets excluded. Out-of-range ranks return notices; follow-ups do not accumulate oversized hidden prompts.
 
 100-question fixture routing benchmark passes; this is not fine-tuning or100 live-model evaluations. Campaign no-discount wording correctly means0percent; missing campaign choice prompts selection; recorded-loss questions use actual amounts. Existing general chat/model page and all prior quota removals remain available. Overall PARTIAL_WITH_EXTERNAL_BLOCKERS unchanged for earlier realOCR/LINE/nativeplatform/two-real-Cognito acceptance inputs.
+
+## Website AI message router — 25 October 2026
+
+DEPLOYED / VERIFIED_LOCAL; browser chat acceptance PARTIAL. All website chat messages now reach the existing authorized AWS assistant endpoint with mode chat and last5completed messages from the same conversation. Normal chat uses no tools; fee/profit goes RAG + bounded deterministic tools; ambiguous/low-confidence asks one question. Legacy scenario UI remains separate. No financial formulas added to Frontend.
+
+57tests/typecheck/static export and clean isolated npm-ci verification passed. Published76files08:40:48UTC from5bc3b9d plus uncommitted router source; release.json feature message-router-v3 records dirty state/source hashes. CloudFront four-file public200/hash checks and invalidationCompleted08:41:35UTC. Backend final reviewed code SHA2w+JsdfaYTcW/Qbfyy2BoRNlV5qe643aGWOQhCYcXkU=;86tests. Preserved latest theme/product listing functionality. No commit/push in this slice.
+
+Latest Qwen development classifier score61/68=89.71%, seven excess clarifications; not production accuracy. Final browser financial acceptance is pending: existing-session tab offered by user showed login daily-openings quota error, not active MOCK chat. No quota expansion/token extraction/new-session workaround. Overall PARTIAL_WITH_EXTERNAL_BLOCKERS remains. Full design/evaluation resides in Backend docs/message-router/README.md.
+
+## Local merge completed — 25 October 2026
+
+LOCAL_MERGED / VERIFIED_LOCAL / NOT_DEPLOYED: base d2f12d5 + preserved local router, campaign payload and catalog-summary integration. Quota removal, current-product calculations and numeric answer cards retained;71tests/full build pass. Backend8ee733d + local router100tests pass. User chose local-only completion; no merged-release upload, commit or push. All conflicts resolved. See latest verification.md; do not treat previous AWS reports as evidence for this combined release.
+
+## Router release ready for deployment — 25 October 2026
+
+READY_FOR_DEPLOY: user explicitly requested commit/push/deploy. Source95ca8fb integrates all latestda63091 features with server routing;83tests/full build pass. Backend5f3c19f/108tests and compatibility path ready. Implementation pushed as a separate batch; final deployed acceptance is recorded after publication, not inferred from source.

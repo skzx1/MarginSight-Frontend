@@ -30,7 +30,7 @@ if (flag('--zoom')) for (const name of ['overview', 'products']) if (!only.lengt
   jobs.push({ name, path: '/login/#' + name, auth: true, w: 720, h: 450, dsf: 2, tag: 'zoom200' }); // 1440x900 device px at 200% = 720x450 CSS px
 
 const profile = join(HERE, '.chrome-profile-' + PORT); rmSync(profile, { recursive: true, force: true });
-const proc = spawn('C:/Program Files/Google/Chrome/Application/chrome.exe', ['--headless=new', '--remote-debugging-port=' + PORT, '--user-data-dir=' + profile, '--no-first-run', '--no-default-browser-check', '--hide-scrollbars', '--disable-extensions', '--lang=th-TH', 'about:blank'], { stdio: 'ignore' });
+const proc = spawn(process.env.CHROME_PATH || '/opt/pw-browsers/chromium', ['--headless=new', '--no-sandbox', '--disable-gpu', '--disable-dev-shm-usage', '--remote-debugging-port=' + PORT, '--user-data-dir=' + profile, '--no-first-run', '--no-default-browser-check', '--hide-scrollbars', '--disable-extensions', '--lang=th-TH', 'about:blank'], { stdio: 'ignore' });
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 let targets; for (let i = 0; i < 60 && !targets; i++) { try { targets = await (await fetch(`http://127.0.0.1:${PORT}/json`)).json(); } catch { await sleep(250); } }
 const sock = new WebSocket(targets.find(t => t.type === 'page').webSocketDebuggerUrl);

@@ -13,7 +13,7 @@ const SCREENS = ['overview', 'products', 'addProduct', 'finance', 'assistant', '
 const pages = opt('--pages', ['/', '/login/', ...SCREENS.map(s => '/login/#' + s)].join(',')).split(',');
 const widths = opt('--widths', '390,1440').split(',').map(Number), LANG = opt('--lang', '');
 const PORT = 9347; const profile = join(HERE, '.chrome-target-' + PORT); rmSync(profile, { recursive: true, force: true });
-const proc = spawn('C:/Program Files/Google/Chrome/Application/chrome.exe', ['--headless=new', '--remote-debugging-port=' + PORT, '--user-data-dir=' + profile, '--no-first-run', '--hide-scrollbars', 'about:blank'], { stdio: 'ignore' });
+const proc = spawn(process.env.CHROME_PATH || '/opt/pw-browsers/chromium', ['--headless=new', '--no-sandbox', '--disable-gpu', '--disable-dev-shm-usage', '--remote-debugging-port=' + PORT, '--user-data-dir=' + profile, '--no-first-run', '--hide-scrollbars', 'about:blank'], { stdio: 'ignore' });
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 const done = () => { try { proc.kill(); } catch {} };
 process.on('exit', done);

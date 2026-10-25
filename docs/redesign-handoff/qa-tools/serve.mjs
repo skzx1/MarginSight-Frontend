@@ -7,7 +7,7 @@ import { join, extname, normalize, dirname } from 'node:path';
 import { pathToFileURL, fileURLToPath } from 'node:url';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
-const REPO = '<home>/Documents/Kasetsart/NTT DATA/MarginSight-Frontend';
+const REPO = process.env.REPO || join(HERE, '../../..');
 const outDir = process.argv[2];
 const EMPTY = process.argv.includes('--empty');
 if (!outDir || !existsSync(outDir)) { console.error('usage: node serve.mjs <outDir> [--empty]'); process.exit(1); }

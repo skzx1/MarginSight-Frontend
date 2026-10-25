@@ -18,10 +18,12 @@
 @media(min-width:768px){
  .shell :global(.topbar){height:100dvh;min-height:0;overflow:hidden;gap:16px;padding-top:20px;padding-bottom:20px}
  .shell :global(.topbar .brand),.shell :global(.desktop-store),.shell :global(.drawer-toggle){flex-shrink:0}
- .shell :global(.primary-nav){flex:1;flex-shrink:1;min-height:0;overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;padding:6px;margin:-6px;scroll-padding-block:8px} /* room for the 3px+3px focus ring inside the scroller */
+ .shell :global(.primary-nav){flex:1;flex-shrink:1;min-height:0;overflow:visible}
  .shell :global(.sidebar-account){flex-shrink:0} /* language + logout stay on screen below a long history list */
  .shell :global(.primary-nav)>button{flex-shrink:0}
 }
+/* >=1024 the history list sits in the sidebar nav: the nav scrolls (room + scroll padding for the 3px+3px focus ring). */
+@media(min-width:1024px){.shell :global(.primary-nav){overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;padding:6px;margin:-6px;scroll-padding-block:8px}}
 @media(max-width:767px){
  .shell{position:fixed;inset-inline:0;top:var(--assistant-top,0px)}
  .shell :global(.primary-nav){position:absolute;bottom:0}

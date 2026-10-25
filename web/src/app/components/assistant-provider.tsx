@@ -4,7 +4,9 @@ import type { ChatArchive, ChatContext, ChatSession } from '../../lib/assistant-
 import { createChat } from '../../lib/assistant-sessions';
 import { useChatSessions } from './use-chat-sessions';
 
-export type AssistantPanel = 'period' | 'products' | 'campaigns' | 'questions' | 'rename' | 'delete' | 'allHistory' | 'sheet' | null;
+export type AssistantPanel = 'period' | 'products' | 'campaigns' | 'questions' | 'rename' | 'delete' | 'sheet' | null;
+/** Where focus goes in the visible history list after a rename or delete dialog closes (R2 §D). `order` is the list the user saw. */
+export type HistoryFocus = { target: 'menu'; id: string } | { target: 'afterDelete'; id: string; order: string[] };
 
 export function ChatIcon({ name }: { name: 'history' | 'copy' | 'edit' | 'trash' | 'down' | 'stop' | 'calendar' | 'dots' | 'check' }) {
   const paths = {
@@ -39,8 +41,9 @@ export interface AssistantContextValue {
   targetChat: ChatSession | null;
   setTargetChat: (chat: ChatSession | null) => void;
   openRenameModal: (chat: ChatSession) => void;
-  openDeleteModal: (chat: ChatSession) => void;
-  openAllHistory: () => void;
+  openDeleteModal: (chat: ChatSession, order?: string[]) => void;
+  historyFocus: HistoryFocus | null;
+  clearHistoryFocus: () => void;
   openSheet: () => void;
   closePanel: () => void;
   textareaRef: React.RefObject<HTMLTextAreaElement | null>;
@@ -69,6 +72,10 @@ export function AssistantProvider({
   const [panel, setPanel] = useState<AssistantPanel>(null);
   const [targetChat, setTargetChat] = useState<ChatSession | null>(null);
   const returnPanel = useRef<AssistantPanel>(null);
+  // The chat a rename/delete dialog was opened for from the history list; focus returns to that row's controls.
+  const historyTarget = useRef<{ id: string; order: string[] } | null>(null);
+  const [historyFocus, setHistoryFocus] = useState<HistoryFocus | null>(null);
+  const clearHistoryFocus = useCallback(() => setHistoryFocus(null), []);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const focusInput = () => {
@@ -88,6 +95,8 @@ export function AssistantProvider({
     setPanel(null);
     setTargetChat(null);
     returnPanel.current = null;
+    historyTarget.current = null;
+    setHistoryFocus(null);
     focusInput();
   };
 
@@ -96,6 +105,8 @@ export function AssistantProvider({
     setPanel(null);
     setTargetChat(null);
     returnPanel.current = null;
+    historyTarget.current = null;
+    setHistoryFocus(null);
     focusInput();
   };
 
@@ -110,6 +121,9 @@ export function AssistantProvider({
     setPanel(returnPanel.current);
     returnPanel.current = null;
     setTargetChat(null);
+    const from = historyTarget.current;
+    historyTarget.current = null;
+    if (from) setHistoryFocus({ target: 'afterDelete', id, order: from.order });
   };
 
   const renameChat = (id: string, title: string) => {
@@ -117,32 +131,38 @@ export function AssistantProvider({
     setPanel(returnPanel.current);
     returnPanel.current = null;
     setTargetChat(null);
+    const from = historyTarget.current;
+    historyTarget.current = null;
+    if (from) setHistoryFocus({ target: 'menu', id: from.id });
   };
 
   const openRenameModal = (chat: ChatSession) => {
-    returnPanel.current = panel === 'sheet' || panel === 'allHistory' ? panel : null;
+    returnPanel.current = panel === 'sheet' ? panel : null;
+    historyTarget.current = { id: chat.id, order: [] };
     setTargetChat(chat);
     setPanel('rename');
   };
 
-  const openDeleteModal = (chat: ChatSession) => {
-    returnPanel.current = panel === 'sheet' || panel === 'allHistory' ? panel : null;
+  const openDeleteModal = (chat: ChatSession, order: string[] = []) => {
+    returnPanel.current = panel === 'sheet' ? panel : null;
+    historyTarget.current = { id: chat.id, order };
     setTargetChat(chat);
     setPanel('delete');
   };
 
-  const openAllHistory = () => {
-    setPanel('allHistory');
-  };
-
   const openSheet = () => {
+    setHistoryFocus(null);
     setPanel('sheet');
   };
 
+  // Cancel or Escape in a rename/delete dialog returns focus to that row's ⋯ button.
   const closePanel = useCallback(() => {
     setPanel(returnPanel.current);
     returnPanel.current = null;
     setTargetChat(null);
+    const from = historyTarget.current;
+    historyTarget.current = null;
+    if (from) setHistoryFocus({ target: 'menu', id: from.id });
   }, []);
 
   const value: AssistantContextValue = {
@@ -164,7 +184,8 @@ export function AssistantProvider({
     setTargetChat,
     openRenameModal,
     openDeleteModal,
-    openAllHistory,
+    historyFocus,
+    clearHistoryFocus,
     openSheet,
     closePanel,
     textareaRef,

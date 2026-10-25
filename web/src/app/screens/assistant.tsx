@@ -31,14 +31,14 @@ function Dialog({ title, kind, close, children }: { title: string; kind: Assista
     const dialog = ref.current; dialog?.showModal();
     return () => { dialog?.close(); if (returnTo.current?.isConnected) returnTo.current.focus({ preventScroll: true }); };
   }, [kind]);
-  return <dialog ref={ref} className={s.dialog + (kind === 'sheet' || kind === 'allHistory' ? ' ' + s.sheetDialog : '')} aria-labelledby="assistant-dialog-title" onCancel={e => { e.preventDefault(); close(); }} onClick={e => { if (e.target === e.currentTarget) { const r = e.currentTarget.getBoundingClientRect(); if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) close(); } }} onKeyDown={e => {
+  return <dialog ref={ref} className={s.dialog + (kind === 'sheet' ? ' ' + s.sheetDialog : '')} aria-labelledby="assistant-dialog-title" onCancel={e => { e.preventDefault(); close(); }} onClick={e => { if (e.target === e.currentTarget) { const r = e.currentTarget.getBoundingClientRect(); if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) close(); } }} onKeyDown={e => {
     if (e.key === 'Escape') { e.preventDefault(); close(); return; }
     if (e.key !== 'Tab') return;
     const nodes = [...e.currentTarget.querySelectorAll<HTMLElement>('button:not(:disabled),input:not(:disabled),textarea,select,a[href]')].filter(n => n.checkVisibility());
     const first = nodes[0], last = nodes.at(-1);
     if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last?.focus(); }
     else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first?.focus(); }
-  }}><div className={s.dialogHeader}>{(kind === 'sheet' || kind === 'allHistory') && <span className={s.dragHandle} aria-hidden="true" onPointerDown={e => { if (window.innerWidth >= 768) return; drag.current = e.clientY; e.currentTarget.setPointerCapture(e.pointerId); }} onPointerMove={e => { if (drag.current !== null && ref.current) ref.current.style.transform = `translateY(${Math.max(0, e.clientY - drag.current)}px)`; }} onPointerUp={e => { const distance = drag.current === null ? 0 : e.clientY - drag.current; drag.current = null; ref.current?.style.removeProperty('transform'); if (distance > 90) close(); }} onPointerCancel={() => { drag.current = null; ref.current?.style.removeProperty('transform'); }} />}<h2 id="assistant-dialog-title">{title}</h2><button type="button" className={s.iconButton} aria-label={title + ' · ' + (document.documentElement.lang === 'en' ? 'Close' : 'ปิด')} onClick={close}><Icon name="close" /></button></div>{children}</dialog>;
+  }}><div className={s.dialogHeader}>{kind === 'sheet' && <span className={s.dragHandle} aria-hidden="true" onPointerDown={e => { if (window.innerWidth >= 768) return; drag.current = e.clientY; e.currentTarget.setPointerCapture(e.pointerId); }} onPointerMove={e => { if (drag.current !== null && ref.current) ref.current.style.transform = `translateY(${Math.max(0, e.clientY - drag.current)}px)`; }} onPointerUp={e => { const distance = drag.current === null ? 0 : e.clientY - drag.current; drag.current = null; ref.current?.style.removeProperty('transform'); if (distance > 90) close(); }} onPointerCancel={() => { drag.current = null; ref.current?.style.removeProperty('transform'); }} />}<h2 id="assistant-dialog-title">{title}</h2><button type="button" className={s.iconButton} aria-label={title + ' · ' + (document.documentElement.lang === 'en' ? 'Close' : 'ปิด')} onClick={close}><Icon name="close" /></button></div>{children}</dialog>;
 }
 
 function AnswerText({ text }: { text: string }) {
@@ -57,7 +57,7 @@ export default function Assistant({ base, guest, origin, products, initialSku, d
   const {
     archive, setArchive, updateSession, ready, active, storageError, retrySave, canRetrySave,
     deleteChat, renameChat, selectChat, panel, setPanel, targetChat,
-    openRenameModal, openDeleteModal, openSheet, closePanel, textareaRef
+    openSheet, closePanel, textareaRef
   } = useAssistantContext();
 
   const [editingTitle, setEditingTitle] = useState(false);
@@ -110,6 +110,34 @@ export default function Assistant({ base, guest, origin, products, initialSku, d
 
   useEffect(() => () => { for (const job of pending.current.values()) job.controller.abort(); }, []);
   useEffect(() => { if (!visible) closePanel(); }, [visible, closePanel]);
+  // R2 §D: the History sheet exists only below 1360px (the in-page column takes over), so close it when the window
+  // grows past 1360. CSS alone decides which history is shown; this only keeps one visible instance.
+  const historyColumn = useRef<HTMLElement>(null), historyButton = useRef<HTMLButtonElement>(null), focusInColumn = useRef(false);
+  useEffect(() => {
+    const column = historyColumn.current;
+    if (!column) return;
+    const enter = () => { focusInColumn.current = true; }, leave = (e: FocusEvent) => { if (e.relatedTarget) focusInColumn.current = column.contains(e.relatedTarget as Node); };
+    column.addEventListener('focusin', enter); column.addEventListener('focusout', leave);
+    return () => { column.removeEventListener('focusin', enter); column.removeEventListener('focusout', leave); };
+  }, []);
+  useEffect(() => {
+    const wide = matchMedia('(min-width:1360px)'), update = () => {
+      const column = historyColumn.current;
+      if (wide.matches) {
+        if (panel !== 'sheet') return;
+        closePanel();
+        // The sheet's return target (the History button) is hidden now, so hand focus to the column's current row (or New chat).
+        requestAnimationFrame(() => (column?.querySelector<HTMLElement>('[data-chat-row][tabindex="0"]') ?? column?.querySelector<HTMLElement>('button'))?.focus({ preventScroll: true }));
+      } else if (focusInColumn.current && (column?.contains(document.activeElement) || document.activeElement === document.body)) {
+        // The column just hid with focus inside it (the browser may already have blurred it); the History button takes over.
+        focusInColumn.current = false;
+        requestAnimationFrame(() => historyButton.current?.focus({ preventScroll: true }));
+      }
+    };
+    if (panel === 'sheet') update();
+    wide.addEventListener('change', update);
+    return () => wide.removeEventListener('change', update);
+  }, [panel, closePanel]);
 
   useEffect(() => {
     if (!ready || !visible || !initialSku || !draftRequest || draftHandled.current === draftRequest) return;
@@ -283,28 +311,31 @@ export default function Assistant({ base, guest, origin, products, initialSku, d
     </div>;
   };
 
+  // >=1360 the grid places the history column left of the header and conversation; DOM order keeps the tab order
+  // header, history, conversation, composer (R2 §D). Below 1360 the column is display:none (CSS only, no width check).
   return <div className={s.root} ref={root}>
     <h1 id="screen-title" tabIndex={-1} className="sr-only">{t('assistant')}</h1>
+    <header className={s.chatHeader}>
+      <div className={s.headerLeft}>
+        {editingTitle ? (
+          <form className={s.inlineTitleForm} onSubmit={e => { e.preventDefault(); saveInlineTitle(); }}>
+            <input ref={inlineTitleInput} type="text" className={s.inlineTitleInput} value={inlineTitleDraft} onChange={e => setInlineTitleDraft(e.target.value)} onKeyDown={e => { if (e.key === 'Escape') setEditingTitle(false); }} onBlur={saveInlineTitle} maxLength={120} aria-label={t('name')} />
+            <button type="submit" className={s.inlineTitleCheck} aria-label={t('save')} title={t('save')}><ChatIcon name="check" /></button>
+          </form>
+        ) : (
+          <button type="button" className={s.headerTitleBtn} onClick={() => { setInlineTitleDraft(active?.title || t('untitled')); setEditingTitle(true); }} title={t('tapToRename')} aria-label={`${active?.title || t('untitled')} · ${t('tapToRename')}`}>
+            <span className={s.headerTitleText}>{active?.title || t('untitled')}</span>
+            <span className={s.editHintIcon} aria-hidden="true"><ChatIcon name="edit" /></span>
+          </button>
+        )}
+        {(guest || origin === 'MOCK') && <span className={s.mockBadge} title={locale === 'th' ? 'ข้อมูลจำลอง · ใช้งานฟีเจอร์ของร้านได้ครบ' : 'Sample data · Full store features'} tabIndex={0} role="note" aria-label={t('mock')}>{t('mock')}</span>}
+      </div>
+      <div className={s.headerRight}>
+        <button ref={historyButton} type="button" className={s.historyHeaderButton} onClick={openSheet} aria-label={t('history')} aria-expanded={panel === 'sheet'} aria-haspopup="dialog"><ChatIcon name="history" /><span>{t('historyShort')}</span></button>
+      </div>
+    </header>
+    <aside ref={historyColumn} className={s.historyColumn} aria-label={t('history')}><AssistantHistory /></aside>
     <div className={s.conversation}>
-      <header className={s.chatHeader}>
-        <div className={s.headerLeft}>
-          {editingTitle ? (
-            <form className={s.inlineTitleForm} onSubmit={e => { e.preventDefault(); saveInlineTitle(); }}>
-              <input ref={inlineTitleInput} type="text" className={s.inlineTitleInput} value={inlineTitleDraft} onChange={e => setInlineTitleDraft(e.target.value)} onKeyDown={e => { if (e.key === 'Escape') setEditingTitle(false); }} onBlur={saveInlineTitle} maxLength={120} aria-label={t('name')} />
-              <button type="submit" className={s.inlineTitleCheck} aria-label={t('save')} title={t('save')}><ChatIcon name="check" /></button>
-            </form>
-          ) : (
-            <button type="button" className={s.headerTitleBtn} onClick={() => { setInlineTitleDraft(active?.title || t('untitled')); setEditingTitle(true); }} title={t('tapToRename')} aria-label={`${active?.title || t('untitled')} · ${t('tapToRename')}`}>
-              <span className={s.headerTitleText}>{active?.title || t('untitled')}</span>
-              <span className={s.editHintIcon} aria-hidden="true"><ChatIcon name="edit" /></span>
-            </button>
-          )}
-          {(guest || origin === 'MOCK') && <span className={s.mockBadge} title={locale === 'th' ? 'ข้อมูลจำลอง · ใช้งานฟีเจอร์ของร้านได้ครบ' : 'Sample data · Full store features'} tabIndex={0} role="note" aria-label={t('mock')}>{t('mock')}</span>}
-        </div>
-        <div className={s.headerRight}>
-          <button type="button" className={s.historyHeaderButton} onClick={openSheet} aria-label={t('history')} aria-expanded={panel === 'sheet'} aria-haspopup="dialog"><ChatIcon name="history" /><span>{t('historyShort')}</span></button>
-        </div>
-      </header>
       {storageError && <div className={s.warning} role="status">{t('storageError')}{canRetrySave && <button type="button" onClick={retrySave}>{t('storageRetry')}</button>}</div>}
       {notice && <div className={s.warning} role="status">{t(notice)}</div>}
       <div className={s.messageScroll} ref={scroll} tabIndex={0} aria-label={t('assistant')} onScroll={e => { const el = e.currentTarget; const near = el.scrollHeight - el.scrollTop - el.clientHeight < 90; nearBottom.current = near; setAtBottom(near); }}>
@@ -333,8 +364,8 @@ export default function Assistant({ base, guest, origin, products, initialSku, d
       </div></div>
     </div>
     <div className="sr-only" aria-live="polite" aria-atomic="true">{lastTurn?.state === 'complete' ? lastTurn.reply?.text : ''}{copied ? t('copied') : ''}</div>
-    {panel && <Dialog kind={panel} title={panel==='questions'?(locale==='th'?'100 คำถามสำหรับร้านค้า':'100 merchant questions'):panel==='campaigns'?(locale==='th'?'แพลตฟอร์มและแคมเปญ':'Platform and campaigns'):t(panel === 'sheet' ? 'history' : panel === 'allHistory' ? 'allHistoryTitle' : panel === 'period' ? 'period' : panel === 'products' ? 'product' : panel === 'rename' ? 'renameTitle' : 'deleteTitle')} close={closePanel}>
-      {panel==='questions'?<MerchantQuestions locale={locale} choose={question=>{if(active)updateSession(active.id,chat=>({...chat,draft:question}));closePanel();window.requestAnimationFrame(()=>textareaRef.current?.focus({preventScroll:true}));}}/>:panel==='campaigns'?<ChatCampaignPicker base={base} initial={active?.context.marketplace} cancel={closePanel} apply={value=>{const context={...(active?.context??defaultContext)};if(value)context.marketplace=structuredClone(value);else delete context.marketplace;changeContext(context);}}/>:panel === 'sheet' || panel === 'allHistory' ? <AssistantHistory /> : panel === 'period' ? <form className={s.dialogBody} onSubmit={e => { e.preventDefault(); if (validContext(periodDraft) && Date.parse(periodDraft.end) - Date.parse(periodDraft.start) <= 366 * 86400000) changeContext(periodDraft); }}><p className={s.dialogNote}>{t('optional')}</p><div className={s.presets}>{(['today','week','lastWeek','month','lastMonth'] as const).map(preset => <button type="button" key={preset} className={s.secondary} onClick={() => setPeriodDraft({ ...active?.context, ...contextPreset(preset, bangkokDate()), sku: active?.context.sku ?? null })}>{t(preset === 'month' ? 'thisMonth' : preset === 'week' ? 'thisWeek' : preset)}</button>)}</div><div className={s.dateFields}><label>{t('from')}<input type="date" required value={periodDraft.start} onChange={e => setPeriodDraft(v => ({ ...v, start: e.target.value }))} /></label><label>{t('to')}<input type="date" required value={periodDraft.end} onChange={e => setPeriodDraft(v => ({ ...v, end: e.target.value }))} /></label></div>{(!validContext(periodDraft) || Date.parse(periodDraft.end) - Date.parse(periodDraft.start) > 366 * 86400000) && <p className={s.missing} role="status">{t('invalidRange')}</p>}<button type="submit" disabled={!validContext(periodDraft) || Date.parse(periodDraft.end) - Date.parse(periodDraft.start) > 366 * 86400000}>{t('apply')}</button></form>
+    {panel && <Dialog kind={panel} title={panel==='questions'?(locale==='th'?'100 คำถามสำหรับร้านค้า':'100 merchant questions'):panel==='campaigns'?(locale==='th'?'แพลตฟอร์มและแคมเปญ':'Platform and campaigns'):t(panel === 'sheet' ? 'history' : panel === 'period' ? 'period' : panel === 'products' ? 'product' : panel === 'rename' ? 'renameTitle' : 'deleteTitle')} close={closePanel}>
+      {panel==='questions'?<MerchantQuestions locale={locale} choose={question=>{if(active)updateSession(active.id,chat=>({...chat,draft:question}));closePanel();window.requestAnimationFrame(()=>textareaRef.current?.focus({preventScroll:true}));}}/>:panel==='campaigns'?<ChatCampaignPicker base={base} initial={active?.context.marketplace} cancel={closePanel} apply={value=>{const context={...(active?.context??defaultContext)};if(value)context.marketplace=structuredClone(value);else delete context.marketplace;changeContext(context);}}/>:panel === 'sheet' ? <AssistantHistory /> : panel === 'period' ? <form className={s.dialogBody} onSubmit={e => { e.preventDefault(); if (validContext(periodDraft) && Date.parse(periodDraft.end) - Date.parse(periodDraft.start) <= 366 * 86400000) changeContext(periodDraft); }}><p className={s.dialogNote}>{t('optional')}</p><div className={s.presets}>{(['today','week','lastWeek','month','lastMonth'] as const).map(preset => <button type="button" key={preset} className={s.secondary} onClick={() => setPeriodDraft({ ...active?.context, ...contextPreset(preset, bangkokDate()), sku: active?.context.sku ?? null })}>{t(preset === 'month' ? 'thisMonth' : preset === 'week' ? 'thisWeek' : preset)}</button>)}</div><div className={s.dateFields}><label>{t('from')}<input type="date" required value={periodDraft.start} onChange={e => setPeriodDraft(v => ({ ...v, start: e.target.value }))} /></label><label>{t('to')}<input type="date" required value={periodDraft.end} onChange={e => setPeriodDraft(v => ({ ...v, end: e.target.value }))} /></label></div>{(!validContext(periodDraft) || Date.parse(periodDraft.end) - Date.parse(periodDraft.start) > 366 * 86400000) && <p className={s.missing} role="status">{t('invalidRange')}</p>}<button type="submit" disabled={!validContext(periodDraft) || Date.parse(periodDraft.end) - Date.parse(periodDraft.start) > 366 * 86400000}>{t('apply')}</button></form>
         : panel === 'products' ? <div className={s.dialogBody}><p className={s.dialogNote}>{t('optional')}</p><label className="sr-only" htmlFor="assistant-product-search">{t('searchProducts')}</label><input id="assistant-product-search" type="search" placeholder={t('searchProducts')} value={productSearch} onChange={e => setProductSearch(e.target.value)} /><div className={s.productChoices}><button type="button" aria-pressed={!active?.context.sku} onClick={() => changeContext({ ...(active?.context ?? defaultContext), sku: null })}><Icon name="products" />{t('all')}</button>{products.filter(p => `${p.name} ${p.sku}`.toLocaleLowerCase().includes(productSearch.toLocaleLowerCase())).map(p => <button type="button" key={p.sku} aria-pressed={active?.context.sku === p.sku} onClick={() => changeContext({ ...(active?.context ?? defaultContext), sku: p.sku })}><span>{p.name}<small>{p.sku}</small></span><Icon name="chevronRight" /></button>)}{!products.some(p => `${p.name} ${p.sku}`.toLocaleLowerCase().includes(productSearch.toLocaleLowerCase())) && <p>{t('noProducts')}</p>}{catalogLoading && <p role="status">{t('typing')}</p>}{Boolean(catalogError) && <div role="alert"><p>{t('catalogError')}</p><button type="button" className={s.secondary} onClick={retryCatalog}>{t('retry')}</button></div>}{more && <button type="button" className={s.secondary} disabled={catalogLoading} onClick={loadMore}>{t('loadMore')}</button>}</div></div>
         : panel === 'rename' ? <form className={s.dialogBody} onSubmit={e => { e.preventDefault(); const target = targetChat || active; const title = renameDraft.trim(); if (target && title) renameChat(target.id, title); }}><label htmlFor="assistant-chat-name">{t('name')}</label><input id="assistant-chat-name" value={renameDraft} onChange={e => setRenameDraft(e.target.value)} maxLength={120} required autoFocus /><div className={s.dialogActions}><button type="button" className={s.secondary} onClick={closePanel}>{t('cancel')}</button><button type="submit">{t('save')}</button></div></form>
         : <div className={s.dialogBody}><p>{t('deleteBody')}</p><strong className={s.deleteName}>{targetChat?.title || active?.title || t('untitled')}</strong><div className={s.dialogActions}><button type="button" className={s.secondary} autoFocus onClick={closePanel}>{t('cancel')}</button><button type="button" className={s.deleteConfirmBtn} onClick={() => { const target = targetChat || active; if (target) deleteChat(target.id); }}>{t('delete')}</button></div></div>}

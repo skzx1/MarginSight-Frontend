@@ -134,3 +134,8 @@ CloudShell preflight04:33:33UTC read team account109991964227, Singapore stable 
 ## Completed code/static publication and palette follow-up — 25 October 2026
 
 Fresh preflight06:23:58UTC/read-before-execute BudgetHackathon-Team10 still limit350USD/laggedActualSpend0.033USD, LastUpdated04:22:10UTC. Team350/trial25 unchanged. One reviewed existing-stack code update,18S3readbackobjects and one8path CDN invalidation; no added capacity/resources/IAM. API verification created2 isolatedMOCKsessions and browser1; one real Qwen API question plus one browser question, bounded simulations and reads. No real merchant write/OCR/LINE/training. Standard traffic/inference/storage may accrue; no fresh measured final charge claimed. Pending palette/Sign-in is appearance-only: local53-test build and palette checks so far. Re-read budget before publishing that follow-up.
+
+
+## Appearance follow-up completed — 25 October 2026
+
+Before Cognito/static updates and final readback budgetlimit350USD/laggedActualSpend0.033USD, LastUpdated2026-10-25 04:22:10.530000+00:00. One further CloudShell frontend build, one presentation-only Cognito CSS/logo update with readback/public-image hash, one static publish and one8path invalidationI615ZICUQLD4WENLVHV65VL3Z5 Completed;18S3hashes plus publicread checks. One additional isolatedMOCK browser session for five screen reads; no extra inference/OCR/LINE/real merchant write in this appearance follow-up. No Backend/IaC/IAM/resource/capacity/authpolicy update. Standard build/storage/API/CDN traffic may accrue; lagged spend is not a real-time final bill or remaining credit. Existing team350USD/trial25USD bounds remain.

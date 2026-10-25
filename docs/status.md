@@ -155,3 +155,8 @@ New first-reference M + Rising Line SVG assets are VERIFIED_LOCAL (53 tests/buil
 ## 25 October source and release status
 
 Frontend9f3edfe/Backend031467b are VERIFIED_AWS for landing/logo and expanded storefront assistant fix. Real Qwen API/browser CAP-005 discount28.12THB passed; see verification.md. Subsequent user-provided cream/ink/terracotta palette applies all pages and Cognito branding assets locally;53 tests,37role/32contrast checks and14screens pass, live publication pending at this commit. Overall PARTIAL_WITH_EXTERNAL_BLOCKERS remains.
+
+
+## Warm palette + Sign in live — 25 October 2026
+
+VERIFIED_AWS appearance: Frontend2bc06b9 is live with user-provided cream/ink/terracotta tokens on all app pages, light sidebar and warm hero motion. Cognito logo/CSS updated and app client unchanged. Local53 tests/37palette roles/32contrast checks/14screens; clean CloudShell53tests; S3hashes/CDN/public protections and five liveMOCK sections checked. Backend031467b expanded-storefront/Qwen fix remains live. Details in verification.md. Overall PARTIAL_WITH_EXTERNAL_BLOCKERS remains.

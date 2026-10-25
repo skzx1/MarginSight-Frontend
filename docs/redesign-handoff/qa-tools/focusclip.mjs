@@ -1,6 +1,6 @@
 // Usage: node focusclip.mjs <out.png> <path> <width> <cssSelector> <index> — keyboard-focus element[index] (focus element[index-1], press Tab) and screenshot it at 2x.
 import { spawn } from 'node:child_process'; import { writeFileSync, rmSync } from 'node:fs';
-const [out, path, w, sel, idx] = process.argv.slice(2); const PORT = 9340, prof = new URL('./.chrome-profile-fclip', import.meta.url).pathname.slice(1);
+const [out, path, w, sel, idx] = process.argv.slice(2); const PORT = 9340, prof = new URL('./.chrome-profile-fclip', import.meta.url).pathname;
 rmSync(prof, { recursive: true, force: true });
 const proc = spawn(process.env.CHROME_PATH || '/opt/pw-browsers/chromium', ['--headless=new', '--no-sandbox', '--disable-gpu', '--disable-dev-shm-usage', '--remote-debugging-port=' + PORT, '--user-data-dir=' + prof, '--hide-scrollbars', 'about:blank'], { stdio: 'ignore' });
 const sleep = ms => new Promise(r => setTimeout(r, ms)); let t; for (let i = 0; i < 60 && !t; i++) { try { t = await (await fetch(`http://127.0.0.1:${PORT}/json`)).json(); } catch { await sleep(250); } }

@@ -124,3 +124,8 @@ One clean CloudShell build/verified Node download, one static publish, thirteen 
 ## Store wording/catalog changes — 25 October 2026
 
 Local-only development, static build/tests and isolated local MOCK sessions. Local AI disabled. No AWS requests, resource creation, publish, inference or training in this slice; no new cloud spend from these operations. Existing retained AWS resources may continue accruing charges; no fresh budget/credit snapshot was taken.
+
+
+## Release preparation — 25 October 2026
+
+CloudShell preflight04:33:33UTC read team account109991964227, Singapore stable stack, budget350USD and lagged ActualSpend0.033USD. Clean source builds/backups and SAM prepare were initiated; no stack execute/static publish/model request was issued by this agent before browser tools became unavailable. Preparation can upload SAM artifacts and consume standard S3/CloudShell/API usage; not a local dry run. New logo rendering/build is local only. Verify change-set state and budget before resuming; no final deployment cost or completion claimed.

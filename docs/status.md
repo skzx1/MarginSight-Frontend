@@ -145,3 +145,8 @@ VERIFIED_LOCAL only: ordinary Thai/English store wording replaces visible Demo t
 ## Assistant data repair and source publication — 25 October 2026
 
 VERIFIED_LOCAL: linked sales now let all five new products use assistant scenarios. Existing CAP-005 chat retry returned28.12THB profit after15% discount. Backend62 tests plus6 Python tests pass; Frontend53 tests pass. User authorized commit/push of the current landing/logo/store wording and catalog/assistant changes. AWS remains unchanged; overall PARTIAL_WITH_EXTERNAL_BLOCKERS. See latest verification entry.
+
+
+## Orange logo and pending publication — 25 October 2026
+
+New first-reference M + Rising Line SVG assets are VERIFIED_LOCAL (53 tests/build and vector rendering). AWS build/backups completed for the earlier source, but change-set review/execute and static publish remain unverified/unissued; browser control is blocked. Rebuild the new frontend revision before publication. Overall PARTIAL_WITH_EXTERNAL_BLOCKERS remains.

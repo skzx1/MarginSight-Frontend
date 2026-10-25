@@ -9,7 +9,7 @@ import { fileURLToPath } from 'node:url';
 const HERE = dirname(fileURLToPath(import.meta.url));
 const args = process.argv.slice(2); const out = args[0];
 const opt = (k, d) => { const i = args.indexOf(k); return i > 0 ? args[i + 1] : d; };
-const SCREENS = ['overview', 'products', 'addProduct', 'finance', 'assistant', 'playground', 'store', 'orders', 'imports', 'receipts', 'rules', 'line', 'simulation'];
+const SCREENS = ['overview', 'products', 'addProduct', 'finance', 'assistant', 'playground', 'store', 'orders', 'imports', 'rules', 'line', 'simulation'];
 const pages = opt('--pages', ['/', '/login/', ...SCREENS.map(s => '/login/#' + s)].join(',')).split(',');
 const widths = opt('--widths', '390,1440').split(',').map(Number), LANG = opt('--lang', '');
 const PORT = 9347; const profile = join(HERE, '.chrome-target-' + PORT); rmSync(profile, { recursive: true, force: true });

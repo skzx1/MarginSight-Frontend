@@ -128,7 +128,7 @@ function route(method, path, q, body) {
   if (rest === '/integrations') return [200, { line: { configured: false } }];
   if (rest === '/line/link') return [200, { code: 'QA-123456', instruction: 'ส่งรหัสนี้ใน LINE OA ภายใน 10 นาที' }];
   if (rest === '/assistant-options') return [200, marketplace];
-  if (rest === '/assistant' || rest === '/assistant-scenarios') { const o = monthOrders(TODAY.slice(0, 7))[1]; return [200, { answer: 'เดือนนี้กำไรสุทธิเป็นบวก แต่ SKU LAMP-06 ขาดทุนต่อชิ้นเพราะต้นทุนสูงกว่าราคาหลังหักค่าธรรมเนียม (คำตอบจำลองจาก QA mock)', provider: 'qa-mock', result: o?.result }]; }
+  if (rest === '/assistant' || rest === '/assistant-scenarios') { const o = monthOrders(TODAY.slice(0, 7))[1]; return [200, { answer: 'เดือนนี้กำไรสุทธิเป็นบวก แต่ SKU LAMP-06 ขาดทุนต่อชิ้นเพราะต้นทุนสูงกว่าราคาหลังหักค่าธรรมเนียม (คำตอบจำลองจาก QA mock)', provider: 'qa-mock', decision: { route: 'NORMAL_CHAT', confidence: 1 }, result: o?.result }]; }
   if (rest === '/simulations') { const o = monthOrders(TODAY.slice(0, 7)).find(x => x.input.items[0].sku === body?.sku) ?? monthOrders(TODAY.slice(0, 7))[0]; if (!o) return [404, { error: 'NO_ORDERS' }]; const price = body?.priceSatang ?? o.input.items[0].revenueSatang; const be = breakEven(o.input); return [200, { baseline: o.result, scenario: simulate(o.input, price), breakEven: { priceSatang: be.priceSatang, rangeChecked: be.rangeChecked }, incrementalTtrPercentagePoints: null }]; }
   if (rest === '/imports' || rest === '/receipts') return [200, { id: 'up-1', uploadUrl: 'http://localhost:4051/dev/upload/up-1', contentType: 'text/csv' }];
   if (/^\/(imports|receipts|conflicts)\//.test(rest)) return [200, { ok: true, downloadUrl: 'http://localhost:4051/dev/download/x.csv' }];

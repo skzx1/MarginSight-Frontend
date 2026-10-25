@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import type { CatalogProduct, FeatureProps } from '../../lib/types';
 import { bangkokDate, money } from '../../lib/format';
-import { contextLabel, contextPreset, resolveChatContext } from '../../lib/assistant-context';
+import { contextLabel, contextPreset, resolveChatContext, answerReferenceLabel } from '../../lib/assistant-context';
 import { answerQuestion } from '../../lib/assistant-service';
 import { createChat, sessionTitle, validContext, type ChatContext, type ChatTurn } from '../../lib/assistant-sessions';
 import { useLanguage } from '../language';
@@ -172,7 +172,7 @@ export default function Assistant({ base, guest, origin, products, initialSku, d
   const copy = async (turn: ChatTurn) => {
     if (!turn.reply) return;
     const reply = turn.reply, result = reply.result;
-    const text = [reply.text, result && `${result.label}: ${result.profitSatang == null ? t('missing') : '฿' + money(result.profitSatang, locale)}`, t('basedOn') + ': ' + contextLabel(reply.context, locale) + ' · ' + productLabel(reply.context.sku), reply.note].filter(Boolean).join('\n');
+    const text = [reply.text, result && `${result.label}: ${result.profitSatang == null ? t('missing') : '฿' + money(result.profitSatang, locale)}`, t('basedOn') + ': ' + answerReferenceLabel(reply.context,reply.catalogReferenceAt,locale) + ' · ' + productLabel(reply.context.sku), reply.note].filter(Boolean).join('\n');
     try { await navigator.clipboard.writeText(text); setCopied(turn.id); setTimeout(() => setCopied(''), 1800); } catch { setNotice('copyFailed'); }
   };
   const dateLabel = (context: ChatContext) => context.start === bangkokDate().slice(0, 7) + '-01' && context.end === bangkokDate() ? t('thisMonth') : contextLabel(context, locale);
@@ -199,7 +199,7 @@ export default function Assistant({ base, guest, origin, products, initialSku, d
         </div>}
         <div className={s.answerFootnote}>
           <ChatIcon name="calendar" />
-          <div><span>{t('basedOn')}: {contextLabel(reply.context, locale)} · {productLabel(reply.context.sku)}</span>
+          <div><span>{t('basedOn')}: {answerReferenceLabel(reply.context,reply.catalogReferenceAt,locale)} · {productLabel(reply.context.sku)}</span>
           {reply.note && <span className={s.footnoteNote}> · {reply.note}</span>}</div>
         </div>
         {reply.calculation && <details className={s.evidence}><summary>{t('evidence')}</summary><EvidencePanel result={reply.calculation} /></details>}

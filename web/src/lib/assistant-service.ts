@@ -1,21 +1,27 @@
-import { ApiError, request } from './auth';
-import { monthContext } from './assistant-context';
-import { orderDateTime, ordersInPeriod, periodMonths, summarizeOrders, type OverviewOrder } from './overview-data';
+import { ApiError, request } from './auth.ts';
+import { monthContext } from './assistant-context.ts';
+import { orderDateTime, ordersInPeriod, periodMonths, summarizeOrders, type OverviewOrder } from './overview-data.ts';
+import {isCatalogDiscountQuestion} from './assistant-routing.ts';
 import type { ChatContext, ChatReply } from './assistant-sessions';
 import type { AssistantAnswer, Calculation, CatalogProduct, Dashboard } from './types';
 
 // This adapter reads API-owned results. No fee, discount, or profit formulas live here.
 export async function answerQuestion({ base, question, context, products, locale, signal }: {
   base: string; question: string; context: ChatContext; products: CatalogProduct[]; locale: 'th' | 'en'; signal: AbortSignal;
-}): Promise<ChatReply> {
+},api:typeof request=request): Promise<ChatReply> {
   const th = locale === 'th';
   const notice = (text: string): ChatReply => ({ text, context, source: 'notice' });
-  const scenario = /ลด|discount|คุ้มทุน|ขั้นต่ำ|break.even|โปรแกรม|แคมเปญ|campaign/i.test(question);
+  if(isCatalogDiscountQuestion(question)){
+    if(!context.sku)return notice(th?'ต้องการลองลดราคาสินค้าไหนครับ? เลือกสินค้าก่อน ผมจะใช้ราคากับต้นทุนสินค้าปัจจุบัน ไม่ต้องมีออเดอร์ขาย':'Which product would you like to discount? Select a product. I will use its current catalog price and cost; a sales order is not required.');
+    const answer=await api<AssistantAnswer & {catalogScenario:{basis:'CATALOG';at:string}}>(base+'/assistant/catalog-discount',{message:question.slice(0,1500),sku:context.sku,locale},signal);
+    return {text:answer.answer,context,source:'fallback',catalogReferenceAt:answer.catalogScenario.at,note:th?'ใช้ราคากับต้นทุนสินค้าปัจจุบันต่อ 1 หน่วย เป็นการเปรียบเทียบก่อนค่าใช้จ่ายอื่น ไม่ใช่กำไรสุทธิหรือยอดขายของเดือนที่เลือก':'Current catalog price and cost for one unit. This comparison is before other expenses, not net profit or recorded sales for the selected month.'};
+  }
+  const scenario = /คุ้มทุน|ขั้นต่ำ|break.even|โปรแกรม|แคมเปญ|campaign/i.test(question);
   if (scenario) {
     if (!context.sku) return notice(th ? 'อยากลองกับสินค้าตัวไหนครับ? พิมพ์ชื่อหรือ SKU ต่อได้เลย หรือแตะ “ทุกสินค้า” ใต้ช่องพิมพ์เพื่อเลือก ผมจะใช้ต้นทุนและค่าบริการที่บันทึกไว้คำนวณให้' : 'Which product would you like to try? Reply with its full name or SKU, or tap “All products” below the input. I’ll use its recorded costs and fees.');
     if (context.start.slice(0, 7) !== context.end.slice(0, 7)) return notice(th ? 'การจำลองราคาตอนนี้ใช้ข้อมูลได้ครั้งละหนึ่งเดือนครับ แตะช่วงวันที่ใต้ช่องพิมพ์เพื่อเลือกเดือน แล้วส่งคำถามอีกครั้งได้เลย' : 'Price scenarios currently use one month at a time. Choose a month below the input and ask again.');
     let answer: AssistantAnswer & { comparison?: { withoutProgram?: Calculation; withProgram?: Calculation } };
-    try { answer = await request(base + '/assistant', { message: question.slice(0, 1500), sku: context.sku, month: context.start.slice(0, 7) }, signal); }
+    try { answer = await api(base + '/assistant', { message: question.slice(0, 1500), sku: context.sku, month: context.start.slice(0, 7) }, signal); }
     catch (error) {
       if (error instanceof ApiError && ['SKU_HAS_NO_ORDER','SIMULATION_REQUIRES_SINGLE_SKU_ORDER'].includes(error.code)) return notice(th ? 'ยังไม่มีออเดอร์สินค้าเดียวที่ใช้จำลองได้ในเดือนนี้ครับ ลองเปลี่ยนสินค้า หรือดูออเดอร์และเติมข้อมูลก่อน' : 'There is no usable single-product order for this scenario in the selected month. Try another product or review its orders.');
       throw error;
@@ -35,7 +41,7 @@ export async function answerQuestion({ base, question, context, products, locale
   const snapshots: Dashboard[] = [];
   for (let i = 0; i < months.length; i += 3) {
     signal.throwIfAborted();
-    snapshots.push(...await Promise.all(months.slice(i, i + 3).map(month => request<Dashboard>(`${base}/dashboard?month=${month}`, undefined, signal))));
+    snapshots.push(...await Promise.all(months.slice(i, i + 3).map(month => api<Dashboard>(`${base}/dashboard?month=${month}`, undefined, signal))));
   }
   const results = snapshots.flatMap(s => s.results);
   const partial = snapshots.some(s => s.totalOrders > s.results.length);
@@ -56,7 +62,7 @@ export async function answerQuestion({ base, question, context, products, locale
   const orders = ordersInPeriod(asOrders(selected), period, context.end);
   if (!orders.length) return notice(partial
     ? (th ? 'ยังไม่พบออเดอร์ที่ตรงกับคำถามในรายละเอียดที่โหลดมาครับ API ส่งรายละเอียดได้สูงสุด 50 ออเดอร์ต่อเดือน จึงยังสรุปไม่ได้ว่าทั้งช่วงไม่มียอดขาย' : 'No matching orders were found in the loaded details. The API returns up to 50 order details per month, so this does not mean the whole period had no sales.')
-    : (th ? 'ยังไม่พบออเดอร์ในช่วงนี้ครับ ลองเปลี่ยนช่วงวันที่ หรือเพิ่มรายงานการขายก่อน ผมจะไม่แทนข้อมูลที่ไม่มีด้วยกำไรศูนย์' : 'No recorded orders were found for this period. Try another date range or import sales first. Missing records are not treated as zero profit.'));
+    : (th ? 'ยังไม่พบออเดอร์ในช่วงนี้ครับ กำไรเดือนนี้ต้องอิงยอดขายที่เกิดขึ้นจริง การเพิ่มสินค้าอย่างเดียวยังไม่ใช่ออเดอร์ ลองเปลี่ยนช่วงวันที่หรือนำเข้ารายงานขายก่อนได้ครับ ถ้าจะลองส่วนลด ถาม “ลดราคา 20%” ได้จากราคากับต้นทุนสินค้า โดยไม่ต้องมีออเดอร์' : 'No recorded orders were found for this period. Monthly profit needs actual sales; adding a product does not create an order. Change the period or import sales. For price planning, ask “discount 20%” using the catalog without an order.'));
   const scope = [th ? 'รวมเฉพาะต้นทุนและค่าใช้จ่ายที่บันทึกไว้' : 'Includes recorded costs and expenses only',
     ...(partial ? [th ? 'API ส่งรายละเอียดได้สูงสุด 50 ออเดอร์ต่อเดือน ผลนี้ครอบคลุมเฉพาะออเดอร์ที่โหลดมา' : 'The API returns up to 50 order details per month. This result covers loaded orders only.'] : []),
     results.some(r => !r.orderAt) ? (th ? 'มีรายการที่ไม่มีวันที่ จึงยังนำมารวมในช่วงนี้ไม่ได้' : 'Records without dates could not be included.') : ''

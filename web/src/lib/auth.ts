@@ -9,7 +9,8 @@ export async function login(register=false){clearFullDemo();await loadConfig();c
 export async function session(){await loadConfig();const query=new URLSearchParams(location.search),code=query.get('code');if(code){clearFullDemo();const state=sessionStorage.getItem('oauthState'),verifier=sessionStorage.getItem('pkce');if(!state||query.get('state')!==state||!verifier)throw Error('สถานะเข้าสู่ระบบไม่ถูกต้อง กรุณาลองใหม่');history.replaceState({},'',location.pathname);const result=await fetch(domain+'/oauth2/token',{method:'POST',headers:{'content-type':'application/x-www-form-urlencoded'},body:new URLSearchParams({grant_type:'authorization_code',client_id:client,code,redirect_uri:location.origin+'/',code_verifier:verifier})});if(!result.ok)throw Error('เข้าสู่ระบบไม่สำเร็จ');const tokens=await result.json();sessionStorage.setItem('token',tokens.access_token);sessionStorage.removeItem('pkce');sessionStorage.removeItem('oauthState')}if(fullDemoMode()){if(Number(sessionStorage.getItem('demoExpiresAt'))*1000<=Date.now()){clearFullDemo();return null}return sessionStorage.getItem('demoToken')}return sessionStorage.getItem('token')}
 export async function demo(user='demo-a'){if(process.env.NEXT_PUBLIC_AUTH_MODE!=='local'&&!api.startsWith('http://localhost:'))throw Error('บัญชีทดลองใช้ได้เฉพาะเครื่อง');const r=await fetch(api+'/dev/login',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({user})});const v=await r.json();sessionStorage.setItem('token',v.accessToken);return v.accessToken}
 export class ApiError extends Error {
- constructor(public code: string, public statusCode: number) { super(code); this.name = 'ApiError'; }
+ code:string;statusCode:number;
+ constructor(code: string, statusCode: number) { super(code); this.name = 'ApiError';this.code=code;this.statusCode=statusCode; }
 }
 export async function request<T = unknown>(path:string,body?:unknown,signal?:AbortSignal):Promise<T> {
  await loadConfig();

@@ -410,3 +410,8 @@ Deployed API check07:38:51UTC used two isolated MOCK tenants: create24999satang/
 Browser live MOCK manual form: create249.99THB/42units, refresh retains both; edit299.50THB/7units and refresh retains both; cost120.50THB unchanged. No horizontal overflow or console errors. Evidence in Frontend .local/product-listing-20261025/aws-final-report.json, browser-verification.json, evidence/products-live.png; CloudShell backup /tmp/marginshot-listing-20261025-15_tvv_j is ephemeral. Existing prices/quantities discarded by the old form were never stored: users must enter them once through product details → แก้ไขราคาขายและจำนวน. No inferred prices or REAL-store seeding.
 
 Overall PARTIAL_WITH_EXTERNAL_BLOCKERS remains for prior realOCR/LINE/nativeplatform/two-Cognito workflows. This feature's checks do not represent FULL_SCOPE_VERIFIED or live merchant adoption.
+
+
+## Catalog discount routing and seven fixture listings — 25 October 2026
+
+VERIFIED_LOCAL: user-requested current-product discount path now works without sales; monthly profit still uses recorded orders. Pre-expense difference is explicitly separate from unknown net profit; no client money inputs, order creation or price mutations. Product-reference timestamp survives history/copy. All seven MOCK fixtures have price/quantity, with conditional missing-only upgrade for old authorized guest catalogs; REAL/personal/custom/edited/zero values preserved. Frontend61/Backend78 tests and builds pass, financial contract unchanged. See Backend docs/catalog-discount.md and docs/storefront-listings.md. AWS pending at this source commit; PARTIAL_WITH_EXTERNAL_BLOCKERS remains.

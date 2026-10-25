@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { cr } from './lib/color.mjs';
+import { cr, CVD, de2000, lab, sim } from './lib/color.mjs';
 import { readRootProperties, resolveProperty } from './lib/css.mjs';
 
 // Pair IDs follow the redesign contrast criteria (T = text >= 4.5:1, N = non-text >= 3:1).
@@ -56,4 +56,38 @@ test('semantic token names describe a role, not a hue', () => {
 });
 test('the approved gain colour is the muted green #17735C', () => {
   assert.equal(hex('--color-positive').toLowerCase(), '#17735c');
+});
+
+// Chart series (criteria C1-C3, C3b, C9, N8). CVD = Machado 2009 at full severity.
+const MEASURES = ['--chart-revenue', '--chart-cost', '--chart-profit', '--chart-loss'];
+const CHANNELS = ['--chart-ch-shopee', '--chart-ch-lazada', '--chart-ch-tiktok', '--chart-ch-line', '--chart-ch-store', '--chart-ch-other'];
+const CVD_MODES = ['protan(Machado09,s=1)', 'deutan(Machado09,s=1)', 'tritan(Machado09,s=1)'];
+const pairs = list => list.flatMap((a, i) => list.slice(i + 1).map(b => [a, b]));
+const dE = (a, b) => de2000(lab(hex(a)), lab(hex(b)));
+const dECvd = (a, b, mode) => de2000(lab(sim(hex(a), CVD[mode])), lab(sim(hex(b), CVD[mode])));
+
+test('every chart series reaches 3:1 on the plot background (N8)', () => {
+  expectPairs(3, [...MEASURES, ...CHANNELS], ['--color-bg-surface', '--color-bg-canvas']);
+});
+test('measure series stay distinct in colour, under colour-vision deficiency and in grey (C3)', () => {
+  for (const [a, b] of pairs(MEASURES)) {
+    assert.ok(dE(a, b) >= 15, `${a} vs ${b} dE2000 ${dE(a, b).toFixed(1)}`);
+    // Profit and loss are one series split at the zero line (position, sign and label carry it), so only the normal-vision gap applies.
+    if (a === '--chart-profit' && b === '--chart-loss') continue;
+    for (const mode of CVD_MODES) assert.ok(dECvd(a, b, mode) >= 10, `${a} vs ${b} ${mode} ${dECvd(a, b, mode).toFixed(1)}`);
+    assert.ok(Math.abs(lab(hex(a))[0] - lab(hex(b))[0]) >= 5, `${a} vs ${b} |dL*|`);
+  }
+});
+test('channel series stay distinct, step in luminance and do not read as text (C3, C3b)', () => {
+  for (const [a, b] of pairs(CHANNELS)) {
+    assert.ok(dE(a, b) >= 15, `${a} vs ${b} dE2000 ${dE(a, b).toFixed(1)}`);
+    for (const mode of CVD_MODES) assert.ok(dECvd(a, b, mode) >= 10, `${a} vs ${b} ${mode} ${dECvd(a, b, mode).toFixed(1)}`);
+    assert.ok(cr(hex(a), hex(b)) >= 1.2, `${a} vs ${b} luminance ratio ${cr(hex(a), hex(b)).toFixed(2)}`);
+  }
+  expectPairs(2, CHANNELS, ['--color-text']);
+});
+test('info stays a status colour, far from every series (C9)', () => {
+  for (const name of [...MEASURES, ...CHANNELS]) assert.ok(dE(name, '--color-info') >= 12, `${name} vs info ${dE(name, '--color-info').toFixed(1)}`);
+  const info = hex('--color-info').toLowerCase();
+  for (const name of props.keys()) if (name.startsWith('--chart-')) assert.notEqual(hex(name).toLowerCase(), info, name);
 });

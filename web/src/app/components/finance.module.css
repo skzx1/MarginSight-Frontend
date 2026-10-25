@@ -24,7 +24,7 @@
 .kpi h2{font-size:var(--text-sm);font-weight:500;color:var(--color-text-muted)}
 .kpi strong{font-family:var(--font-numeric);font-size:var(--text-2xl);font-weight:600;line-height:1.3;letter-spacing:-.01em;overflow-wrap:anywhere}
 .kpiProfit{background:var(--color-accent-tint);color:var(--color-action)}
-.spark{width:100%;height:24px;fill:none;stroke:var(--chart-1);stroke-width:1.6}
+.spark{width:100%;height:24px;fill:none;stroke:var(--chart-revenue);stroke-width:1.6}
 .delta{font-size:var(--text-xs);color:var(--color-text-muted)}
 .positive{color:var(--color-positive)}
 .negative{color:var(--color-negative)}
@@ -41,20 +41,18 @@
 .statement .net{margin-top:8px;padding:14px 12px;border:0;border-radius:var(--radius-md);background:var(--color-accent-tint);color:var(--color-action);font-size:var(--text-base);font-weight:600}
 .statement .net.negative{background:var(--color-negative-bg);color:var(--color-negative)}
 .allocation{display:flex;height:8px;border-radius:4px;overflow:hidden;margin:20px 0 6px;background:var(--color-bg-subtle)}
-.allocation span{background:var(--chart-1)}
-.allocation span+span{background:var(--chart-5);margin-left:2px}
+.allocation span{background:var(--chart-profit)}
+.allocation span+span{background:var(--chart-cost);margin-left:2px}
 .segmented{display:flex;flex-wrap:wrap;gap:4px;margin-top:16px}
 .segmented button{font-size:var(--text-xs);padding:8px 14px;border-color:transparent;border-radius:var(--radius-pill);background:transparent;color:var(--color-text-muted)}
 .segmented button[aria-pressed=true]{background:var(--color-accent-tint);border-color:var(--color-selected);color:var(--color-action);font-weight:600}
 .chart{display:block;width:100%;height:auto;margin:14px 0;overflow:visible}
-.chart text{fill:var(--color-text-muted);font-size:var(--text-xs)}
-.gridLine{stroke:var(--color-border);stroke-dasharray:3 5}
-.mainLine,.secondaryLine{stroke:var(--chart-sales);fill:var(--chart-sales);stroke-width:2.5}
-.mainLine path,.secondaryLine path{fill:none}
-.secondaryLine{stroke:var(--chart-profit);fill:var(--chart-profit);stroke-dasharray:6 4}
+.chart text{fill:var(--chart-axis);font-size:var(--text-xs)}
+.gridLine{stroke:var(--chart-grid);stroke-dasharray:3 5}
 .chartReadout{display:flex;flex-wrap:wrap;gap:16px;align-items:end;padding-top:12px;border-top:1px solid var(--color-border)}
 .chartReadout label{display:grid;gap:4px;font-size:var(--text-xs);color:var(--color-text-muted)}
 .chartReadout div{display:grid;gap:4px}
+.chartReadout small{display:inline-flex;align-items:center;gap:6px}
 .chartReadout strong{font-family:var(--font-numeric);font-size:var(--text-lg)}
 .details{margin-top:12px}
 .details summary{cursor:pointer;color:var(--color-link);display:flex;align-items:center;gap:8px;font-size:var(--text-sm)}
@@ -70,10 +68,10 @@
 .page tfoot{font-weight:600;background:var(--color-bg-subtle)}
 .best{background:var(--color-accent-tint)}
 .share{display:flex;align-items:center;gap:10px}
-.share meter{width:70px;height:8px;accent-color:var(--chart-1)}
+.share meter{width:70px;height:8px;accent-color:var(--chart-revenue)}
 .page meter::-webkit-meter-bar{background:var(--color-bg-subtle);border:0}
-.page meter::-webkit-meter-optimum-value{background:var(--chart-1)}
-.page meter::-moz-meter-bar{background:var(--chart-1)}
+.page meter::-webkit-meter-optimum-value{background:var(--chart-revenue)}
+.page meter::-moz-meter-bar{background:var(--chart-revenue)}
 .orderFilters{display:grid;grid-template-columns:1fr;gap:12px;margin:16px 0}
 .orderFilters label{display:grid;gap:4px;font-size:var(--text-sm)}
 .statusCounts{display:flex;flex-wrap:wrap;gap:10px;margin:16px 0}
@@ -85,7 +83,7 @@
 .ranking li span{overflow-wrap:anywhere}
 .ranking strong{white-space:nowrap;font-weight:600;font-family:var(--font-numeric)}
 .expenseRow{display:grid;grid-template-columns:minmax(100px,1fr) minmax(30px,2fr) auto;align-items:center;gap:16px;margin:16px 0}
-.expenseRow meter{width:100%;height:14px;accent-color:var(--chart-1)}
+.expenseRow meter{width:100%;height:14px;accent-color:var(--chart-cost)}
 .expenseForm{margin:20px 0;padding:20px;background:var(--color-bg-subtle);border:1px solid var(--color-border);border-radius:var(--radius-lg);display:grid;gap:16px;grid-template-columns:1fr}
 .expenseForm label{display:grid;gap:4px;font-size:var(--text-sm)}
 .formActions{display:flex;justify-content:flex-end;gap:12px;align-items:center;flex-wrap:wrap;grid-column:1/-1}

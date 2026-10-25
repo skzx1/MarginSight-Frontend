@@ -13,8 +13,8 @@
  --mustard-700:#735c00;--mustard-300:#e3c35a;--mustard-50:#f5edcf;
  --navy-700:#2f5784;--navy-200:#a9c2e3;--navy-50:#e5ecf4;
  --green-700:#145f4c;--green-600:#17735c;--green-200:#9acbae;--green-50:#e3f1ec;
- /* Chart series keep their previous values until chart roles replace index colours (P1b). */
- --series-green:#187b62;--series-orange:#c26b12;--series-blue:#3c5fa8;--series-purple:#8a4f9e;--series-slate:#5c6b63;
+ /* Channel series: a luminance ladder, each >= 3:1 on surface and canvas and >= 2:1 against ink text. */
+ --brown-700:#6b3d1c;--blue-500:#556dc6;--plum-600:#61506d;--leaf-500:#588e44;--slate-green-600:#56695c;--stone-450:#958f86;
 
  /* 2. Semantic roles */
  --color-action:var(--terracotta-600);--color-action-hover:var(--terracotta-700);--color-on-action:var(--cream-0);
@@ -39,8 +39,15 @@
  --color-warning-on-dark:var(--mustard-300);--color-info-on-dark:var(--navy-200);
  /* Retired roles kept as aliases while components migrate */
  --color-accent:var(--color-action);--color-accent-tint:var(--color-bg-subtle);
- --chart-1:var(--series-green);--chart-2:var(--series-orange);--chart-3:var(--series-blue);--chart-4:var(--series-purple);--chart-5:var(--series-slate);
- --chart-sales:var(--chart-1);--chart-profit:var(--chart-2);
+ /* Charts: measures and channels are separate palettes and never share a chart. Colour is never the only key:
+    lines also differ by dash and marker, loss sits below the zero line, and the highlight is a ring, never a fill. */
+ --chart-revenue:var(--ink-800);--chart-cost:var(--stone-500);--chart-profit:var(--green-600);--chart-loss:var(--burgundy-600);
+ --chart-highlight:var(--terracotta-600);--chart-grid:var(--cream-250);--chart-axis:var(--stone-700);
+ --chart-ch-shopee:var(--brown-700);--chart-ch-lazada:var(--blue-500);--chart-ch-tiktok:var(--plum-600);
+ --chart-ch-line:var(--leaf-500);--chart-ch-store:var(--slate-green-600);--chart-ch-other:var(--stone-450);
+ /* Deprecated index and measure aliases kept while nothing new uses them */
+ --chart-1:var(--chart-ch-shopee);--chart-2:var(--chart-ch-lazada);--chart-3:var(--chart-ch-tiktok);--chart-4:var(--chart-ch-line);--chart-5:var(--chart-ch-store);
+ --chart-sales:var(--chart-revenue);
 
  /* Typography */
  --font-sans:'Anuphan','Inter',Tahoma,sans-serif;--font-numeric:'Inter','Anuphan',sans-serif;

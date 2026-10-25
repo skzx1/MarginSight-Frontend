@@ -5,6 +5,8 @@ import { dailySummaries, channelSummaries, type OverviewOrder } from '../../lib/
 import { money } from '../../lib/format';
 import { Money } from './ledger';
 import { ProfitAmount } from './profit-amount';
+import { SeriesMark, SeriesSwatch } from './chart-marks';
+import { channelColorClass } from '../../lib/chart-roles';
 
 /** 2px surface-coloured gap between donut segments, in pathLength (100) units of the r=76 ring. */
 const DONUT_GAP = 2 / (2 * Math.PI * 76) * 100;
@@ -30,14 +32,15 @@ export function OverviewCharts({ orders }: { orders: OverviewOrder[] }) {
   return <div className="dashboard-charts">
     <section className="performance-panel">
       <div className="chart-heading"><div><span className="eyebrow">{th ? 'ร้านของคุณในช่วงนี้' : 'Your store this period'}</span><h2>{th ? 'ยอดขายและกำไร' : 'Sales & profit'}</h2></div><span className="chart-unit">{th ? 'บาท · รายวัน' : 'THB · Daily'}</span></div>
-      <div className="chart-legend"><span><i className="sales-dot" />{t('salesCard')}</span><span><i className="profit-dot" />{t('profitCard')}</span></div>
+      <div className="chart-legend"><span><SeriesSwatch series="revenue" />{t('salesCard')}</span><span><SeriesSwatch series="profit" />{t('profitCard')}</span></div>
       {!days.length ? <p className="chart-empty">{t('noOrdersInPeriod')}</p> : <>
         <svg className="sales-chart" viewBox="0 0 720 270" role="img" aria-label={th ? 'กราฟยอดขายและกำไรรายวัน ดูตัวเลขครบได้ในตารางด้านล่าง' : 'Daily sales and profit; exact values in the table below'}>
           {[0, 1, 2, 3, 4].map(i => { const value = min + (max - min) * i / 4; return <g key={i}><line x1="64" x2="680" y1={y(value)} y2={y(value)} className="chart-grid" /><text x="54" y={y(value) + 4} textAnchor="end" className="chart-axis">{new Intl.NumberFormat(th ? 'th-TH' : 'en-GB', { notation: 'compact', maximumFractionDigits: 1 }).format(value / 100)}</text></g>; })}
-          <path d={path('revenueSatang')} className="sales-line" /><path d={path('profitSatang')} className="profit-line" />
+          {min < 0 && <line x1="64" x2="680" y1={y(0)} y2={y(0)} className="chart-zero" />}
+          <path d={path('revenueSatang')} className="series-line series-revenue" /><path d={path('profitSatang')} className="series-line series-profit" />
           {days.map((day, i) => <g key={day.day}>
-            <circle cx={x(i)} cy={y(day.revenueSatang)} r="4" className="sales-point"><title>{day.day}: {money(day.revenueSatang, locale)} THB</title></circle>
-            {day.profitSatang != null && <circle cx={x(i)} cy={y(day.profitSatang)} r="4" className="profit-point"><title>{day.day}: {money(day.profitSatang, locale)} THB</title></circle>}
+            <SeriesMark series="revenue" x={x(i)} y={y(day.revenueSatang)}><title>{day.day}: {money(day.revenueSatang, locale)} THB</title></SeriesMark>
+            {day.profitSatang != null && <SeriesMark series="profit" x={x(i)} y={y(day.profitSatang)} loss={day.profitSatang < 0}><title>{day.day}: {money(day.profitSatang, locale)} THB</title></SeriesMark>}
             {(i === 0 || i === days.length - 1 || (days.length > 4 && i === Math.floor(days.length / 2))) && <text x={x(i)} y="252" textAnchor="middle" className="chart-axis">{day.day.slice(8)}/{day.day.slice(5, 7)}</text>}
           </g>)}
         </svg>
@@ -47,8 +50,8 @@ export function OverviewCharts({ orders }: { orders: OverviewOrder[] }) {
       <p className="caption chart-note">{t('loadedOnly')} · {days.length === 1 && (th ? 'มีข้อมูล 1 วัน จึงแสดงเป็นจุด · ' : 'One recorded day is shown as points · ')}{th ? 'วันที่ข้อมูลไม่ครบจะแสดงกำไรเป็น — และเว้นเส้นกราฟ' : 'Incomplete days show no profit value and a gap in the line.'}</p>
     </section>
     <section className="channel-panel"><span className="eyebrow">{th ? 'ช่องทางขาย' : 'Sales channels'}</span><h2>{th ? 'ยอดขายมาจากไหน' : 'Where sales come from'}</h2>
-      {canShare && <div className="channel-donut"><svg viewBox="0 0 200 200" role="img" aria-label={th ? 'สัดส่วนยอดขายตามช่องทาง ดูตัวเลขในรายการด้านล่าง' : 'Sales share by channel; values listed below'}><circle cx="100" cy="100" r="76" className="donut-track" />{channels.map((row, i) => { const share = row.revenueSatang / total * 100; const start = offset; offset += share; const visible = channels.length > 1 ? Math.max(share - DONUT_GAP, 0) : share; return <circle key={row.platform} cx="100" cy="100" r="76" pathLength="100" fill="none" strokeWidth="18" className={`channel-color-${i % 5}`} strokeDasharray={`${visible} ${100 - visible}`} strokeDashoffset={-start} transform="rotate(-90 100 100)" />; })}</svg><div><small>{t('salesCard')}</small><strong><Money value={total} /></strong></div></div>}
-      {!channels.length ? <p className="chart-empty">{t('noOrdersInPeriod')}</p> : <ul className="channel-key">{channels.map((row, i) => <li key={row.platform}><span><i className={`channel-color-${i % 5}`} />{row.platform}<small>{row.totalOrders} {t('orders')}</small></span><strong><Money value={row.revenueSatang} />{canShare && <small>{new Intl.NumberFormat(th ? 'th-TH' : 'en-GB', { maximumFractionDigits: 1 }).format(row.revenueSatang / total * 100)}%</small>}</strong></li>)}</ul>}
+      {canShare && <div className="channel-donut"><svg viewBox="0 0 200 200" role="img" aria-label={th ? 'สัดส่วนยอดขายตามช่องทาง ดูตัวเลขในรายการด้านล่าง' : 'Sales share by channel; values listed below'}><circle cx="100" cy="100" r="76" className="donut-track" />{channels.map(row => { const share = row.revenueSatang / total * 100; const start = offset; offset += share; const visible = channels.length > 1 ? Math.max(share - DONUT_GAP, 0) : share; return <circle key={row.platform} cx="100" cy="100" r="76" pathLength="100" fill="none" strokeWidth="18" className={channelColorClass(row.platform)} strokeDasharray={`${visible} ${100 - visible}`} strokeDashoffset={-start} transform="rotate(-90 100 100)" />; })}</svg><div><small>{t('salesCard')}</small><strong><Money value={total} /></strong></div></div>}
+      {!channels.length ? <p className="chart-empty">{t('noOrdersInPeriod')}</p> : <ul className="channel-key">{channels.map(row => <li key={row.platform}><span><i className={channelColorClass(row.platform)} />{row.platform}<small>{row.totalOrders} {t('orders')}</small></span><strong><Money value={row.revenueSatang} />{canShare && <small>{new Intl.NumberFormat(th ? 'th-TH' : 'en-GB', { maximumFractionDigits: 1 }).format(row.revenueSatang / total * 100)}%</small>}</strong></li>)}</ul>}
       {!canShare && channels.length > 0 && <p className="caption">{th ? 'แสดงยอดตามบันทึก ไม่แปลงยอดติดลบหรือยอดรวมศูนย์เป็นสัดส่วน' : 'Recorded signed amounts are listed without a percentage for negative or zero totals.'}</p>}
     </section>
   </div>;

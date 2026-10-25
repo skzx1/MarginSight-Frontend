@@ -29,7 +29,7 @@ export function niceTicks(min: number, max: number, maxTicks = 5): Ticks {
 /** Compact axis number ("12.5K", "−410", "0"): a negative value carries U+2212, never an ASCII hyphen; a value that prints as 0 has no sign. */
 export function axisNumber(value: number, locale = 'th'): string {
   if (!Number.isFinite(value)) return '—';
-  const digits = new Intl.NumberFormat(locale === 'en' ? 'en-GB' : 'th-TH', { notation: 'compact', maximumFractionDigits: 1 }).format(Math.abs(value));
+  const digits = new Intl.NumberFormat(locale === 'en' ? 'en-US' : 'th-TH', { notation: 'compact', maximumFractionDigits: 1 }).format(Math.abs(value));
   return value < 0 && /[1-9]/.test(digits) ? MINUS + digits : digits;
 }
 

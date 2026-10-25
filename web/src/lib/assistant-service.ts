@@ -18,6 +18,7 @@ export async function answerQuestion({ base, question, context, products, locale
   const chat=await api<{kind:'GENERAL'|'STORE_DATA';answer?:string;provider?:string}>(base+'/assistant',{mode:'chat',message:question.slice(0,1500),locale,history:history.slice(-8).map(row=>({...row,text:row.text.slice(0,1500)}))},signal);
   if(chat.kind==='GENERAL')return {text:chat.answer??(th?'ลองส่งคำถามอีกครั้งครับ':'Please try again.'),context,source:chat.provider==='bedrock-chat'?'assistant':'notice',conversation:'general'};
   if(chat.kind!=='STORE_DATA')throw Error('INVALID_CHAT_ROUTING_RESPONSE');
+  if(/แคมเปญ|โปรแกรม(?:นี้|ที่เลือก)/i.test(question)&&(!/เดือนนี้|สัปดาห์นี้|this month|this week/i.test(question)||isCatalogDiscountQuestion(question))&&(!context.marketplace||context.marketplace.platform==='recorded'))return notice(th?'เลือกแพลตฟอร์มและแคมเปญที่ปุ่ม “แคมเปญ” ใต้ช่องพิมพ์ก่อนครับ แล้วผมจะใช้เงื่อนไขที่เลือกคำนวณให้':'Choose the platform and campaigns below the input first, then I can calculate that selection.');
   const campaignQuestion=context.marketplace&&context.marketplace.platform!=='recorded'&&/แคมเปญ|โปรแกรม|campaign/i.test(question)&&!/เดือนนี้|สัปดาห์นี้|this month|this week/i.test(question);
   if(isCatalogDiscountQuestion(question)||campaignQuestion){
     if(!context.sku)return notice(th?'ต้องการลองลดราคาสินค้าไหนครับ? เลือกสินค้าก่อน ผมจะใช้ราคากับต้นทุนสินค้าปัจจุบัน ไม่ต้องมีออเดอร์ขาย':'Which product would you like to discount? Select a product. I will use its current catalog price and cost; a sales order is not required.');
@@ -44,7 +45,7 @@ export async function answerQuestion({ base, question, context, products, locale
         ...(answer.comparison?.withoutProgram && answer.comparison.withProgram ? { beforeSatang: answer.comparison.withoutProgram.profitSatang, afterSatang: answer.comparison.withProgram.profitSatang } : {}) } } : {}) };
   }
 
-  if(!/กำไร|ยอด|ขาย|profit|sales|revenue|earn/i.test(question))return notice(th?'อยากดูข้อมูลร้านส่วนไหนครับ? เช่น “กำไรเดือนนี้เท่าไร” หรือ “ลดราคา 20%” ผมจะใช้ข้อมูลที่บันทึกไว้คำนวณให้':'Which shop figure would you like to check? For example, monthly profit or a 20% discount.');
+  if(!/กำไร|ขาดทุน|ยอด|ขาย|profit|loss|sales|revenue|earn/i.test(question))return notice(th?'อยากดูข้อมูลร้านส่วนไหนครับ? เช่น “กำไรเดือนนี้เท่าไร” หรือ “ลดราคา 20%” ผมจะใช้ข้อมูลที่บันทึกไว้คำนวณให้':'Which shop figure would you like to check? For example, monthly profit or a 20% discount.');
   const period = { type: 'custom' as const, start: context.start, end: context.end };
   const months = periodMonths(period, context.end);
   if (!months.length || months.length > 12) return notice(th ? 'เลือกช่วงวันที่ไม่เกิน 12 เดือน แล้วถามใหม่ได้เลยครับ' : 'Please choose a range of up to 12 months and ask again.');

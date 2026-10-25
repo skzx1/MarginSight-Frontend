@@ -25,6 +25,7 @@ test('chat campaign selection is validated against Playground options and forwar
 });
 test('a selected campaign can be compared at the current product price without discount wording or orders',async()=>{
  const calls=[];await answerQuestion({...input('แคมเปญนี้เหลือเท่าไร'),context:{...context,marketplace}},async(path,body)=>{calls.push([path,body]);return path.endsWith('/assistant-options')?options:{answer:'ส่วนต่างหลังค่าบริการ',catalogScenario:{basis:'CATALOG',at:'2026-10-25T10:00:00.000Z'}};});assert.equal(calls.at(-1)[0],'/stores/QA/assistant/catalog-discount');
+ const absent=await answerQuestion(input('แคมเปญนี้เหลือเท่าไร'),async()=>{throw Error('CAMPAIGN_MUST_BE_SELECTED')});assert.equal(absent.source,'notice');assert.match(absent.text,/เลือกแพลตฟอร์มและแคมเปญ/);
 });
 test('campaign assumptions survive history with each turn and malformed assumptions are rejected',()=>{
  const chat=createChat({...context,marketplace});chat.turns=[{id:'C1',question:'ลดราคา 20%',context:structuredClone(chat.context),createdAt:chat.createdAt,state:'complete',reply:{text:'อิงแคมเปญ',source:'fallback',context:structuredClone(chat.context),catalogReferenceAt:'2026-10-25T10:00:00.000Z'}}];
@@ -42,9 +43,10 @@ test('monthly profit comes from recorded order amounts, not current catalog pric
  const reply=await answerQuestion({...input('กำไรเดือนนี้เท่าไร'),context:{...context,start:'2026-10-01'},products:[{sku:'ASAW',sellingPriceSatang:999999,quantity:1000}]},async(path,body)=>{calls.push([path,body]);return {totalOrders:1,results:[order]};});
  assert.deepEqual(calls,[['/stores/QA/dashboard?month=2026-10',undefined]]);assert.equal(reply.source,'recorded');assert.equal(reply.result.profitSatang,3000);assert.equal(reply.result.revenueSatang,10000);assert.equal(reply.catalogReferenceAt,undefined);
 });
-test('no sales gives a monthly-data notice rather than invented zero profit or a catalog simulation',async()=>{
+test('monthly empty data stays unknown and a loss question uses recorded amounts',async()=>{
  const reply=await answerQuestion({...input('กำไรเดือนนี้เท่าไร'),context:{...context,start:'2026-10-01'}},async()=>({totalOrders:0,results:[],profitSatang:0}));
  assert.equal(reply.source,'notice');assert.equal(reply.result,undefined);assert.match(reply.text,/การเพิ่มสินค้าอย่างเดียวยังไม่ใช่ออเดอร์/);
+ const loss=await answerQuestion({...input('เดือนนี้ร้านขาดทุนไหม'),context:{...context,start:'2026-10-01'}},async()=>({totalOrders:1,results:[{orderId:'LOSS',platform:'mock',orderAt:'2026-10-15T05:00:00Z',items:[{sku:'ASAW'}],profitSatang:-500,revenueSatang:10000,cogsSatang:9500,feeSatang:1000,packagingSatang:0,adsSatang:0,sellerShippingSatang:0,missingFields:[]}]}));assert.equal(loss.source,'recorded');assert.equal(loss.result.profitSatang,-500);
 });
 test('catalog references survive chat history and do not falsely show the selected monthly date range',()=>{
  const chat=createChat(context);chat.turns=[{id:'T1',question:'ลดราคา 20%',context,createdAt:chat.createdAt,state:'complete',reply:{text:'ส่วนต่างก่อนค่าใช้จ่าย',source:'fallback',context,catalogReferenceAt:'2026-10-25T10:00:00.000Z'}}];

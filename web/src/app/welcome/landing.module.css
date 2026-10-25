@@ -31,25 +31,25 @@
 .resultSummary strong[data-tone=loss],.mobileResult strong[data-tone=loss]{color:var(--color-negative-on-dark)}
 
 /* Local full-viewport fly-through study. Copy stays above the moving scene. */
-.depthPage .header{background:var(--color-bg-dark);border-bottom-color:color-mix(in srgb, var(--color-text-inverse) 8%, transparent)}
-.depthPage .header .brand :global(.brand){color:var(--color-text-inverse)}
-.depthPage .navigation a,.depthPage .signIn{background:transparent;color:var(--color-text-inverse-muted)!important}
-.depthPage .desktopLanguage :global(.language-switch button){background:transparent;color:var(--color-text-inverse-muted)}
-.depthPage .desktopLanguage :global(.language-switch button[aria-pressed=true]){background:color-mix(in srgb, var(--color-text-inverse) 8%, transparent);color:var(--color-text-inverse)}
-.depthPage .mobileMenu>summary{background:color-mix(in srgb, var(--color-text-inverse) 7%, transparent);color:var(--color-text-inverse)}
-.page .depthHero{display:flex;align-items:center;min-height:calc(100svh - 80px);padding:56px max(32px,calc((100vw - 1320px)/2)) 96px!important;background:var(--color-bg-dark)!important}
-.depthHero .heroCopy{width:min(590px,49%);margin:0;text-align:left;padding:0;text-shadow:0 2px 24px color-mix(in srgb, var(--color-shadow) 35%, transparent)}
-.depthHero .pill{color:var(--color-text-inverse-muted);background:color-mix(in srgb, var(--color-text-inverse) 4%, transparent);border-color:color-mix(in srgb, var(--color-text-inverse-muted) 17%, transparent)}
-.depthHero h1{font-size:clamp(42px,4.8vw,72px);line-height:1.5;color:var(--color-text-inverse)}
-.depthHero h1 span{color:var(--color-emphasis-on-dark)}
-.depthHero .heroLead{font-size:16px;max-width:490px;margin:22px 0 0!important;color:var(--color-text-inverse-muted)}
+.depthPage .header{background:var(--color-hero-bg);border-bottom-color:var(--color-border)}
+.depthPage .header .brand :global(.brand){color:var(--color-text)}
+.depthPage .navigation a,.depthPage .signIn{background:transparent;color:var(--color-text-muted)!important}
+.depthPage .desktopLanguage :global(.language-switch button){background:transparent;color:var(--color-text-muted)}
+.depthPage .desktopLanguage :global(.language-switch button[aria-pressed=true]){background:var(--color-bg-subtle);color:var(--color-text)}
+.depthPage .mobileMenu>summary{background:var(--color-bg-subtle);color:var(--color-text)}
+.page .depthHero{display:flex;align-items:center;min-height:calc(100svh - 80px);padding:56px max(32px,calc((100vw - 1320px)/2)) 96px!important;background:var(--color-hero-bg)!important}
+.depthHero .heroCopy{width:min(590px,49%);margin:0;text-align:left;padding:0;text-shadow:none}
+.depthHero .pill{color:var(--color-text-muted);background:var(--color-bg-surface);border-color:var(--color-border)}
+.depthHero h1{font-size:clamp(42px,4.8vw,72px);line-height:1.5;color:var(--color-text)}
+.depthHero h1 span{color:var(--color-action)}
+.depthHero .heroLead{font-size:16px;max-width:490px;margin:22px 0 0!important;color:var(--color-text-muted)}
 .depthHero .actions{justify-content:flex-start;gap:12px;margin-top:30px}
 .depthHero .primary,.depthHero .secondary{font-size:15px;padding-inline:22px;text-shadow:none}
-.depthHero .primary{background:var(--color-text-inverse);color:var(--color-text);border-color:var(--color-text-inverse);box-shadow:0 4px 24px color-mix(in srgb, var(--color-shadow) 13%, transparent)}
-.depthHero .primary:hover{background:var(--color-bg-surface);color:var(--color-text)}
-.depthHero .secondary{background:color-mix(in srgb, var(--color-bg-dark-hover) 40%, transparent);color:var(--color-text-inverse);border-color:color-mix(in srgb, var(--color-text-inverse-muted) 42%, transparent);backdrop-filter:blur(12px)}
-.depthHero .secondary:hover{background:var(--color-bg-dark-hover);color:var(--color-text-inverse)}
-.depthHero :focus-visible{outline-color:var(--color-focus-on-dark)}
+.depthHero .primary{background:var(--color-action);color:var(--color-on-action);border-color:var(--color-action);box-shadow:0 4px 24px color-mix(in srgb,var(--color-shadow) 12%,transparent)}
+.depthHero .primary:hover{background:var(--color-action-hover);color:var(--color-on-action)}
+.depthHero .secondary{background:var(--color-bg-surface);color:var(--color-text);border-color:var(--color-border-strong);backdrop-filter:blur(12px)}
+.depthHero .secondary:hover{background:var(--color-bg-subtle);color:var(--color-text)}
+.depthHero :focus-visible{outline-color:var(--color-focus)}
 .page .heroProof{padding:36px 32px;background:var(--color-bg-canvas)}
 .heroProof .heroStage{width:min(1090px,100%);margin:0 auto}
 .heroProof .alertStack{width:100%;max-width:none;margin:0;display:grid;grid-template-columns:1.2fr 1fr;gap:12px 20px}

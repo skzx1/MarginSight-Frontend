@@ -144,3 +144,50 @@ Before Cognito/static updates and final readback budgetlimit350USD/laggedActualS
 ## Product listing release — 25 October 2026
 
 Fresh account109991964227/Singapore/budget gates before build, SAM preparation, review/execute and publication; final read07:41:21UTC: team cap350USD, laggedActualSpend0.033USD, LastUpdated04:22:10UTC, trial target25USD unchanged. First prepare failed before SAM upload on live FeeRules parameter drift; recovered existing source/template and preserved all values rather than dropping settings. One reviewed existing-stack code update, static publish and8path invalidation; no new resources/IAM/capacity, model switch, index rebuild, training or Marketplace action. Two API MOCK sessions plus one browser MOCK session for bounded catalog/cost edits and reads; no REALmerchant writes/model inference/OCR/LINE action. Read-only Qwen metadata gate is not inference. Standard build/API/storage/Lambda/CDN charges may accrue; this is not a final measured cost or current remaining-credit claim. Backups /tmp/marginshot-listing-20261025-15_tvv_j ephemeral; previous sources and recovered pre-price live code retained in Git for reviewed rollback without deleting merchant data.
+
+
+## Application usage quotas removed — 25 October 2026
+
+User requested all app usage limits removed: no 2-hour guest lifetime, daily/session/write/AI/import/receipt quotas, 100-chat or 200-turn caps. Guest records no longer receive 24-hour TTL; legacy rows read by the app have TTL removed conditionally without changing financial values/version. Opaque guest tokens remain MOCK-only, origin/tenant-bound, revocable and stored in sessionStorage; Cognito remains unchanged. File/content validation, per-request deadlines/token/context bounds, native browser/provider quotas and the $350 team budget remain. Local verification and AWS release evidence follow; deployment is pending at this source commit. No cloud charges from these local tests. Overall PARTIAL_WITH_EXTERNAL_BLOCKERS unchanged.
+
+
+## 25 October 2026 quota/catalog/campaign release
+
+Verified account109991964227, Singapore, team BudgetLimit350USD; fresh reads at preflight/review/execute/publication. Reported lagged ActualSpend0.033USD, budget LastUpdated04:22:10UTC. This is not a current remaining-credit guarantee or final measured release cost. Existing operator target25USD and350USD total guard remain. User explicitly removed app usage quotas; usage can therefore accrue beyond the former per-user counts, while provider/account constraints still apply.
+
+One reviewed existing-stack code update; seven Lambda modifications plus unchanged generated API references,18static objects and8path invalidation. No new resources, IAM, reserved capacity, training, model switch, fee-index rebuild or Marketplace subscription. AWS verification created isolated synthetic shops and bounded catalog/cost edits only; zero REALmerchant writes and zero model/OCR inference. Pre-release session attempt returned old global daily429; post-release two API test shops and one browser shop succeeded. Keep normal operational cost monitoring; no unused new services were created. Ephemeral backup `/tmp/marginshot-catalog-scenarios-20261025-d1t2140d/pre-release`; rollback source pinned in prepared evidence. Never restore a backup by deleting merchant data.
+
+
+## 25 October 2026 answer-card/subtotal deployment
+
+Fresh preflight09:12:53UTC and review/execute/publication gates: account109991964227 / ap-southeast-1; team cap350USD, lagged ActualSpend0.033USD, budget LastUpdated04:22:10UTC. Not a final cost or current remaining-credit claim. Existing25USD operator target preserved. One executed existing-stack code update,18static object hashes and8path invalidation. No new services/IAM/capacity, training, model switch, Marketplace or REALstore writes. Two API MOCK sessions plus existing browser shop used; zero AI/OCR inference. Ephemeral backup `/tmp/marginshot-summary-cards-20261025-_y4q47w2/pre-release`; rollback restores code only and preserves merchant data.
+
+
+## 25 October 2026 general conversation deployment/inference
+
+Fresh preflight09:38:31UTC and review/execute/publication gates confirmed account109991964227 / ap-southeast-1, BudgetLimit350USD, lagged ActualSpend0.033USD with LastUpdated04:22:10UTC. This is not the current remaining credit or final measured inference cost. Existing25USD operator target retained. One executed existing-stack code update,18object hash checks and8path invalidation; no new services/capacity/IAM/model subscription, embedding/index rebuild or training.
+
+Two scripted real general Qwen calls plus one agent-entered browser greeting were executed; an additional user-entered five-greeting browser request was observed. These are scoped test observations, not total account usage. Financial preflight does not generate model output. General inference uses one call/no automatic retries, existing500-token per-request output bound and approved direct us-east-1 runtime. User's removal of daily/session quotas remains in force; provider/account/budget constraints still apply. MOCK-only catalog test mutations, no REALmerchant writes or customer data sent. Ephemeral paired code/static backup `/tmp/marginshot-general-chat-20261025-f8xq1sox/pre-release`; rollback preserves all merchant data.
+
+
+## 25 October 2026 merchant question library/ranking deployment
+
+Fresh preflight10:11:35UTC plus review/execute/publication gates verified account109991964227 / Singapore, BudgetLimit350USD, lagged ActualSpend0.033USD with LastUpdated04:22:10UTC. Not a current remaining-credit or final measured release cost. Existing25USD operator target unchanged. One executed existing-stack code update,18static object checks and8path invalidation. No new services/roles/capacity/model subscriptions, training or embedding/index rebuild.
+
+100question intent cases run locally/CI without model generation. Choosing a question drafts it; it does not call AI or submit automatically. Live API made one general Qwen generation for the creative discount-reply boundary; browser financial rank2/rank3 used no model generation. MOCK-only shops/catalog test writes; zero REALmerchant writes. User's prior removal of daily/session quotas remains. Ephemeral paired backup `/tmp/marginshot-merchant-questions-20261025-lj1pa4yj/pre-release`; rollback code/static assets together without deleting merchant data.
+
+## Website router publication — 25 October 2026
+
+Existing account109991964227 and regional resources only. Model evaluation/API usage recorded in Backend cost-log; no new model provider, database, IAM/capacity or training. One76file static publish and7path invalidation; four public entry/config/release readbacks; existing private bucket preserved. Final budget read08:41:35UTC:350USDteam limit, laggedActualSpend0.033USD LastUpdated04:22:10.530UTC, trial25USD unchanged; not current remaining credit or final charges. Existing demo quota exhausted; user chose existing tab, which also showed daily openings error. No quota changes or browser inference from that blocked session. Ordinary storage/CDN/API/inference/log usage may accrue; backups retained ignored, no credentials published.
+
+## Local upstream/router merge — 25 October 2026
+
+Local code merges/tests/builds only in Frontend; no new static publish/invalidation/auth/IAM or model inference for this merged release. Backend performed bounded read-only AWS checks/SAM preparations before user chose local-only; those are recorded in Backend cost-log. No cloud actions after local-only choice. Browser action was rejected by automatic approval review due to tool usage, and was not executed or bypassed. Retained artifacts may accrue existing storage cost; no measured final bill claim.
+
+## Router release preparation — 25 October 2026
+
+Commit/push/source verification and isolated clean npm-ci build only on Frontend so far;83tests/0npm audit vulnerabilities. AWS account/budget/live source readback is logged in Backend cost-log (lagged0.034USD, updated18:46:19.853+07;350team/25trial unchanged). Static publication, model/API verification and actual final spend remain separate evidence. No new auth/IAM/capacity/training changes are requested.
+
+## Committed router static publication — 25 October 2026
+
+One76file publication to existing privateS3 and7path invalidation, confirmedCompleted; no capacity/Cognito/IAM/backend infrastructure changes from Frontend. One isolated browserMOCK store and2assistant questions for real UI verification; API2MOCKstores/8requests and deployment costs logged in Backend cost-log. Final budget read12:24:40UTC lagged0.034USD updated18:46:19.853+07,350team/25trial unchanged; no current-credit/final-bill claim. No REALmerchant write/training/OCR/LINE action. Backups retained locally/ignored; only sanitized deployment metadata is committed.

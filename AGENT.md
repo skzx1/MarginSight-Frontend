@@ -27,3 +27,7 @@
 ## Local references
 
 ภาพใน `docs/design/` และบันทึก UI/release บางฉบับเป็น local-only ตาม `docs/reference-policy.md` และ `.gitignore`. อ่านประกอบได้เมื่อไฟล์มีอยู่ แต่ห้ามใช้เป็น dependency ของ build/test/deploy หรือถือว่า clone ใหม่ต้องมีไฟล์เหล่านี้. ใช้ source และคู่มือที่ยัง tracked เป็นหลัก.
+
+25 October 2026: User removed app usage quotas (guest lifetime/session/write/AI/import/receipt counts and chat history counts). Preserve tenant/origin checks, payload validation, per-request deadlines, actual provider quotas and the $350 team budget. Do not reinstate app quotas from older plan text.
+
+25 October 2026: General conversation is user-authorized through the existing Bedrock Qwen model, with no tools or shop data attached. Only general-chat text may be rendered directly from the model. Recorded financial claims and cards still require the deterministic engine. General mode never bypasses membership/origin checks.

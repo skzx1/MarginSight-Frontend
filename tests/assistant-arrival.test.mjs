@@ -2,8 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { createChat } from '../web/src/lib/assistant-sessions.ts';
-import { recentChats, SESSION_LIMIT, startAskChat } from '../web/src/lib/assistant-arrival.ts';
-import { assistantCopy } from '../web/src/app/components/assistant-copy.ts';
+import { recentChats } from '../web/src/lib/assistant-arrival.ts';
 
 const context = { start: '2026-10-01', end: '2026-10-24', sku: null };
 const used = (i, at = `2026-10-${String(1 + (i % 24)).padStart(2, '0')}T0${i % 10}:00:00Z`) => {
@@ -11,31 +10,12 @@ const used = (i, at = `2026-10-${String(1 + (i % 24)).padStart(2, '0')}T0${i % 1
   chat.turns.push({ id: `t${i}`, question: 'q', context, createdAt: at, state: 'complete' });
   return chat;
 };
-const ask = () => { const chat = createChat({ ...context, sku: 'SKU-1' }); chat.draft = 'สินค้านี้เหลือกำไรเท่าไร?'; return chat; };
 
-test('ask from a product opens a new prepared chat below the limit', () => {
-  const archive = { version: 1, activeId: null, sessions: [used(1)] }, chat = ask();
-  const next = startAskChat(archive, chat);
-  assert.equal(next.activeId, chat.id);
-  assert.equal(next.sessions.length, 2);
-  assert.equal(next.sessions[0].draft, chat.draft);
-});
-test('A12: at 100 saved chats the ask is not silently dropped; null tells the screen to show the notice and open history', () => {
-  const full = { version: 1, activeId: 'x', sessions: Array.from({ length: SESSION_LIMIT }, (_, i) => used(i)) };
-  assert.equal(SESSION_LIMIT, 100);
-  assert.equal(startAskChat(full, ask()), null);
+test('ask from a product always opens a new prepared chat (no saved-chat limit since a8bcfa0)', () => {
   const screen = readFileSync('web/src/app/screens/assistant.tsx', 'utf8');
-  assert.match(screen, /if \(!startAskChat\(archive, chat\)\) \{ setNotice\('askLimit'\); setPanel\('sheet'\); return; \}/);
-  assert.equal(assistantCopy.askLimit.length, 2);
-});
-test('A12: at the limit an unused empty chat is reused for the ask instead', () => {
-  const sessions = Array.from({ length: SESSION_LIMIT }, (_, i) => used(i)), empty = createChat(context);
-  sessions[40] = empty;
-  const chat = ask(), next = startAskChat({ version: 1, activeId: sessions[0].id, sessions }, chat);
-  assert.equal(next.sessions.length, SESSION_LIMIT);
-  assert.equal(next.activeId, empty.id);
-  assert.equal(next.sessions[40].draft, chat.draft);
-  assert.equal(next.sessions[40].context.sku, 'SKU-1');
+  const ask = screen.slice(screen.indexOf("chat.draft = locale === 'th' ? 'สินค้านี้"), screen.indexOf('onDraftHandled();'));
+  assert.match(ask, /setArchive\(old => \(\{ \.\.\.old, activeId: chat\.id, sessions: \[chat, \.\.\.old\.sessions\] \}\)\)/);
+  assert.doesNotMatch(screen, /askLimit|SESSION_LIMIT|>= 100/);
 });
 test('A7: recent chats are at most six saved chats, newest first, without the open one or empty chats', () => {
   const sessions = Array.from({ length: 9 }, (_, i) => used(i, `2026-10-0${i + 1}T00:00:00Z`));

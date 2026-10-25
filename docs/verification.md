@@ -410,3 +410,87 @@ Deployed API check07:38:51UTC used two isolated MOCK tenants: create24999satang/
 Browser live MOCK manual form: create249.99THB/42units, refresh retains both; edit299.50THB/7units and refresh retains both; cost120.50THB unchanged. No horizontal overflow or console errors. Evidence in Frontend .local/product-listing-20261025/aws-final-report.json, browser-verification.json, evidence/products-live.png; CloudShell backup /tmp/marginshot-listing-20261025-15_tvv_j is ephemeral. Existing prices/quantities discarded by the old form were never stored: users must enter them once through product details → แก้ไขราคาขายและจำนวน. No inferred prices or REAL-store seeding.
 
 Overall PARTIAL_WITH_EXTERNAL_BLOCKERS remains for prior realOCR/LINE/nativeplatform/two-Cognito workflows. This feature's checks do not represent FULL_SCOPE_VERIFIED or live merchant adoption.
+
+
+## Catalog discount routing and seven fixture listings — 25 October 2026
+
+VERIFIED_LOCAL: user-requested current-product discount path now works without sales; monthly profit still uses recorded orders. Pre-expense difference is explicitly separate from unknown net profit; no client money inputs, order creation or price mutations. Product-reference timestamp survives history/copy. All seven MOCK fixtures have price/quantity, with conditional missing-only upgrade for old authorized guest catalogs; REAL/personal/custom/edited/zero values preserved. Frontend61/Backend78 tests and builds pass, financial contract unchanged. See Backend docs/catalog-discount.md and docs/storefront-listings.md. AWS pending at this source commit; PARTIAL_WITH_EXTERNAL_BLOCKERS remains.
+
+
+## Checkbox-only assistant campaigns — 25 October 2026
+
+VERIFIED_LOCAL Frontend65/Backend80 tests, typecheck/build/static export/bundled handlers and unchanged financial contract. Added composer campaign button with native accessible dialog: platform pills, campaign checkboxes, seller/category/eligibility radios and checkboxes; cancel/clear/apply. No text/number fields, select elements or details section remain. Manual base fee values are explicitly removed when applying this checkbox-only preset. Playground options and the existing server marketplace rule engine supply program rates; missing base commissions/payment rates remain unknown, never zero or fabricated. The current-product endpoint returns known campaign charges and, only when all platform rules are known, the difference after platform fees; net profit remains unknown where other expenses are absent. Campaign assumptions are snapshotted per turn/history and ignored by monthly recorded-order totals. Local browser observed selection forwarding and calculated campaign fee13.70THB for160THB after discount, plus no manual controls/overflow. AWS release pending at this source commit. PARTIAL_WITH_EXTERNAL_BLOCKERS remains.
+
+
+
+## Application usage quotas removed — 25 October 2026
+
+User requested all app usage limits removed: no 2-hour guest lifetime, daily/session/write/AI/import/receipt quotas, 100-chat or 200-turn caps. Guest records no longer receive 24-hour TTL; legacy rows read by the app have TTL removed conditionally without changing financial values/version. Opaque guest tokens remain MOCK-only, origin/tenant-bound, revocable and stored in sessionStorage; Cognito remains unchanged. File/content validation, per-request deadlines/token/context bounds, native browser/provider quotas and the $350 team budget remain. Local verification and AWS release evidence follow; deployment is pending at this source commit. No cloud charges from these local tests. Overall PARTIAL_WITH_EXTERNAL_BLOCKERS unchanged.
+
+
+## 25 October 2026 quota/catalog/campaign release evidence
+
+- Fresh clean Git clones in CloudShell: Frontend66 tests, Backend81 tests, Python operator6; typechecks, static export, all bundled handlers and unchanged margin-v1.1.0 contract passed. Local logs `.local/no-usage-limits-verify.log`.
+- Quota regression:22 session creations,55 imports,24 receipts; old app reserve function made to throw if called. Financial baseline26800satang unchanged; legacy guest row TTL removed without changing content/version;101chats/201turns restore. Old model daily limit0 does not suppress provider invocation. Cross-tenant/origin and revoked session checks still reject.
+- AWS API at09:02:25UTC: nonExpiring new session, backdated old expiry accepted/cleared; repeated reads and merchant0/edited metadata preserved; custom no-order product discount exact; no saved scenario. Spoofed price400, tenant403, origin403, normal no-auth401, private S3403. Existing legacy fixture backfill was VERIFIED_LOCAL; pre-release legacy-session creation was blocked by the old global quota, so do not claim that backfill was tested on an old live tenant this release. Fresh seven-row listings verified live.
+- AWS browser: one-click entry succeeds; seven price/quantity rows; no2-hour/3-import/3-AI quota copy. Campaign dialog inputs checkbox/radio only,0selects/0details. Lazada Premium selection applied to catalog discount; monthly268 from6orders with campaign excluded from actual totals. Screenshots in Frontend `.local/catalog-scenarios-20261025/evidence/`.
+- Safe machine-readable proof (ignored, no raw capability): `.local/catalog-scenarios-20261025/aws-final-report.json` and `browser-verification.json`. Runtime commits, stack/change-set/invalidation IDs in status.md. Do not commit raw sessions/backups/merchant records.
+
+
+## 25 October 2026 answer-card/subtotal verification
+
+Frontend70 / Backend81 tests and Python6 operator tests pass in CloudShell, plus typechecks/static export/bundled handlers/domain contract. Tests cover exact complete-vs-partial known fees, zero, missing cost, negative subtotal display, no invented net profit, persistence and malformed stored summary rejection. Frontend only displays backend satang fields.
+
+AWS/API: known fee17.12 and subtotal62.88 under incomplete base-rate assumptions; obsolete warning absent; actual monthly268 and6orders unchanged, tenant/origin403, spoofed-price400, no-auth401/privateS3403. Non-expiring guest session and backdated old expiry checks still pass. Browser card16.30 after13.70knownfees, calculation details collapsed, prior session/history survived refresh. No REAL merchant writes or model/OCR inference. Evidence ignored under `.local/summary-cards-20261025/aws-final-report.json`, `browser-verification.json`; Frontend screenshots `evidence/aws-card.png` and `evidence/aws-assistant.png`.
+
+Preparation encountered two available change sets; no arbitrary/latest selection was executed. Selected only the exact ARN printed in the current SAM preparation log, then independently reviewed it and rechecked live drift/budget before execution. The other available change set was not executed.
+
+
+## 25 October 2026 general conversation verification
+
+Fresh CloudShell clones: Frontend75 tests, Backend87 tests, Python6; typechecks, static export, bundled handler smoke, unchanged domain contract and SAM lint pass. Local logs `.local/general-chat-verify.log`. New tests cover general vs financial intent, sales advice/code/translation, no tools/retrieval/catalog loads, bounded alternating history, rejected role/field injection, honest model failure, tenant/origin isolation, and accurate UI provenance/persistence. Financial adapter tests explicitly mock only the new routing preflight; separate tests exercise the actual preflight and continuation.
+
+Live API proof: two successful real Qwen general generations (Thai greeting then English follow-up), financial routing marker without model output, unknown fee totals remain null while known-fee subtotal62.88 stays exact, monthly268 from6orders unchanged. Strict unknown SKU in chat mode400; spoofed financial input400, cross-tenant403, origin403, no-auth401, privateS3403. Guest non-expiry/backdated-expiry regression still passes. Browser actual general replies display no recorded amount/card or dated ledger reference. No REALmerchant records read into the model or written. No OCR/LINE inference/operation in this release.
+
+Ignored evidence `.local/general-chat-20261025/aws-final-report.json` and `browser-verification.json`; Frontend `evidence/aws-general-chat.png` plus `evidence/aws-model.png`. Live financial results remain domain-owned; generated knowledge/examples are not merchant finance verification.
+
+
+## 25 October 2026 100-question/ranking verification
+
+Fresh CloudShell verification: Frontend82, Backend88 tests; Python6 operator tests; typecheck, static export, bundled Lambda smoke, unchanged domain SHA/version and SAM lint pass. The100 curated intent cases are checked individually inside the backend suite;82+88=170 test cases is the suite count, not170 model generations. Canonical Backend fixture and shipped Frontend JSON byte-identical SHA256 `2da873c30f3b1e1c00fc96a4fb1901092126bc4b4ac551e7084a3254c7bd09b6`.
+
+Ranking regression covers user-reported rank2 vs first place, rank3, lowest rank2, Thai ordinals/digits, stable ties, selected-SKU scope, unknown/mixed exclusion and invalid/out-of-range ranks.250successive follow-ups keep bounded hidden request length. Loss question reads negative recorded profit; unspecified campaign asks for explicit choice.
+
+Live browser:100questions/10categories, search ordinal2 gives2matches, draft-only selection, actual rank2=54.20 and follow-up rank3=50.20. Live API10:22:36UTC: one successful general Qwen response to a merchant discount-reply writing request, financial routing marker without model generation, current catalog discount and monthly268/6orders unchanged. No-discount Lazada scenario250.00minus120.00costminus21.40knownfees=108.60subtotal, netProfit remainsnull. Prior tenant/origin403, spoofed-input400, no-auth401/private-S3403 and guest expiry regressions still pass. No REALmerchant writes or OCR/LINE operation.
+
+Ignored proof `.local/merchant-questions-20261025/aws-final-report.json`, `browser-verification.json`; Frontend screenshots `evidence/aws-question-bank.png`, `aws-rank-2.png`, `aws-rank-3.png`. A readable100-question handout is outside both repos at D:/NTT/output/MarginShot-merchant-questions-100.md. See merchant-questions.md for usage and fixture ownership.
+
+## Website router release — 25 October 2026
+
+User clarified existing website chat and AWS-hosted Qwen, approved deployment and real tests. Frontend base fast-forwarded safely to5bc3b9d to preserve newer theme/product listing changes; router edits reapplied without conflicts. Retained recoverable local stash/patch; no force/reset. Source assistant-service.ts sends every current message with last5previous messages and existing context to /assistant mode chat. assistant-sessions.ts filters completed prior messages in that session only, including safe regenerate boundaries. No browser keyword routing or new finance formulas.
+
+57localtests/typecheck/static export/secret policy/packaging pass. Clean tracked-source snapshot under ignored .local/router-clean-verify independently passed npm ci and npm run verify. Existing preview contract margin-v1.1.0 unchanged. Narrow Impeccable copy/behavior review found no detector findings; no visual redesign. Backend86tests include history/threshold/strictJSON/no-normal-tools/no-log-content/platform scope/fee-context/missing-data/golden financial cases.
+
+Published2026-10-25T08:40:48.963UTC,76files to existing private WebBucket, no deletions/auth/Cognito/IAM changes. Dirty release manifest message-router-v3: base5bc3b9d424825b106e3aedeca2e650ed7e6aa41e, assistant-service SHA89070f9aa3f59614f2dd845adb017dacf981dc69caeb4748498642c93b68bf4b; session SHA93793fc3094a5209ad7267ca84b59e3a75a32600499cbd7d2d55b7a627780d5c; screen SHA90aad208ca4ec6a860c99dabadb0ffa330135e2e3d107b76b03b4171d34b96a9; copy SHAc483ec34b2ecfbd9f019dcdd31fc84ef3dfdcbe67626fd1dd3c779074a67c02e. Four key S3 and public CloudFront index/login/config/release hashes match; all200. Invalidation I6JOA5X1H1P25YL7IFJS0ICNCA Completed checked08:41:35UTC. Backend final all7Lambda SHA2w+JsdfaYTcW/Qbfyy2BoRNlV5qe643aGWOQhCYcXkU= with old environment/index/config preserved.
+
+Classifier evaluation latest61/68=89.71%, FEE28/31, NORMAL19/23, CLARIFY14/14; all7excess clarification, no cross-fee/normal error observed in this development set. Not held-out production/answer accuracy. Before final context fix, deployed API normal response and Shopee RAG READY passed; Lazada follow-up reached fee route but asked extra clarification. Final context/channel fixes are locally verified and deployed; final live financial answers are NOT verified yet.
+
+New-session smoke stopped at DEMO_DAILY_LIMIT. User offered existing MOCK session. Accessible browser tab was login, then showed daily openings exhausted when details expanded; no active shop/chat available. Did not raise quota, read browser tokens or create replacement sessions. Screenshot .local/message-router/demo-quota-blocker.png. Final discount/cost and desktop/mobile chat acceptance remain pending. No REALmerchant/LINE/native marketplace acceptance claim. Backend docs/message-router/README.md contains full design/prompt/schema/68cases/evaluation/failures/open decisions. No commit/push performed.
+
+## Latest upstream/router local merge — 25 October 2026
+
+LOCAL_MERGED / VERIFIED_LOCAL / NOT_DEPLOYED for this combined release. Fast-forwarded to d2f12d5 after a8bcfa0, preserving app quota/chat-count removal, checkbox campaign picker, current-product discounts and latest numeric answer cards. Restored local router adapter with last5completed prior messages; every question goes to the authorized server /assistant mode chat, no keyword bypass. Campaign payload is serialized without extra options requests; server validates assumptions. Catalog summary fields and current-reference date map into existing numeric cards without frontend money formulas. Recorded monthly profit remains backend-owned and campaign-independent.
+
+Full root verification71tests/TypeScript/static export/package passed. Earlier isolated npm-ci snapshot passed67tests before the final4summary tests arrived; final root run passed all71. Backend merged base8ee733d plus local RAG/router passed100tests/full build. Conflicts resolved; no reset/force push, commit or push. Recoverable stash snapshots retained. No merged-release frontend publication. User explicitly chose to finish local pull/merge only after another task repeatedly deployed the same stack. Previous AWS verification entries are historical; this merged router has no new AWS/browser acceptance proof. Browser attempt was denied by automatic approval review because tool usage was exhausted; this is separate from the removed app quotas, and no workaround was attempted.
+
+## Website router publication authorized — 25 October 2026
+
+User requested commit, push and deploy after the local-only merge. Latest upstreamda63091 (general conversation, ordinal ranking,100questions and numeric cards) integrated. Source95ca8fb pushed as a separate implementation batch. All website questions go to the server router with the last5completed messages; general conversation provenance, current catalog summary/date, campaign controls and100questions retained. Legacy backend chat contract remains available during backend-first rollout.83tests/TypeScript/static export pass; clean npm-ci snapshot83tests also passed. Backend108tests plus9Python parameter tests passed, source5f3c19f. Current paragraph is pre-deployment evidence; final AWS/API/browser checks follow separately.
+
+## Committed website router live — 25 October 2026
+
+Frontend source95ca8fb/documentation4c6880d pushed separately and published as clean committed release4c6880ddc4840788f6c186fd759854c430b5a9c8.76files, key S3 readbacks matched;7path CloudFront invalidation I2IVAH8BES14GDVVGL6XQRHR95 Completed confirmed12:24:40UTC. Backend source5f3c19f/releasedocsa60f393, all7reviewed Lambda hashes M2AnVYW1jTPZY/Lxg9L85eBUZ+dyxFDg673id7q/GOk= read back. Formula margin-v1.1.0 and original resources/config/tenant/origin controls preserved; no IAM/auth change or reinstated app quota.
+
+Local clean npm-ci/full verification83Frontend/108Backend tests and9Python parameter tests passed. Deployed protected API8/8cases passed with no-token401/cross-store403: normal, research policy, Lazada context follow-up, ambiguous clarification, current catalog discount, cost, selected campaign and recorded monthly profit. Classifier development result61/68 is a separate historical score, not eight-case production accuracy.
+
+Browser verification on a new isolatedMOCK store succeeded after prior transient tool quota recovered: displayed latest intro, campaign and100-question buttons; rank2returnedBAG-00254.20THB, then raw follow-up rank3returnedCASE-00450.20THB with correct recorded-data card and all-product/date scope. Screenshot1280x720 .local/message-router/deployed-chat.png (local-only, not clone/build dependency). Not a new mobile/real-merchant/Cognito/native-marketplace/LINE acceptance claim. Backend docs/message-router/deployment-2026-10-25.json contains sanitized evidence. Final verification recorded/pushed separately from deployed runtime commits.

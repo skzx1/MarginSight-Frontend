@@ -170,3 +170,81 @@ VERIFIED_LOCAL; AWS pending at this commit. Manual/CSV creation saves price and 
 ## Product prices live — 25 October 2026
 
 VERIFIED_AWS for product listing persistence and corrections. Frontendf9bc84e/Backend5b61c6a deployed and checked; local/CloudShell56+70tests/Python6. Price and merchant-entered quantity survive create/edit/refresh; cost/history unaffected; zero/missing and tenant/version guards pass. Existing Fee Rules runtime/parameters preserved. Old discarded inputs require one manual re-entry. See latest verification.md and product-listing.md. Overall PARTIAL_WITH_EXTERNAL_BLOCKERS remains.
+
+
+## Application usage quotas removed — 25 October 2026
+
+User requested all app usage limits removed: no 2-hour guest lifetime, daily/session/write/AI/import/receipt quotas, 100-chat or 200-turn caps. Guest records no longer receive 24-hour TTL; legacy rows read by the app have TTL removed conditionally without changing financial values/version. Opaque guest tokens remain MOCK-only, origin/tenant-bound, revocable and stored in sessionStorage; Cognito remains unchanged. File/content validation, per-request deadlines/token/context bounds, native browser/provider quotas and the $350 team budget remain. Local verification and AWS release evidence follow; deployment is pending at this source commit. No cloud charges from these local tests. Overall PARTIAL_WITH_EXTERNAL_BLOCKERS unchanged.
+
+
+## AWS verified: app usage quotas and catalog campaign chat — 25 October 2026
+
+Deployed and verified account109991964227 / ap-southeast-1. Runtime Frontend `a8bcfa0f1909b6097631d4b7c4626766f06f8fda`, Backend `83200ebf9c5b46d18fd1d5c508c3a8e105b0d326`. Existing stack UPDATE_COMPLETE; change set `samcli-deploy1792918702` executed08:59:49UTC; frontend published09:01:23UTC; CloudFront invalidation `I8Y1M6P0CYSESHNDP7MOCQTYCY` Completed. Seven Lambda code hashes and18 published object hashes verified. No infrastructure/config/IAM/resource replacement or new services.
+
+Removed app-imposed 2-hour session lifetime and daily/session/write/AI/import/receipt quotas plus100-chat/200-turn caps. Existing global daily quota demonstrably rejected pre-release creation; post-release new sessions succeed with nonExpiring:true. AWS test backdated the old expiry on an agent-owned MOCK session and verified continued access plus removal of obsolete TTL. Origin/tenant binding, revocation, Cognito, payload validation and bounded individual requests remain. Tokens remain in sessionStorage; closing the browser session can still end local access. AWS service quotas and actual team budget remain.
+
+Seven MOCK fixtures have prices/quantities; catalog discounts work without orders. Campaign popup is checkbox/radio-only, with shared Playground rules, seller options and no numeric/select/details form. Unknown base fees stay unknown. Browser BAG-001200→160/cost130 gives30 before expenses; selected Lazada Premium known fee13.70, no fabricated net profit. Monthly all-SKU answer remains268 from6 recorded orders, independent of selected hypothetical campaign. API no-order ASAW-QA250→200/cost120 yields80 before expenses, netProfit:null; historical dashboard/catalog unchanged. No REAL store writes or model/OCR inference in this release verification.
+
+Status remains PARTIAL_WITH_EXTERNAL_BLOCKERS for the previously recorded real receipt/OCR evaluation, LINE live credentials/message, native platform evidence and two real Cognito-account acceptance gates. These feature-specific checks do not claim full-system/live-merchant verification.
+
+
+## Requested answer cards and listed-fee subtotal — local verification
+
+Frontend70 and Backend81 tests/builds pass. Catalog answers now include a separate summary card with original/discounted price, cost, calculated fees and backend-owned remaining-after-known-fees subtotal. Monthly result cards remain actual-order measures. Removed the requested long base-fee warning; the numeric subtotal explicitly deducts only calculated fee lines, while missingFields and netProfit:null remain unchanged. Unknown fees/costs are not converted to zero or described as complete net profit. Verified hypothetical200THB discounted price,120cost,24.19known fees gives55.81remaining; complete44.19fees gives35.81. No financial history or campaign enrollment mutation. Deployment pending at this source commit.
+
+
+## AWS verified: numeric answer cards and listed-fee subtotal — 25 October 2026
+
+Runtime Frontend `d2f12d52433ecae3b2ccafbffd4a6fd7c91ca7ed`, Backend `8ee733d91fa95af292fbf63d621c9a6f9ff48195`. Reviewed exact logged change set `samcli-deploy1792919770` executed09:17:57UTC; stack UPDATE_COMPLETE, seven Lambda hashes match reviewed bundle. Frontend published09:19:53UTC,18object hashes verified; invalidation `I78F5Y93IWBFWO9FPFJ046THQ6` Completed, public release commit matches. No resource/parameter/IAM changes.
+
+AWS API09:21:06UTC: catalog250→200, cost120, known Lazada fees17.12, remaining62.88. Full platform fee total and net profit remain null when base rates/other expenses are missing; no zero substitution or financial-history writes. Requested long warning removed from new answers, replaced with numeric subtotal and a clear listed-deductions scope. Browser existing session survives reload; BAG-001200→160, cost130, fees13.70, card remaining16.30. Card has per-unit scope, rows and collapsed calculation detail; monthly recorded268/6orders unchanged. Old historical replies remain unchanged; ask again or regenerate to see the new card.
+
+All earlier usage-quota removals remain active. PARTIAL_WITH_EXTERNAL_BLOCKERS unchanged for external acceptance inputs previously listed.
+
+
+## General conversation — local verification, 25 October 2026
+
+Frontend75 / Backend87 tests and builds pass. User-authorized general conversation uses existing Qwen3 32B direct us-east-1, no new model/training/service/role. Existing /assistant POST accepts strict mode:chat; server classifies actual shop calculations without generation, which continue to the deterministic catalog/order adapters. General text generation has no tools, retrieval, SKU, store records or live web access. Only four completed general exchanges are sent as bounded untrusted context, with per-request size/deadline limits. General answers have separate provenance, no fake financial card/monthly reference. Provider failure is an honest retry notice; membership/origin isolation unchanged. AWS deployment and real inference pending at this source commit. PARTIAL_WITH_EXTERNAL_BLOCKERS remains for existing external integrations.
+
+
+## AWS verified: general Qwen conversation — 25 October 2026
+
+Runtime Frontend `4855e61665991fbe9f7ff9a7f35928598fb962b7`, Backend `8c3708d017d39be6be14d594559ab3cd984e5bd3`. Account109991964227/Singapore. Exact logged change set `samcli-deploy1792921559` executed09:47:01UTC, stack UPDATE_COMPLETE. Seven Lambda code hashes verified; static publication09:48:57UTC,18object hashes match. Invalidation `I2V29V9UJ7J9LEM3AOEIK7N13S` Completed; public release commit matches. No new resources/roles, parameter/route/model changes or training.
+
+Real AWS API09:50:32UTC: Qwen3 32B directly generated a Thai greeting and an English follow-up using conversational context. Both provider=bedrock-chat/model=qwen.qwen3-32b-v1:0, no financial result/card or attached tools/shop data. Financial question returns STORE_DATA without generation; existing catalog subtotal62.88 and monthly268/6orders remain exact. API tenant/origin/no-auth/private-S3/spoofed-input checks still pass. Browser asks general questions without selecting a SKU; actual greeting and five-example answer display AI-only provenance and no fake financial card. Previous general replies are retained; only general conversation text is sent as model context. General advice/creative requests are separate from actual shop amount queries.
+
+User-requested AWS Lambda Environment variables page opened and filtered to ASSISTANT_MODEL_ID; visible actual value qwen.qwen3-32b-v1:0, with BEDROCK_REGION=us-east-1 separately verified. Overall PARTIAL_WITH_EXTERNAL_BLOCKERS unchanged for previously documented external acceptance inputs. See general-chat.md for usage/boundaries.
+
+
+## Ranking correction and 100 merchant questions — local verified
+
+Frontend82 / Backend88 tests pass, including all100 curated intent cases. Corrected requested rank2/3 instead of always selecting first place; Thai ordinals/digits, lowest rank, unknown/mixed exclusions, stable ties, out-of-range notices and follow-ups are covered. Added100 distinct questions in10 categories as a searchable draft picker; selection does not send/infer automatically. No-discount campaign wording explicitly maps to0percent. Question fixture copies have matching SHA; this is content/routing validation, not training or100 live-model evaluations. AWS deployment pending at this source commit.
+
+
+## AWS verified: 100 merchant questions and ordinal ranking — 25 October 2026
+
+Runtime Frontend `04527bafd537a8809e187bfb4124b62c9eaff126`, Backend `c68b3b4a0a2f1854dcdf5ca26a757a0216c75617`. Account109991964227 / ap-southeast-1. Exact logged change set `samcli-deploy1792923276` executed10:18:18UTC; stack UPDATE_COMPLETE, seven Lambda hashes match reviewed bundle. Frontend published10:20:22UTC,18object hashes verified; invalidation `IA1BKDQTG1EAOARJW0KQPMINDF` Completed, public release commit matches. No resource/role/model/parameter changes, replacement or training.
+
+Added100 distinct merchant questions in10 categories, searchable and selectable as an editable draft. Browser verified100buttons/count100,10categories, no horizontal overflow, search ordinal2 finds2questions and selection does not send automatically. Ranking now respects requested2/3 rather than always selecting first place; live browser rank2 BAG-002profit54.20, follow-up rank3 CASE-004profit50.20. Financial ranking remains complete single-SKU recorded orders with stable SKU ties; unknown and mixed baskets excluded. Out-of-range ranks return notices; follow-ups do not accumulate oversized hidden prompts.
+
+100-question fixture routing benchmark passes; this is not fine-tuning or100 live-model evaluations. Campaign no-discount wording correctly means0percent; missing campaign choice prompts selection; recorded-loss questions use actual amounts. Existing general chat/model page and all prior quota removals remain available. Overall PARTIAL_WITH_EXTERNAL_BLOCKERS unchanged for earlier realOCR/LINE/nativeplatform/two-real-Cognito acceptance inputs.
+
+## Website AI message router — 25 October 2026
+
+DEPLOYED / VERIFIED_LOCAL; browser chat acceptance PARTIAL. All website chat messages now reach the existing authorized AWS assistant endpoint with mode chat and last5completed messages from the same conversation. Normal chat uses no tools; fee/profit goes RAG + bounded deterministic tools; ambiguous/low-confidence asks one question. Legacy scenario UI remains separate. No financial formulas added to Frontend.
+
+57tests/typecheck/static export and clean isolated npm-ci verification passed. Published76files08:40:48UTC from5bc3b9d plus uncommitted router source; release.json feature message-router-v3 records dirty state/source hashes. CloudFront four-file public200/hash checks and invalidationCompleted08:41:35UTC. Backend final reviewed code SHA2w+JsdfaYTcW/Qbfyy2BoRNlV5qe643aGWOQhCYcXkU=;86tests. Preserved latest theme/product listing functionality. No commit/push in this slice.
+
+Latest Qwen development classifier score61/68=89.71%, seven excess clarifications; not production accuracy. Final browser financial acceptance is pending: existing-session tab offered by user showed login daily-openings quota error, not active MOCK chat. No quota expansion/token extraction/new-session workaround. Overall PARTIAL_WITH_EXTERNAL_BLOCKERS remains. Full design/evaluation resides in Backend docs/message-router/README.md.
+
+## Local merge completed — 25 October 2026
+
+LOCAL_MERGED / VERIFIED_LOCAL / NOT_DEPLOYED: base d2f12d5 + preserved local router, campaign payload and catalog-summary integration. Quota removal, current-product calculations and numeric answer cards retained;71tests/full build pass. Backend8ee733d + local router100tests pass. User chose local-only completion; no merged-release upload, commit or push. All conflicts resolved. See latest verification.md; do not treat previous AWS reports as evidence for this combined release.
+
+## Router release ready for deployment — 25 October 2026
+
+READY_FOR_DEPLOY: user explicitly requested commit/push/deploy. Source95ca8fb integrates all latestda63091 features with server routing;83tests/full build pass. Backend5f3c19f/108tests and compatibility path ready. Implementation pushed as a separate batch; final deployed acceptance is recorded after publication, not inferred from source.
+
+## Routed chat published and checked — 25 October 2026
+
+VERIFIED_AWS_API / VERIFIED_BROWSER_MOCK: clean Frontend release4c6880d live, CloudFront invalidationCompleted; Backend5f3c19f runtime with reviewed hash/config preserved.83Frontend/108Backend/9Python checks pass, API8/8plusauth/tenant401/403pass. Browser rank2andfollow-up rank3correct; latest100questions/campaign controls retained. See latest verification.md. Original project external blockers and research/classifier limitations remain distinct.

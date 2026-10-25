@@ -1,12 +1,14 @@
 'use client';
+import {rankingFollowup} from '../../lib/assistant-ranking';
+import {MerchantQuestions} from '../components/merchant-questions';
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import type { CatalogProduct, FeatureProps } from '../../lib/types';
 import { bangkokDate } from '../../lib/format';
 import { percent, profitParts } from '../../lib/signed-money';
-import { contextLabel, contextPreset, resolveChatContext } from '../../lib/assistant-context';
+import { contextLabel, contextPreset, resolveChatContext, answerReferenceLabel } from '../../lib/assistant-context';
 import { answerQuestion } from '../../lib/assistant-service';
-import { createChat, historyGroup, sessionTitle, validContext, type ChatContext, type ChatTurn } from '../../lib/assistant-sessions';
-import { recentChats, startAskChat } from '../../lib/assistant-arrival';
+import { createChat, historyGroup, sessionTitle, validContext, recentChatMessages, type ChatContext, type ChatTurn } from '../../lib/assistant-sessions';
+import { recentChats } from '../../lib/assistant-arrival';
 import { enterAction } from '../../lib/composer-keys';
 import { bangkokDayLabel, greetingBucket } from '../../lib/greeting';
 import { useLanguage } from '../language';
@@ -18,6 +20,8 @@ import { ChatIcon, useAssistantContext, type AssistantPanel } from '../component
 import s from '../components/assistant.module.css';
 import { AssistantHistory } from '../components/assistant-history';
 import { useAssistantViewport } from '../components/use-assistant-viewport';
+import {ChatCampaignPicker} from '../components/chat-campaign-picker';
+import {chatCampaignLabel} from '../../lib/marketplace-context';
 
 function Dialog({ title, kind, close, children }: { title: string; kind: AssistantPanel; close: () => void; children: ReactNode }) {
   const ref = useRef<HTMLDialogElement>(null), returnTo = useRef<HTMLElement | null>(null);
@@ -112,14 +116,12 @@ export default function Assistant({ base, guest, origin, products, initialSku, d
     draftHandled.current = draftRequest;
     const chat = createChat({ ...defaultContext, sku: initialSku });
     chat.draft = locale === 'th' ? 'สินค้านี้เหลือกำไรเท่าไร?' : 'How much profit does this product make?';
+    setArchive(old => ({ ...old, activeId: chat.id, sessions: [chat, ...old.sessions] }));
     onDraftHandled();
-    // A12: at the 100-chat limit (and no empty chat to reuse) say so and open history, instead of dropping the ask.
-    if (!startAskChat(archive, chat)) { setNotice('askLimit'); setPanel('sheet'); return; }
-    setArchive(old => startAskChat(old, chat) ?? old);
     // A11: this arrival focuses the composer (caret at the end of the prepared question), not the screen title.
     textareaRef.current?.focus({ preventScroll: true });
     focusComposer();
-  }, [ready, visible, draftRequest, initialSku, defaultContext, locale, archive, setArchive, setPanel, onDraftHandled, textareaRef]);
+  }, [ready, visible, draftRequest, initialSku, defaultContext, locale, setArchive, onDraftHandled, textareaRef]);
 
   useEffect(() => {
     const node = textareaRef.current;
@@ -162,7 +164,9 @@ export default function Assistant({ base, guest, origin, products, initialSku, d
     const controller = new AbortController();
     pending.current.set(sessionId, { turnId: turn.id, controller });
     try {
-      const reply = await answerQuestion({ base, question: turn.requestQuestion ?? turn.question, context: turn.context, products, locale, signal: controller.signal });
+      const session = archive.sessions.find(chat => chat.id === sessionId);
+      const history = recentChatMessages(session?.turns ?? [], turn.id);
+      const reply = await answerQuestion({ base, question: turn.question, context: turn.context, history, products, locale, signal: controller.signal });
       if (!controller.signal.aborted) updateSession(sessionId, chat => ({ ...chat, updatedAt: new Date().toISOString(), turns: chat.turns.map(item => item.id === turn.id ? { ...item, reply, state: 'complete' } : item) }));
     } catch {
       if (!controller.signal.aborted) updateSession(sessionId, chat => ({ ...chat, turns: chat.turns.map(item => item.id === turn.id ? { ...item, state: 'failed' } : item) }));
@@ -173,11 +177,11 @@ export default function Assistant({ base, guest, origin, products, initialSku, d
     if (!active || pending.current.has(active.id)) return;
     const question = (explicit ?? active.draft).trim();
     if (!question) return;
-    if (active.turns.length >= 200) { setNotice('turnLimit'); return; }
     const context = resolveChatContext(question, active.context, products, bangkokDate());
     const previous = active.turns.at(-1);
     const productOnly = products.some(p => [p.sku, p.name].some(v => v.toLocaleLowerCase() === question.toLocaleLowerCase()));
-    const requestQuestion = productOnly && previous?.reply?.source === 'notice' && !previous.context.sku && /ลด|discount|คุ้มทุน|break.even/i.test(previous.question) ? previous.question + '\n' + question : undefined;
+    const rankQuestion=previous?.reply?.source==='recorded'?rankingFollowup(question,previous.requestQuestion??previous.question):undefined;
+    const requestQuestion = rankQuestion??(productOnly && previous?.reply?.source === 'notice' && !previous.context.sku && /ลด|discount|คุ้มทุน|break.even/i.test(previous.question) ? previous.question + '\n' + question : undefined);
     const turn: ChatTurn = { id: crypto.randomUUID(), question, requestQuestion, createdAt: new Date().toISOString(), context, state: 'pending' };
     forceBottom.current = true; setNotice(null);
     updateSession(active.id, chat => ({ ...chat, context, draft: '', title: chat.title || sessionTitle(question), updatedAt: turn.createdAt, turns: [...chat.turns, turn] }));
@@ -200,7 +204,7 @@ export default function Assistant({ base, guest, origin, products, initialSku, d
   const copy = async (turn: ChatTurn) => {
     if (!turn.reply) return;
     const reply = turn.reply, result = reply.result;
-    const text = [reply.text, result && `${result.label}: ${result.profitSatang == null ? t('missing') : profitParts(result.profitSatang, locale).text}`, t('basedOn') + ': ' + contextLabel(reply.context, locale) + ' · ' + productLabel(reply.context.sku), reply.note].filter(Boolean).join('\n');
+    const text = [reply.text, result && `${result.label}: ${result.profitSatang == null ? t('missing') : profitParts(result.profitSatang, locale).text}`, reply.conversation==='general'?(locale==='th'?'คำตอบทั่วไปจาก AI · ไม่ได้ดึงข้อมูลร้านหรือค้นเว็บสด':'General AI response · No shop records or live web search'):t('basedOn') + ': ' + answerReferenceLabel(reply.context,reply.catalogReferenceAt,locale) + ' · ' + productLabel(reply.context.sku), reply.note].filter(Boolean).join('\n');
     try { await navigator.clipboard.writeText(text); setCopied(turn.id); setTimeout(() => setCopied(''), 1800); } catch { setNotice('copyFailed'); }
   };
   const dateLabel = (context: ChatContext) => context.start === bangkokDate().slice(0, 7) + '-01' && context.end === bangkokDate() ? t('thisMonth') : contextLabel(context, locale);
@@ -221,13 +225,21 @@ export default function Assistant({ base, guest, origin, products, initialSku, d
         {reply && reply.source !== 'recorded' && <small className={s.sourceTag}>{t(reply.source === 'assistant' ? 'ai' : reply.source === 'fallback' ? 'fallback' : 'notice')}</small>}
       </div>
       {turn.state === 'pending' ? <div className={s.typing} role="status"><span aria-hidden="true"><i /><i /><i /></span>{t('typing')}</div> : reply ? <>
-        <AnswerText text={reply.text} />
+        {reply.catalogSummary && (()=>{const c=reply.catalogSummary,remaining=c.platform?c.differenceAfterKnownFeesBeforeOtherExpensesSatang:c.differenceBeforeExpensesSatang;const label=(th:string,en:string)=>locale==='th'?th:en;return <div className={s.resultCard} aria-label={label('สรุปการลองราคา','Price comparison summary')}><div className={s.resultMain}><span>{c.platform?label('เหลือหลังต้นทุนและค่าบริการที่คำนวณได้ · ต่อ 1 หน่วย','Remaining after cost and calculated fees · per unit'):label('ส่วนต่างก่อนค่าใช้จ่ายอื่น · ต่อ 1 หน่วย','Difference before expenses · per unit')}</span><strong className={remaining==null?s.missing:remaining<0?s.loss:s.catalogAmount}>{remaining==null?t('missing'):<Money value={remaining}/>}</strong></div><dl>
+          <div><dt>{label('ราคาก่อนลด','Original price')}</dt><dd><Money value={c.originalPriceSatang}/></dd></div>
+          <div><dt>{label('ส่วนลด','Discount')}</dt><dd>{c.discountPct}%</dd></div>
+          <div><dt>{label('ราคาหลังลด','Discounted price')}</dt><dd><Money value={c.discountedPriceSatang}/></dd></div>
+          <div><dt>{label('ต้นทุนสินค้า','Product cost')}</dt><dd>{c.unitCostSatang==null?'—':<Money value={c.unitCostSatang}/>}</dd></div>
+          {c.platform&&<div><dt>{label('ค่าบริการที่คำนวณได้','Calculated fees')}</dt><dd>{c.knownPlatformFeeSatang===undefined?'—':<Money value={c.knownPlatformFeeSatang}/>}</dd></div>}
+          <div><dt>{label('ขอบเขต','Scope')}</dt><dd>{label('ก่อนค่าใช้จ่ายอื่น · ยังไม่ใช่กำไรสุทธิ','Before other expenses · not net profit')}</dd></div>
+        </dl></div>})()}
         {reply.result && <div className={s.resultCard}><div className={s.resultMain}><span>{reply.result.label}</span><strong className={reply.result.profitSatang == null ? s.missing : reply.result.profitSatang < 0 ? s.loss : ''}>{reply.result.profitSatang == null ? t('missing') : <ProfitAmount value={reply.result.profitSatang} />}</strong></div>
           <dl>{reply.result.revenueSatang !== undefined && <div><dt>{t('revenue')}</dt><dd><Money value={reply.result.revenueSatang} /></dd></div>}{reply.result.marginPct !== undefined && <div><dt>{t('margin')}</dt><dd>{percent(reply.result.marginPct, locale)}</dd></div>}{reply.result.count !== undefined && <div><dt>{locale === 'th' ? 'จากออเดอร์' : 'Recorded orders'}</dt><dd>{reply.result.count} {t('orders')}</dd></div>}{reply.result.beforeSatang !== undefined && <><div><dt>{t('before')}</dt><dd><Money value={reply.result.beforeSatang} /></dd></div><div><dt>{t('after')}</dt><dd><Money value={reply.result.afterSatang} /></dd></div></>}</dl>
         </div>}
+        {reply.catalogSummary?<details className={s.evidence}><summary>{locale==='th'?'ดูวิธีคำนวณและรายการที่หัก':'Calculation and deductions'}</summary><AnswerText text={reply.text}/></details>:<AnswerText text={reply.text} />}
         <div className={s.answerFootnote}>
           <ChatIcon name="calendar" />
-          <div><span>{t('basedOn')}: {contextLabel(reply.context, locale)} · {productLabel(reply.context.sku)}</span>
+          <div><span>{reply.conversation==='general'?(locale==='th'?'คำตอบทั่วไปจาก AI · ไม่ได้ดึงข้อมูลร้านหรือค้นเว็บสด':'General AI response · No shop records or live web search'):<>{t('basedOn')}: {answerReferenceLabel(reply.context,reply.catalogReferenceAt,locale)} · {productLabel(reply.context.sku)}</>}</span>
           {reply.note && <span className={s.footnoteNote}> · {reply.note}</span>}</div>
         </div>
         {reply.calculation && <details className={s.evidence}><summary>{t('evidence')}</summary><EvidencePanel result={reply.calculation} /></details>}
@@ -287,7 +299,7 @@ export default function Assistant({ base, guest, origin, products, initialSku, d
               <span className={s.editHintIcon} aria-hidden="true"><ChatIcon name="edit" /></span>
             </button>
           )}
-          {(guest || origin === 'MOCK') && <span className={s.mockBadge} title={locale === 'th' ? 'นำเข้าได้ 3 ไฟล์ · ผู้ช่วยและอ่านบิลรวม 3 ครั้งต่อรอบ' : '3 imports · 3 assistant/receipt requests per session'} tabIndex={0} role="note" aria-label={t('mock')}>{t('mock')}</span>}
+          {(guest || origin === 'MOCK') && <span className={s.mockBadge} title={locale === 'th' ? 'ข้อมูลจำลอง · ใช้งานฟีเจอร์ของร้านได้ครบ' : 'Sample data · Full store features'} tabIndex={0} role="note" aria-label={t('mock')}>{t('mock')}</span>}
         </div>
         <div className={s.headerRight}>
           <button type="button" className={s.historyHeaderButton} onClick={openSheet} aria-label={t('history')} aria-expanded={panel === 'sheet'} aria-haspopup="dialog"><ChatIcon name="history" /><span>{t('historyShort')}</span></button>
@@ -312,6 +324,8 @@ export default function Assistant({ base, guest, origin, products, initialSku, d
               <span className={s.contextLabel} aria-hidden="true">{t('using')}</span>
               <button type="button" disabled={!ready} aria-label={t('editPeriod')} aria-haspopup="dialog" aria-expanded={panel === 'period'} onClick={() => { setPeriodDraft(active?.context ?? defaultContext); setPanel('period'); }}><ChatIcon name="calendar" /><span>{dateLabel(active?.context ?? defaultContext)}</span><span className={s.contextChevron} aria-hidden="true"><Icon name="chevronRight" /></span></button>
               <button type="button" disabled={!ready} aria-label={t('editProduct')} aria-haspopup="dialog" aria-expanded={panel === 'products'} onClick={() => { setProductSearch(''); setPanel('products'); }}><Icon name="products" /><span>{productLabel(active?.context.sku ?? null)}</span><span className={s.contextChevron} aria-hidden="true"><Icon name="chevronRight" /></span></button>
+              <button type="button" disabled={!ready} aria-label={locale==='th'?'เลือกแพลตฟอร์มและแคมเปญ':'Choose platform and campaigns'} aria-haspopup="dialog" aria-expanded={panel==='campaigns'} onClick={()=>setPanel('campaigns')}><Icon name="rules"/><span>{chatCampaignLabel(active?.context.marketplace,locale)}</span><span className={s.contextChevron} aria-hidden="true"><Icon name="chevronRight"/></span></button>
+              <button type="button" disabled={!ready} aria-label={locale==='th'?'เลือกจาก 100 คำถามสำหรับร้านค้า':'Choose from 100 merchant questions'} aria-haspopup="dialog" aria-expanded={panel==='questions'} onClick={()=>setPanel('questions')}><Icon name="assistant"/><span>{locale==='th'?'100 คำถาม':'100 questions'}</span></button>
             </div>
             {activePending ? <button type="button" className={s.send} onClick={stop} aria-label={t('stop')} title={t('stop')}><ChatIcon name="stop" /></button> : <button type="submit" className={s.send} disabled={!ready || !active?.draft.trim()} aria-label={t('send')} title={t('send')}><Icon name="arrow" /><span className={s.sendLabel} aria-hidden="true">{t('sendShort')}</span></button>}
           </div>
@@ -319,8 +333,8 @@ export default function Assistant({ base, guest, origin, products, initialSku, d
       </div></div>
     </div>
     <div className="sr-only" aria-live="polite" aria-atomic="true">{lastTurn?.state === 'complete' ? lastTurn.reply?.text : ''}{copied ? t('copied') : ''}</div>
-    {panel && <Dialog kind={panel} title={t(panel === 'sheet' ? 'history' : panel === 'allHistory' ? 'allHistoryTitle' : panel === 'period' ? 'period' : panel === 'products' ? 'product' : panel === 'rename' ? 'renameTitle' : 'deleteTitle')} close={closePanel}>
-      {panel === 'sheet' || panel === 'allHistory' ? <AssistantHistory /> : panel === 'period' ? <form className={s.dialogBody} onSubmit={e => { e.preventDefault(); if (validContext(periodDraft) && Date.parse(periodDraft.end) - Date.parse(periodDraft.start) <= 366 * 86400000) changeContext(periodDraft); }}><p className={s.dialogNote}>{t('optional')}</p><div className={s.presets}>{(['today','week','lastWeek','month','lastMonth'] as const).map(preset => <button type="button" key={preset} className={s.secondary} onClick={() => setPeriodDraft({ ...contextPreset(preset, bangkokDate()), sku: active?.context.sku ?? null })}>{t(preset === 'month' ? 'thisMonth' : preset === 'week' ? 'thisWeek' : preset)}</button>)}</div><div className={s.dateFields}><label>{t('from')}<input type="date" required value={periodDraft.start} onChange={e => setPeriodDraft(v => ({ ...v, start: e.target.value }))} /></label><label>{t('to')}<input type="date" required value={periodDraft.end} onChange={e => setPeriodDraft(v => ({ ...v, end: e.target.value }))} /></label></div>{(!validContext(periodDraft) || Date.parse(periodDraft.end) - Date.parse(periodDraft.start) > 366 * 86400000) && <p className={s.missing} role="status">{t('invalidRange')}</p>}<button type="submit" disabled={!validContext(periodDraft) || Date.parse(periodDraft.end) - Date.parse(periodDraft.start) > 366 * 86400000}>{t('apply')}</button></form>
+    {panel && <Dialog kind={panel} title={panel==='questions'?(locale==='th'?'100 คำถามสำหรับร้านค้า':'100 merchant questions'):panel==='campaigns'?(locale==='th'?'แพลตฟอร์มและแคมเปญ':'Platform and campaigns'):t(panel === 'sheet' ? 'history' : panel === 'allHistory' ? 'allHistoryTitle' : panel === 'period' ? 'period' : panel === 'products' ? 'product' : panel === 'rename' ? 'renameTitle' : 'deleteTitle')} close={closePanel}>
+      {panel==='questions'?<MerchantQuestions locale={locale} choose={question=>{if(active)updateSession(active.id,chat=>({...chat,draft:question}));closePanel();window.requestAnimationFrame(()=>textareaRef.current?.focus({preventScroll:true}));}}/>:panel==='campaigns'?<ChatCampaignPicker base={base} initial={active?.context.marketplace} cancel={closePanel} apply={value=>{const context={...(active?.context??defaultContext)};if(value)context.marketplace=structuredClone(value);else delete context.marketplace;changeContext(context);}}/>:panel === 'sheet' || panel === 'allHistory' ? <AssistantHistory /> : panel === 'period' ? <form className={s.dialogBody} onSubmit={e => { e.preventDefault(); if (validContext(periodDraft) && Date.parse(periodDraft.end) - Date.parse(periodDraft.start) <= 366 * 86400000) changeContext(periodDraft); }}><p className={s.dialogNote}>{t('optional')}</p><div className={s.presets}>{(['today','week','lastWeek','month','lastMonth'] as const).map(preset => <button type="button" key={preset} className={s.secondary} onClick={() => setPeriodDraft({ ...active?.context, ...contextPreset(preset, bangkokDate()), sku: active?.context.sku ?? null })}>{t(preset === 'month' ? 'thisMonth' : preset === 'week' ? 'thisWeek' : preset)}</button>)}</div><div className={s.dateFields}><label>{t('from')}<input type="date" required value={periodDraft.start} onChange={e => setPeriodDraft(v => ({ ...v, start: e.target.value }))} /></label><label>{t('to')}<input type="date" required value={periodDraft.end} onChange={e => setPeriodDraft(v => ({ ...v, end: e.target.value }))} /></label></div>{(!validContext(periodDraft) || Date.parse(periodDraft.end) - Date.parse(periodDraft.start) > 366 * 86400000) && <p className={s.missing} role="status">{t('invalidRange')}</p>}<button type="submit" disabled={!validContext(periodDraft) || Date.parse(periodDraft.end) - Date.parse(periodDraft.start) > 366 * 86400000}>{t('apply')}</button></form>
         : panel === 'products' ? <div className={s.dialogBody}><p className={s.dialogNote}>{t('optional')}</p><label className="sr-only" htmlFor="assistant-product-search">{t('searchProducts')}</label><input id="assistant-product-search" type="search" placeholder={t('searchProducts')} value={productSearch} onChange={e => setProductSearch(e.target.value)} /><div className={s.productChoices}><button type="button" aria-pressed={!active?.context.sku} onClick={() => changeContext({ ...(active?.context ?? defaultContext), sku: null })}><Icon name="products" />{t('all')}</button>{products.filter(p => `${p.name} ${p.sku}`.toLocaleLowerCase().includes(productSearch.toLocaleLowerCase())).map(p => <button type="button" key={p.sku} aria-pressed={active?.context.sku === p.sku} onClick={() => changeContext({ ...(active?.context ?? defaultContext), sku: p.sku })}><span>{p.name}<small>{p.sku}</small></span><Icon name="chevronRight" /></button>)}{!products.some(p => `${p.name} ${p.sku}`.toLocaleLowerCase().includes(productSearch.toLocaleLowerCase())) && <p>{t('noProducts')}</p>}{catalogLoading && <p role="status">{t('typing')}</p>}{Boolean(catalogError) && <div role="alert"><p>{t('catalogError')}</p><button type="button" className={s.secondary} onClick={retryCatalog}>{t('retry')}</button></div>}{more && <button type="button" className={s.secondary} disabled={catalogLoading} onClick={loadMore}>{t('loadMore')}</button>}</div></div>
         : panel === 'rename' ? <form className={s.dialogBody} onSubmit={e => { e.preventDefault(); const target = targetChat || active; const title = renameDraft.trim(); if (target && title) renameChat(target.id, title); }}><label htmlFor="assistant-chat-name">{t('name')}</label><input id="assistant-chat-name" value={renameDraft} onChange={e => setRenameDraft(e.target.value)} maxLength={120} required autoFocus /><div className={s.dialogActions}><button type="button" className={s.secondary} onClick={closePanel}>{t('cancel')}</button><button type="submit">{t('save')}</button></div></form>
         : <div className={s.dialogBody}><p>{t('deleteBody')}</p><strong className={s.deleteName}>{targetChat?.title || active?.title || t('untitled')}</strong><div className={s.dialogActions}><button type="button" className={s.secondary} autoFocus onClick={closePanel}>{t('cancel')}</button><button type="button" className={s.deleteConfirmBtn} onClick={() => { const target = targetChat || active; if (target) deleteChat(target.id); }}>{t('delete')}</button></div></div>}

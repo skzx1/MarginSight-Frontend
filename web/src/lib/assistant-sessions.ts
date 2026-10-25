@@ -1,18 +1,28 @@
+import {catalogSummary,type CatalogSummary} from './assistant-summary.ts';
 import type { Calculation } from './types';
+import {validMarketplaceDraft,type MarketplaceDraft} from './marketplace-context.ts';
 
-export type ChatContext = { start: string; end: string; sku: string | null };
+export type ChatContext = { start: string; end: string; sku: string | null; marketplace?:MarketplaceDraft };
 export type ChatResult = {
   label: string; profitSatang: number | null; revenueSatang?: number; marginPct?: number | null;
   beforeSatang?: number | null; afterSatang?: number | null; count?: number;
 };
 export type ChatReply = {
   text: string; source: 'recorded' | 'assistant' | 'fallback' | 'notice';
-  context: ChatContext; note?: string; result?: ChatResult; calculation?: Calculation;
+  context: ChatContext; note?: string; result?: ChatResult; calculation?: Calculation; conversation?:'general'; catalogReferenceAt?: string; catalogSummary?:CatalogSummary;
 };
 export type ChatTurn = {
   id: string; question: string; requestQuestion?: string; createdAt: string; context: ChatContext;
   reply?: ChatReply; state: 'pending' | 'complete' | 'failed' | 'stopped';
 };
+export function recentChatMessages(turns: ChatTurn[], beforeId: string): Array<{role: 'user' | 'assistant';text:string}> {
+  const index = turns.findIndex(t => t.id === beforeId);
+  const previous = index < 0 ? turns : turns.slice(0, index);
+  return previous.filter(t => t.state === 'complete' && t.reply).flatMap(t => [
+    { role: 'user' as const, text: t.question.slice(0, 1500) },
+    { role: 'assistant' as const, text: t.reply!.text.slice(0, 4500) }
+  ]).slice(-5);
+}
 export type ChatSession = {
   id: string; title: string; renamed?: boolean; createdAt: string; updatedAt: string;
   context: ChatContext; turns: ChatTurn[]; draft: string;
@@ -24,7 +34,7 @@ const validDate = (v: unknown): v is string => typeof v === 'string' && /^\d{4}-
 export function validContext(v: unknown): v is ChatContext {
   if (!v || typeof v !== 'object') return false;
   const c = v as ChatContext;
-  return validDate(c.start) && validDate(c.end) && c.start <= c.end && (c.sku === null || typeof c.sku === 'string' && c.sku.length <= 100);
+  return validDate(c.start) && validDate(c.end) && c.start <= c.end && (c.sku === null || typeof c.sku === 'string' && c.sku.length <= 100)&& (c.marketplace===undefined||validMarketplaceDraft(c.marketplace));
 }
 export function sessionTitle(question: string) {
   const chars = Array.from(question.trim().replace(/\s+/g, ' '));
@@ -42,10 +52,10 @@ export function historyGroup(timestamp: string, today: string): 'today' | 'yeste
 export function parseArchive(raw: string | null): ChatArchive {
   if (!raw) return empty();
   const value = JSON.parse(raw) as ChatArchive;
-  if (value.version !== 1 || !Array.isArray(value.sessions) || value.sessions.length > 100) throw Error('INVALID_CHAT_ARCHIVE');
+  if (value.version !== 1 || !Array.isArray(value.sessions)) throw Error('INVALID_CHAT_ARCHIVE');
   const sessions = value.sessions.map(session => {
     if (typeof session.id !== 'string' || typeof session.title !== 'string' || session.title.length > 120 || !validContext(session.context) ||
-      !Number.isFinite(Date.parse(session.createdAt)) || !Number.isFinite(Date.parse(session.updatedAt)) || !Array.isArray(session.turns) || session.turns.length > 200 ||
+      !Number.isFinite(Date.parse(session.createdAt)) || !Number.isFinite(Date.parse(session.updatedAt)) || !Array.isArray(session.turns) ||
       typeof session.draft !== 'string' || session.draft.length > 1500) throw Error('INVALID_CHAT_SESSION');
     const turns = session.turns.map(turn => {
       if (typeof turn.id !== 'string' || typeof turn.question !== 'string' || turn.question.length > 1500 || (turn.requestQuestion !== undefined && (typeof turn.requestQuestion !== 'string' || turn.requestQuestion.length > 3200)) || !validContext(turn.context) ||
@@ -53,6 +63,9 @@ export function parseArchive(raw: string | null): ChatArchive {
         (turn.reply && (typeof turn.reply.text !== 'string' || !validContext(turn.reply.context) || !['recorded','assistant','fallback','notice'].includes(turn.reply.source)))) throw Error('INVALID_CHAT_TURN');
       if (turn.reply?.result && (typeof turn.reply.result.label !== 'string' || (turn.reply.result.profitSatang !== null && !Number.isFinite(turn.reply.result.profitSatang)) || ['revenueSatang','marginPct','beforeSatang','afterSatang','count'].some(key => { const value = turn.reply!.result![key as keyof ChatResult]; return value !== undefined && value !== null && !Number.isFinite(value); }))) throw Error('INVALID_CHAT_RESULT');
       if (turn.reply?.calculation && (!Array.isArray(turn.reply.calculation.items) || !Array.isArray(turn.reply.calculation.missingFields) || !Array.isArray(turn.reply.calculation.evidence))) throw Error('INVALID_CHAT_EVIDENCE');
+      if(turn.reply?.conversation!==undefined&&turn.reply.conversation!=='general')throw Error('INVALID_CHAT_CONVERSATION');
+      if(turn.reply?.catalogSummary!==undefined&&!catalogSummary(turn.reply.catalogSummary))throw Error('INVALID_CATALOG_SUMMARY');
+      if(turn.reply?.catalogReferenceAt!==undefined&&(typeof turn.reply.catalogReferenceAt!=='string'||turn.reply.catalogReferenceAt.length>40||!Number.isFinite(Date.parse(turn.reply.catalogReferenceAt))))throw Error('INVALID_CATALOG_REFERENCE');
       return { ...turn, state: turn.state === 'pending' ? 'stopped' as const : turn.state };
     });
     return { ...session, turns };

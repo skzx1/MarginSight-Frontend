@@ -1,5 +1,6 @@
 import type { CatalogProduct } from './types';
 import type { ChatContext } from './assistant-sessions';
+import {chatCampaignLabel} from './marketplace-context.ts';
 
 export function monthContext(month: string): ChatContext {
   const end = new Date(Number(month.slice(0, 4)), Number(month.slice(5, 7)), 0, 12);
@@ -37,4 +38,9 @@ export function contextLabel(context: ChatContext, locale: 'th' | 'en') {
   const formatter = new Intl.DateTimeFormat(locale === 'th' ? 'th-TH' : 'en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'Asia/Bangkok' });
   const format = (date: string) => formatter.format(new Date(date + 'T12:00:00Z'));
   return context.start === context.end ? format(context.start) : `${format(context.start)} – ${format(context.end)}`;
+}
+export function answerReferenceLabel(context:ChatContext,catalogReferenceAt:string|undefined,locale:'th'|'en'){
+  if(!catalogReferenceAt)return contextLabel(context,locale);
+  const date=new Intl.DateTimeFormat(locale==='th'?'th-TH':'en-GB',{day:'numeric',month:'short',year:'numeric',timeZone:'Asia/Bangkok'}).format(new Date(catalogReferenceAt));
+  return (locale==='th'?'ข้อมูลสินค้าปัจจุบัน ณ ':'Current product data as of ')+date+(context.marketplace&&context.marketplace.platform!=='recorded'?' · '+chatCampaignLabel(context.marketplace,locale):'');
 }

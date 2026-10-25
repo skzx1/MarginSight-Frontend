@@ -1,9 +1,16 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { createChat, historyGroup, localChatStorage, parseArchive, sessionTitle, validContext } from '../web/src/lib/assistant-sessions.ts';
+import { createChat, historyGroup, localChatStorage, parseArchive, sessionTitle, validContext, recentChatMessages } from '../web/src/lib/assistant-sessions.ts';
 import { contextPreset, monthContext, resolveChatContext } from '../web/src/lib/assistant-context.ts';
 
 const context = { start: '2026-10-01', end: '2026-10-17', sku: null };
+test('router history includes only the last five completed messages before a turn; retries exclude later turns', () => {
+  const turns = Array.from({length:5},(_,i)=>({id:String(i),question:'q'+i,state:'complete',createdAt:'2026-10-01',context,reply:{text:'a'+i,source:'assistant',context}}));
+  assert.deepEqual(recentChatMessages(turns,'new').map(m=>m.text),['a2','q3','a3','q4','a4']);
+  assert.deepEqual(recentChatMessages(turns,'2').map(m=>m.text),['q0','a0','q1','a1']);
+  assert.deepEqual(recentChatMessages([{...turns[0],state:'failed'}, {...turns[1],state:'pending'}],'new'),[]);
+  assert.deepEqual(recentChatMessages([],'new'),[]);
+});
 test('chat archive saves, restores, deletes and isolates storage keys', () => {
   const map = new Map(), storage = { getItem: key => map.get(key) ?? null, setItem: (key, value) => map.set(key, value) };
   const a = localChatStorage('account-a/store-a', storage), b = localChatStorage('account-b/store-a', storage);
@@ -39,4 +46,11 @@ test('date and product defaults resolve without choosing a random first product'
   assert.equal(resolveChatContext('กำไรทุกสินค้าเดือนนี้', result, products, '2026-10-17').sku, null);
   assert.deepEqual(resolveChatContext('profit 2026-09', context, products, '2026-10-17'), { start: '2026-09-01', end: '2026-09-30', sku: null });
   assert.deepEqual(context, { start: '2026-10-01', end: '2026-10-17', sku: null });
+});
+
+test('history restores more than 100 chats and 200 turns without an application quota',()=>{
+ const sessions=Array.from({length:101},()=>createChat(context,'2026-10-25T00:00:00Z'));
+ sessions[0].turns=Array.from({length:201},(_,i)=>({id:String(i),question:'กำไร',context,createdAt:sessions[0].createdAt,state:'complete'}));
+ const restored=parseArchive(JSON.stringify({version:1,activeId:sessions[0].id,sessions}));
+ assert.equal(restored.sessions.length,101);assert.equal(restored.sessions[0].turns.length,201);
 });

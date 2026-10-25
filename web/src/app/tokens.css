@@ -47,6 +47,9 @@
  --chart-highlight:var(--terracotta-600);--chart-grid:var(--cream-250);--chart-axis:var(--stone-700);
  --chart-ch-shopee:var(--brown-700);--chart-ch-lazada:var(--blue-500);--chart-ch-tiktok:var(--plum-600);
  --chart-ch-line:var(--leaf-500);--chart-ch-store:var(--slate-green-600);--chart-ch-other:var(--stone-450);
+ /* Landing depth hero (light, as on main): background, text, square lines and the orange glow */
+ --color-hero-bg:var(--color-bg-canvas);--color-hero-text:var(--color-text);--color-hero-muted:var(--color-text-muted);
+ --color-hero-line:var(--color-border-strong);--color-hero-glow:var(--color-brand-bright);
  /* Deprecated index and measure aliases kept while nothing new uses them */
  --chart-1:var(--chart-ch-shopee);--chart-2:var(--chart-ch-lazada);--chart-3:var(--chart-ch-tiktok);--chart-4:var(--chart-ch-line);--chart-5:var(--chart-ch-store);
  --chart-sales:var(--chart-revenue);

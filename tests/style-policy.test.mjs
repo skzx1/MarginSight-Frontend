@@ -29,6 +29,15 @@ test('the policy scans every stylesheet, including the landing and hero', () => 
   for (const path of ['app/globals.css', 'app/welcome/landing.module.css', 'app/welcome/hero-depth.module.css', 'app/login/login.module.css']) assert.ok(sources.includes(path), path);
   assert.ok(sources.filter(path => path.endsWith('.css')).length >= 8);
 });
+// Design tokens (colour, chart, type, shape, shadow, motion) must be defined, or the declaration silently drops
+// (after the main merge the landing hero lost its background, lines and glow this way).
+test('every design token a stylesheet uses is defined in tokens.css', () => {
+  const defined = new Set(stripComments(readFileSync(join(ROOT, TOKENS), 'utf8')).match(/--[\w-]+(?=\s*:)/g));
+  const missing = sources.filter(path => path.endsWith('.css')).flatMap(path =>
+    [...stripComments(readFileSync(join(ROOT, path), 'utf8')).matchAll(/var\((--(?:color|chart|text|font|radius|shadow|space|ease|duration)-[\w-]+)/g)]
+      .map(m => m[1]).filter(name => !defined.has(name)).map(name => `${path}: ${name}`));
+  assert.deepEqual([...new Set(missing)], []);
+});
 test('no colour literal outside tokens.css', () => {
   const found = {};
   for (const path of sources) {

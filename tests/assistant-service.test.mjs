@@ -4,6 +4,7 @@ import {answerQuestion} from '../web/src/lib/assistant-service.ts';
 import {isCatalogDiscountQuestion} from '../web/src/lib/assistant-routing.ts';
 import {answerReferenceLabel} from '../web/src/lib/assistant-context.ts';
 import {createChat,parseArchive} from '../web/src/lib/assistant-sessions.ts';
+import {chatMarketplaceDraft} from '../web/src/lib/marketplace-context.ts';
 const context={start:'2026-09-01',end:'2026-10-25',sku:'ASAW'};
 const input=question=>({base:'/stores/QA',question,context,products:[],locale:'th',signal:new AbortController().signal});
 test('discount reads current server catalog without a monthly/order dependency or client-provided money',async()=>{
@@ -11,6 +12,23 @@ test('discount reads current server catalog without a monthly/order dependency o
  const reply=await answerQuestion(input('ถ้าลดราคา 20% จะเหลือกำไรเท่าไร'),api);
  assert.deepEqual(calls,[['/stores/QA/assistant/catalog-discount',{message:'ถ้าลดราคา 20% จะเหลือกำไรเท่าไร',sku:'ASAW',locale:'th'}]]);
  assert.equal(reply.catalogReferenceAt,'2026-10-25T10:00:00.000Z');assert.equal(reply.result,undefined);assert.equal(reply.calculation,undefined);assert.equal(reply.source,'fallback');assert.match(reply.note,/ไม่ใช่กำไรสุทธิ/);
+});
+
+const options={version:'test',reviewedAt:'2026-10-18',platforms:[{id:'shopee',name:'Shopee',categories:[{id:'general',name:'ทั่วไป'}],campaigns:[{id:'shopee-prime',name:'PRIME'}]}]};
+const marketplace={...chatMarketplaceDraft(),platform:'shopee',campaigns:['shopee-prime'],commission:'10',commissionVat:'INCLUDED',payment:'3',confirmed:true};
+test('chat campaign selection is validated against Playground options and forwarded only to catalog price comparisons',async()=>{
+ const calls=[];const reply=await answerQuestion({...input('ลดราคา 20%'),context:{...context,marketplace}},async(path,body)=>{calls.push([path,body]);return path.endsWith('/assistant-options')?options:{answer:'ค่าแคมเปญ',catalogScenario:{basis:'CATALOG',at:'2026-10-25T10:00:00.000Z'}};});
+ assert.equal(calls[0][0],'/stores/QA/assistant-options');assert.equal(calls[1][0],'/stores/QA/assistant/catalog-discount');assert.deepEqual(calls[1][1].scenario.campaigns,['shopee-prime']);assert.equal(calls[1][1].scenario.commissionRateBps,1000);assert.equal(reply.context.marketplace.confirmed,true);
+ const monthly=[];await answerQuestion({...input('กำไรเดือนนี้เท่าไร'),context:{...context,start:'2026-10-01',marketplace}},async(path,body)=>{monthly.push([path,body]);return {totalOrders:0,results:[]};});assert.deepEqual(monthly,[['/stores/QA/dashboard?month=2026-10',undefined]]);
+});
+test('a selected campaign can be compared at the current product price without discount wording or orders',async()=>{
+ const calls=[];await answerQuestion({...input('แคมเปญนี้เหลือเท่าไร'),context:{...context,marketplace}},async(path,body)=>{calls.push([path,body]);return path.endsWith('/assistant-options')?options:{answer:'ส่วนต่างหลังค่าบริการ',catalogScenario:{basis:'CATALOG',at:'2026-10-25T10:00:00.000Z'}};});assert.equal(calls.at(-1)[0],'/stores/QA/assistant/catalog-discount');
+});
+test('campaign assumptions survive history with each turn and malformed assumptions are rejected',()=>{
+ const chat=createChat({...context,marketplace});chat.turns=[{id:'C1',question:'ลดราคา 20%',context:structuredClone(chat.context),createdAt:chat.createdAt,state:'complete',reply:{text:'อิงแคมเปญ',source:'fallback',context:structuredClone(chat.context),catalogReferenceAt:'2026-10-25T10:00:00.000Z'}}];
+ const archive={version:1,activeId:chat.id,sessions:[chat]},parsed=parseArchive(JSON.stringify(archive));assert.deepEqual(parsed.sessions[0].turns[0].context.marketplace.campaigns,['shopee-prime']);
+ assert.match(answerReferenceLabel(chat.context,'2026-10-25T10:00:00.000Z','th'),/Shopee/);
+ chat.context.marketplace={...marketplace,campaigns:Array(20).fill('bad')};assert.throws(()=>parseArchive(JSON.stringify(archive)),/INVALID_CHAT_SESSION/);
 });
 test('discount asks for a product, while monthly profit and declining-sales reports remain order questions',async()=>{
  let calls=0;const reply=await answerQuestion({...input('ลดราคา 20%'),context:{...context,sku:null}},async()=>{calls++;throw Error('UNEXPECTED_REQUEST')});

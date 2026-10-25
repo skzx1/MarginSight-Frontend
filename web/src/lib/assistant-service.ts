@@ -2,6 +2,7 @@ import { ApiError, request } from './auth.ts';
 import { monthContext } from './assistant-context.ts';
 import { orderDateTime, ordersInPeriod, periodMonths, summarizeOrders, type OverviewOrder } from './overview-data.ts';
 import {isCatalogDiscountQuestion} from './assistant-routing.ts';
+import {marketplaceRequest,type MarketplaceOptions} from './marketplace-context.ts';
 import type { ChatContext, ChatReply } from './assistant-sessions';
 import type { AssistantAnswer, Calculation, CatalogProduct, Dashboard } from './types';
 
@@ -11,9 +12,12 @@ export async function answerQuestion({ base, question, context, products, locale
 },api:typeof request=request): Promise<ChatReply> {
   const th = locale === 'th';
   const notice = (text: string): ChatReply => ({ text, context, source: 'notice' });
-  if(isCatalogDiscountQuestion(question)){
+  const campaignQuestion=context.marketplace&&context.marketplace.platform!=='recorded'&&/แคมเปญ|โปรแกรม|campaign/i.test(question)&&!/เดือนนี้|สัปดาห์นี้|this month|this week/i.test(question);
+  if(isCatalogDiscountQuestion(question)||campaignQuestion){
     if(!context.sku)return notice(th?'ต้องการลองลดราคาสินค้าไหนครับ? เลือกสินค้าก่อน ผมจะใช้ราคากับต้นทุนสินค้าปัจจุบัน ไม่ต้องมีออเดอร์ขาย':'Which product would you like to discount? Select a product. I will use its current catalog price and cost; a sales order is not required.');
-    const answer=await api<AssistantAnswer & {catalogScenario:{basis:'CATALOG';at:string}}>(base+'/assistant/catalog-discount',{message:question.slice(0,1500),sku:context.sku,locale},signal);
+    const options=context.marketplace&&context.marketplace.platform!=='recorded'?await api<MarketplaceOptions>(base+'/assistant-options',undefined,signal):undefined;
+    const selection=context.marketplace?marketplaceRequest(context.marketplace,options):undefined;
+    const answer=await api<AssistantAnswer & {catalogScenario:{basis:'CATALOG';at:string}}>(base+'/assistant/catalog-discount',{message:question.slice(0,1500),sku:context.sku,locale,...(selection?{scenario:selection}:{})},signal);
     return {text:answer.answer,context,source:'fallback',catalogReferenceAt:answer.catalogScenario.at,note:th?'ใช้ราคากับต้นทุนสินค้าปัจจุบันต่อ 1 หน่วย เป็นการเปรียบเทียบก่อนค่าใช้จ่ายอื่น ไม่ใช่กำไรสุทธิหรือยอดขายของเดือนที่เลือก':'Current catalog price and cost for one unit. This comparison is before other expenses, not net profit or recorded sales for the selected month.'};
   }
   const scenario = /คุ้มทุน|ขั้นต่ำ|break.even|โปรแกรม|แคมเปญ|campaign/i.test(question);
@@ -64,6 +68,7 @@ export async function answerQuestion({ base, question, context, products, locale
     ? (th ? 'ยังไม่พบออเดอร์ที่ตรงกับคำถามในรายละเอียดที่โหลดมาครับ API ส่งรายละเอียดได้สูงสุด 50 ออเดอร์ต่อเดือน จึงยังสรุปไม่ได้ว่าทั้งช่วงไม่มียอดขาย' : 'No matching orders were found in the loaded details. The API returns up to 50 order details per month, so this does not mean the whole period had no sales.')
     : (th ? 'ยังไม่พบออเดอร์ในช่วงนี้ครับ กำไรเดือนนี้ต้องอิงยอดขายที่เกิดขึ้นจริง การเพิ่มสินค้าอย่างเดียวยังไม่ใช่ออเดอร์ ลองเปลี่ยนช่วงวันที่หรือนำเข้ารายงานขายก่อนได้ครับ ถ้าจะลองส่วนลด ถาม “ลดราคา 20%” ได้จากราคากับต้นทุนสินค้า โดยไม่ต้องมีออเดอร์' : 'No recorded orders were found for this period. Monthly profit needs actual sales; adding a product does not create an order. Change the period or import sales. For price planning, ask “discount 20%” using the catalog without an order.'));
   const scope = [th ? 'รวมเฉพาะต้นทุนและค่าใช้จ่ายที่บันทึกไว้' : 'Includes recorded costs and expenses only',
+    ...(context.marketplace&&context.marketplace.platform!=='recorded'?[th?'แคมเปญที่เลือกใช้เฉพาะลองราคา ไม่ปรับกำไรจากออเดอร์จริง':'Campaign selection applies only to price planning, not recorded order profit']:[]),
     ...(partial ? [th ? 'API ส่งรายละเอียดได้สูงสุด 50 ออเดอร์ต่อเดือน ผลนี้ครอบคลุมเฉพาะออเดอร์ที่โหลดมา' : 'The API returns up to 50 order details per month. This result covers loaded orders only.'] : []),
     results.some(r => !r.orderAt) ? (th ? 'มีรายการที่ไม่มีวันที่ จึงยังนำมารวมในช่วงนี้ไม่ได้' : 'Records without dates could not be included.') : ''
   ].filter(Boolean).join(' · ');

@@ -1,6 +1,7 @@
 import type { Calculation } from './types';
+import {validMarketplaceDraft,type MarketplaceDraft} from './marketplace-context.ts';
 
-export type ChatContext = { start: string; end: string; sku: string | null };
+export type ChatContext = { start: string; end: string; sku: string | null; marketplace?:MarketplaceDraft };
 export type ChatResult = {
   label: string; profitSatang: number | null; revenueSatang?: number; marginPct?: number | null;
   beforeSatang?: number | null; afterSatang?: number | null; count?: number;
@@ -24,7 +25,7 @@ const validDate = (v: unknown): v is string => typeof v === 'string' && /^\d{4}-
 export function validContext(v: unknown): v is ChatContext {
   if (!v || typeof v !== 'object') return false;
   const c = v as ChatContext;
-  return validDate(c.start) && validDate(c.end) && c.start <= c.end && (c.sku === null || typeof c.sku === 'string' && c.sku.length <= 100);
+  return validDate(c.start) && validDate(c.end) && c.start <= c.end && (c.sku === null || typeof c.sku === 'string' && c.sku.length <= 100)&& (c.marketplace===undefined||validMarketplaceDraft(c.marketplace));
 }
 export function sessionTitle(question: string) {
   const chars = Array.from(question.trim().replace(/\s+/g, ' '));
